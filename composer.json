@@ -6,8 +6,8 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
-
-        "sylius/sylius": "^1.4"
+        "sylius/sylius": "^1.4",
+        "jolicode/elastically": "v0.1-beta.1"
     },
     "require-dev": {
         "behat/behat": "^3.4",
@@ -32,7 +32,8 @@
         "symfony/dotenv": "^4.2",
         "symfony/intl": "^3.4|^4.1",
         "symfony/web-profiler-bundle": "^3.4|^4.1",
-        "symfony/web-server-bundle": "^3.4|^4.1"
+        "symfony/web-server-bundle": "^3.4|^4.1",
+        "jane-php/json-schema": "^5.2"
     },
     "conflict": {
         "symfony/symfony": "4.1.8",

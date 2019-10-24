@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
+namespace Monsieurbiz\SyliusSearchPlugin\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

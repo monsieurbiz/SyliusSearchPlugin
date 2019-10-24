@@ -45,8 +45,8 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "MonsieurBiz\\SyliusSearchPlugin\\": "src/",
-            "Tests\\MonsieurBiz\\SyliusSearchPlugin\\": "tests/"
+            "Monsieurbiz\\SyliusSearchPlugin\\": "src/",
+            "Tests\\Monsieurbiz\\SyliusSearchPlugin\\": "tests/"
         }
     },
     "autoload-dev": {

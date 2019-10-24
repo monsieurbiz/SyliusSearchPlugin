@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
+namespace Monsieurbiz\SyliusSearchPlugin\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-final class MonsieurBizSyliusSearchExtension extends Extension
+final class MonsieurbizSyliusSearchExtension extends Extension
 {
     /**
      * {@inheritdoc}

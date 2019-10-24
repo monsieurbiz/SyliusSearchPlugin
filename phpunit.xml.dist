@@ -6,7 +6,7 @@
          colors="true"
          bootstrap="tests/Application/config/bootstrap.php">
     <testsuites>
-        <testsuite name="MonsieurBizSyliusSearchPlugin Test Suite">
+        <testsuite name="MonsieurbizSyliusSearchPlugin Test Suite">
             <directory>tests</directory>
         </testsuite>
         <env name="APP_ENV" value="test"/>

@@ -9,11 +9,14 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 final class MonsieurbizSyliusSearchExtension extends Extension
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $config, ContainerBuilder $container): void
+    CONST EXTENSION_CONFIG_NAME = 'monsieurbiz_sylius_search';
+
+    public function load(array $configs, ContainerBuilder $container)
     {
-        $config = $this->processConfiguration($this->getConfiguration([], $container), $config);
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+        foreach ($config as $name => $value) {
+            $container->setParameter(self::EXTENSION_CONFIG_NAME . '.' . $name, $value);
+        }
     }
 }

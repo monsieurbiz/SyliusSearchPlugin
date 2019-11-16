@@ -92,7 +92,7 @@ class SearchController extends AbstractController
             }
         }
 
-        return $this->templatingEngine->renderResponse('@MonsieurBizSearchPlugin/Search/result.html.twig', [
+        return $this->templatingEngine->renderResponse('@MonsieurbizSyliusSearchPlugin/Search/result.html.twig', [
             'query' => $query,
             'resultNumber' => count($searchResults),
             'results' => $searchResults,
@@ -114,7 +114,7 @@ class SearchController extends AbstractController
 
         $searchResults = $this->documentIndexer->instant($request->getLocale(), $query, self::MAX_DISPLAYED_ITEMS_INSTANT);
 
-        return $this->templatingEngine->renderResponse('@MonsieurBizSearchPlugin/Instant/result.html.twig', [
+        return $this->templatingEngine->renderResponse('@MonsieurbizSyliusSearchPlugin/Instant/result.html.twig', [
             'query' => $query,
             'resultNumber' => count($searchResults),
             'results' => $searchResults,

@@ -36,7 +36,7 @@ class RenderSearchForm extends AbstractExtension
 
     public function createForm($template = null)
     {
-        $template = $template ?? '@MonsieurBizSearchPlugin/form.html.twig';
+        $template = $template ?? '@MonsieurbizSyliusSearchPlugin/form.html.twig';
 
         return new Markup($this->templatingEngine->render($template, [
             'form' => $this->formFactory->create(SearchType::class)->createView(),

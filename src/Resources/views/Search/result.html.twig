@@ -8,7 +8,7 @@
     {% else %}
         <div class="ui three cards" id="products">
             {% for result in results %}
-                {% include '@MonsieurBizSearchPlugin/Search/_box.html.twig' with {'result': result} %}
+                {% include '@MonsieurbizSyliusSearchPlugin/Search/_box.html.twig' with {'result': result} %}
             {% endfor %}
         </div>
     {% endif %}

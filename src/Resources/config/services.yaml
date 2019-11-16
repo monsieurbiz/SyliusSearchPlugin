@@ -41,7 +41,7 @@ services:
       $config:
         host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
         port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
-        elastically_mappings_directory: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch'
+        elastically_mappings_directory: '%kernel.project_dir%/src/Resources/config/elasticsearch'
         elastically_index_class_mapping:
           documents-fr: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
           documents-en: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
@@ -51,7 +51,7 @@ services:
   monsieurbiz_sylius_search.block_event_listener.layout.javascripts:
     class: Sylius\Bundle\UiBundle\Block\BlockEventListener
     arguments:
-      - '@@MonsieurBizSearchPlugin/Instant/instant_javascript.html.twig'
+      - '@@MonsieurbizSyliusSearchPlugin/Instant/instant_javascript.html.twig'
     tags:
       - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.javascripts, method: onBlockEvent }
 

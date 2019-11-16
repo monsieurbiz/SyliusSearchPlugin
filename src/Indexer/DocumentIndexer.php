@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Monsieurbiz\SyliusSearchPlugin\Indexer;
 
+use Elastica\Exception\Connection\HttpException;
 use Monsieurbiz\SyliusSearchPlugin\Exception\MissingParamException;
 use Monsieurbiz\SyliusSearchPlugin\Exception\ReadFileException;
 use Monsieurbiz\SyliusSearchPlugin\Model\DocumentableInterface;
@@ -64,7 +65,7 @@ class DocumentIndexer
      *
      * @return array
      */
-    public function getLocales()
+    public function getLocales(): array
     {
         if (empty($this->locales)) {
             $locales = $this->localeRepository->findAll();
@@ -80,8 +81,10 @@ class DocumentIndexer
 
     /**
      * Index all documents in all locales
+     *
+     * @throws \Exception
      */
-    public function indexAll()
+    public function indexAll(): void
     {
         foreach ($this->getLocales() as $locale) {
             $this->indexAllByLocale($locale);
@@ -94,7 +97,7 @@ class DocumentIndexer
      * @param string $locale
      * @throws \Exception
      */
-    public function indexAllByLocale(string $locale)
+    public function indexAllByLocale(string $locale): void
     {
         $this->getIndexBuilder()->markAsLive(
             $this->getIndexBuilder()->createIndex($this->getIndexName($locale)),
@@ -122,7 +125,7 @@ class DocumentIndexer
      * @param DocumentableInterface $subject
      * @throws \Exception
      */
-    public function indexOne(DocumentableInterface $subject)
+    public function indexOne(DocumentableInterface $subject): void
     {
         foreach ($this->getLocales() as $locale) {
             $this->indexOneByLocale($subject->convertToDocument($locale), $locale);
@@ -137,7 +140,7 @@ class DocumentIndexer
      * @param string $locale
      * @throws MissingParamException
      */
-    public function indexOneByLocale(DocumentResult $document, string $locale)
+    public function indexOneByLocale(DocumentResult $document, string $locale): void
     {
         $this->getIndexer()->scheduleIndex(
             $this->getIndexName($locale),
@@ -151,7 +154,7 @@ class DocumentIndexer
      * @param DocumentableInterface $subject
      * @throws \Exception
      */
-    public function removeOne(DocumentableInterface $subject)
+    public function removeOne(DocumentableInterface $subject): void
     {
         foreach ($this->getLocales() as $locale) {
             $this->removeOneByLocale($subject->convertToDocument($locale), $locale);
@@ -166,7 +169,7 @@ class DocumentIndexer
      * @param string $locale
      * @throws MissingParamException
      */
-    public function removeOneByLocale(DocumentResult $document, string $locale)
+    public function removeOneByLocale(DocumentResult $document, string $locale): void
     {
         $this->getIndexer()->scheduleDelete(
             $this->getIndexName($locale),
@@ -182,13 +185,15 @@ class DocumentIndexer
      * @param int $maxItems
      * @return array
      */
-    public function search(string $locale, string $query, int $maxItems)
+    public function search(string $locale, string $query, int $maxItems): array
     {
         try {
             $results = $this->client->getIndex($this->getIndexName($locale))->search(
                 json_decode($this->getSearch($query), true), $maxItems
             );
         } catch (ReadFileException $exception) {
+            $results = [];
+        } catch (HttpException  $exception) {
             $results = [];
         }
 
@@ -208,7 +213,7 @@ class DocumentIndexer
      * @param int $maxItems
      * @return array
      */
-    public function instant(string $locale, string $query, int $maxItems)
+    public function instant(string $locale, string $query, int $maxItems): array
     {
         try {
             $results = $this->client->getIndex($this->getIndexName($locale))->search(
@@ -240,7 +245,7 @@ class DocumentIndexer
     /**
      * @return IndexBuilder
      */
-    private function getIndexBuilder()
+    private function getIndexBuilder(): IndexBuilder
     {
         return $this->client->getIndexBuilder();
     }
@@ -248,7 +253,7 @@ class DocumentIndexer
     /**
      * @return Indexer
      */
-    private function getIndexer()
+    private function getIndexer(): Indexer
     {
         return $this->client->getIndexer();
     }

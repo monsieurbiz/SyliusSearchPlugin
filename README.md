@@ -77,7 +77,7 @@ monsieur_biz_search:
   search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
   instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
   documentable_classes :
-    - 'App\Entity\Product'
+    - 'App\Entity\Product\Product'
 ```
 
 You can customize it in `apps/sylius/config/packages/monsieur_biz_search.yaml`.

@@ -1,0 +1,3 @@
+monsieurbiz_sylius_search_shop:
+  resource: "routing/shop.yaml"
+  prefix: /{_locale}

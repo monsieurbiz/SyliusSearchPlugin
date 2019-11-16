@@ -1,0 +1,9 @@
+{% block content %}
+    {% if results is empty %}
+        {{ 'monsieurbiz_searchplugin.instant.result.no_result'|trans }}
+    {% else %}
+        {% for result in results %}
+            {% include '@MonsieurbizSyliusSearchPlugin/Instant/_box.html.twig' with {'result': result} %}
+        {% endfor %}
+    {% endif %}
+{% endblock %}

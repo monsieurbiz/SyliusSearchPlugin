@@ -1,0 +1,8 @@
+monsieurbiz_searchplugin:
+  form:
+    query: 'Search'
+    submit: 'Submit search'
+  search:
+    result:
+      search_result: 'Search results for "%query%"'
+      no_result: 'No result.'

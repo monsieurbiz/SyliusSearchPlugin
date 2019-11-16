@@ -1,0 +1,79 @@
+services:
+
+  # Default configuration for services in *this* file
+  _defaults:
+    # Automatically injects dependencies in your services
+    autowire: true
+
+    # Automatically registers your services as commands, event subscribers, etc.
+    autoconfigure: true
+
+    # Allows optimizing the container by removing unused services; this also means
+    # fetching services directly from the container via $container->get() won't work
+    public: false
+
+  # Makes classes in src/ available to be used as services;
+  # this creates a service per class whose id is the fully-qualified class name
+  Monsieurbiz\SyliusSearchPlugin\:
+    resource: '../../*'
+    exclude: '../../{Entity,Migrations,Tests,Kernel.php}'
+
+  # Controllers are imported separately to make sure services can be injected
+  # as action arguments even if you don't extend any base controller class
+  Monsieurbiz\SyliusSearchPlugin\Controller\:
+    resource: '../../Controller'
+    tags: ['controller.service_arguments']
+
+  # Controller to handle the search.
+  monsieurbiz_sylius_search.controller.search:
+    class: Monsieurbiz\SyliusSearchPlugin\Controller\SearchController
+    public: true
+    arguments:
+      - "@templating.engine.twig"
+      - '@Monsieurbiz\SyliusSearchPlugin\Indexer\DocumentIndexer'
+      - "@sylius.context.channel"
+      - "@sylius.context.currency"
+    tags: ['controller.service_arguments']
+
+  # Client configuration.
+  JoliCode\Elastically\Client:
+    arguments:
+      $config:
+        host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
+        port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
+        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch'
+        elastically_index_class_mapping:
+          documents-fr: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
+          documents-en: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
+          documents-en_us: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
+        elastically_bulk_size: 100
+
+  # Add JS for instant search
+  monsieurbiz_sylius_search.block_event_listener.layout.javascripts:
+    class: Sylius\Bundle\UiBundle\Block\BlockEventListener
+    arguments:
+      - '@@MonsieurbizSyliusSearchPlugin/Instant/instant_javascript.html.twig'
+    tags:
+      - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.javascripts, method: onBlockEvent }
+
+  # Event when a product is added / modified / deleted
+  monsieurbiz_sylius_search.event_listener.document_listener:
+    class: Monsieurbiz\SyliusSearchPlugin\EventListener\DocumentListener
+    arguments:
+      - '@Monsieurbiz\SyliusSearchPlugin\Indexer\DocumentIndexer'
+    tags:
+      - { name: kernel.event_listener, event: sylius.product.post_create, method: saveDocument }
+      - { name: kernel.event_listener, event: sylius.product.post_update, method: saveDocument }
+      - { name: kernel.event_listener, event: sylius.product.pre_delete, method: deleteDocument }
+
+  # TODO Make it work in plugin, actually added in `config/services.yaml` to works
+  Monsieurbiz\SyliusSearchPlugin\Provider\SearchRequestProvider:
+    arguments:
+      $searchPath: '%monsieurbiz_sylius_search.search_file%'
+      $instantPath: '%monsieurbiz_sylius_search.instant_file%'
+
+  # TODO Make it work in plugin, actually added in `config/services.yaml` to works
+  # Provider to retrieve repositories to index
+  Monsieurbiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider:
+    arguments:
+      $documentableClasses: '%monsieurbiz_sylius_search.documentable_classes%'

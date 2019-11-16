@@ -1,0 +1,5 @@
+{{ form_start(form, {'action': path('monsieurbiz_sylius_search_post'), 'method': 'POST'}) }}
+    {{ form_errors(form) }}
+    {{ form_row(form.query, {'value': query}) }}
+    {{ form_row(form.submit) }}
+{{ form_end(form) }}

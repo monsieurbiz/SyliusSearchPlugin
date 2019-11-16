@@ -1,0 +1,26 @@
+{
+  "query": {
+    "nested": {
+      "path": "attributes",
+      "query": {
+        "bool": {
+          "must": {
+            "multi_match": {
+              "query": "{{QUERY}}",
+              "fields": [
+                "attributes.value"
+              ],
+              "fuzziness": "AUTO"
+            }
+          },
+          "should": {
+            "rank_feature": {
+              "field": "attributes.score",
+              "boost": 10
+            }
+          }
+        }
+      }
+    }
+  }
+}

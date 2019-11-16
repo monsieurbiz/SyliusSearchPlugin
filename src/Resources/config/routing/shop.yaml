@@ -1,0 +1,17 @@
+monsieurbiz_sylius_search_search:
+    path: /search/{query}
+    methods: [GET]
+    defaults:
+        _controller: monsieurbiz_sylius_search.controller.search:searchAction
+
+monsieurbiz_sylius_search_post:
+    path: /search
+    methods: [POST]
+    defaults:
+        _controller: monsieurbiz_sylius_search.controller.search:postAction
+
+monsieurbiz_sylius_search_instant:
+    path: /instant
+    methods: [POST]
+    defaults:
+        _controller: monsieurbiz_sylius_search.controller.search:instantAction

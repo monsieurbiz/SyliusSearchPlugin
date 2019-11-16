@@ -9,3 +9,5 @@
 
 /behat.yml
 /phpspec.yml
+
+/.php_cs.cache

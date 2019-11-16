@@ -1,0 +1,15 @@
+{% extends '@SyliusShop/layout.html.twig' %}
+
+{% block content %}
+    {{ 'monsieurbiz_searchplugin.search.result.search_result'|trans({'%query%': query}) }}
+
+    {% if results is empty %}
+        {{ 'monsieurbiz_searchplugin.search.result.no_result'|trans }}
+    {% else %}
+        <div class="ui three cards" id="products">
+            {% for result in results %}
+                {% include '@MonsieurBizSearchPlugin/Search/_box.html.twig' with {'result': result} %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

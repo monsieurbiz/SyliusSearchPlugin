@@ -1,0 +1,36 @@
+mappings:
+  dynamic: false
+  properties:
+    type:
+      type: keyword
+    code:
+      type: keyword
+    enabled:
+      type: boolean
+    channel:
+      type: keyword
+    attributes:
+      type: nested
+      properties:
+        name:
+          type: text
+          analyzer: search_standard
+        value:
+          type: text
+          analyzer: search_standard
+        score:
+          type: rank_feature
+    price:
+      type: nested
+      properties:
+        currency:
+          type: keyword
+        value:
+          type: integer
+    original_price:
+      type: nested
+      properties:
+        currency:
+          type: keyword
+        value:
+          type: integer

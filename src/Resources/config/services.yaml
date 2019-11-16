@@ -45,6 +45,7 @@ services:
         elastically_index_class_mapping:
           documents-fr: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
           documents-en: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
+          documents-en_us: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
         elastically_bulk_size: 100
 
   # Add JS for instant search

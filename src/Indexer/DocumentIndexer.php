@@ -234,7 +234,7 @@ class DocumentIndexer
      */
     private function getIndexName(string $locale): string
     {
-        return self::DOCUMENT_INDEX_NAME . '-' . $locale;
+        return self::DOCUMENT_INDEX_NAME . '-' . strtolower($locale);
     }
 
     /**

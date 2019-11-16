@@ -41,7 +41,7 @@ services:
       $config:
         host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
         port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
-        elastically_mappings_directory: '%kernel.project_dir%/src/Resources/config/elasticsearch'
+        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch'
         elastically_index_class_mapping:
           documents-fr: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult
           documents-en: \Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult

@@ -7,7 +7,7 @@
     "require": {
         "php": "^7.2",
         "sylius/sylius": "^1.4",
-        "jolicode/elastically": "dev-master#cd7f134fb0d1298ba0cd10babbb74d6bd05fa884"
+        "jolicode/elastically": "dev-master#cd7f134fb0d1298ba0cd10babbb74d6bd05fa884 as 1.0.x-dev"
     },
     "require-dev": {
         "behat/behat": "^3.4",

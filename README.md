@@ -2,6 +2,43 @@
 
 A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and [Elastically](https://github.com/jolicode/elastically).
 
+## Installation
+
+Require the plugin :  
+`composer require monsieurbiz/sylius-search-plugin`
+
+Then create the config file in `config/packages/monsieurbiz_search_plugin.yaml` : 
+
+```yaml
+imports:
+  - { resource: "@MonsieurbizSyliusSearchPlugin/Resources/config/config.yaml" }
+
+monsieurbiz_sylius_search:
+  search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
+  instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
+  documentable_classes :
+    - 'App\Entity\Product'
+```
+
+Import routes in `config/routes.yaml` :
+```yaml
+monsieurbiz_search_plugin:
+  resource: "@MonsieurbizSyliusSearchPlugin/Resources/config/routing.yaml"
+```
+
+Modify `config/bundles.php` to add this line at the end : 
+```
+    Monsieurbiz\SyliusSearchPlugin\MonsieurbizSyliusSearchPlugin::class => ['all' => true],
+```
+
+Finally configure plugin in your `.env` file, ina dding this att the end : 
+```
+###> MonsieurBizSearchPlugin ###
+MONSIEURBIZ_SEARCHPLUGIN_ES_HOST=localhost
+MONSIEURBIZ_SEARCHPLUGIN_ES_PORT=9200
+###< MonsieurBizSearchPlugin ###
+```
+
 ## Infrastructure
 
 ### Development 

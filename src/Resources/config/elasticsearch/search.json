@@ -1,26 +1,36 @@
 {
   "query": {
-    "nested": {
-      "path": "attributes",
-      "query": {
-        "bool": {
-          "must": {
-            "multi_match": {
-              "query": "{{QUERY}}",
-              "fields": [
-                "attributes.value"
-              ],
-              "fuzziness": "AUTO"
-            }
-          },
-          "should": {
-            "rank_feature": {
-              "field": "attributes.score",
-              "boost": 10
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "enabled": true
+          }
+        }
+      ],
+      "must": {
+        "nested": {
+          "path": "attributes",
+          "query": {
+            "bool": {
+              "must": {
+                "multi_match": {
+                  "query": "{{QUERY}}",
+                  "fields": [
+                    "attributes.value"
+                  ],
+                  "fuzziness": 1
+                }
+              },
+              "should": {
+                "rank_feature": {
+                  "field": "attributes.score",
+                  "boost": 100
+                }
+              }
             }
           }
         }
       }
-    }
-  }
+    }}
 }

@@ -1,5 +1,8 @@
-{{ form_start(form, {'action': path('monsieurbiz_sylius_search_post'), 'method': 'POST'}) }}
-    {{ form_errors(form) }}
-    {{ form_row(form.query, {'value': query}) }}
-    {{ form_row(form.submit) }}
-{{ form_end(form) }}
+{% form_theme form '@SyliusShop/Form/theme.html.twig' %}
+<div class="ui form items">
+        {{ form_start(form, {'action': path('monsieurbiz_sylius_search_post'), 'method': 'POST', 'attr': {'class': 'item'}}) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.query, {'value': query, 'label': false}) }}
+        {{ form_row(form.submit, {'attr': {'class': 'ui primary button'}}) }}
+        {{ form_end(form) }}
+</div>

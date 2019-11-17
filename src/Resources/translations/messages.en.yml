@@ -6,3 +6,7 @@ monsieurbiz_searchplugin:
     result:
       search_result: 'Search results for "%query%"'
       no_result: 'No result.'
+  instant:
+    result:
+      search_result: 'Search results for "%query%"'
+      no_result: 'No result.'

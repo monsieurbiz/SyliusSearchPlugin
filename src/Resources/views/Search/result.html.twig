@@ -1,7 +1,9 @@
 {% extends '@SyliusShop/layout.html.twig' %}
 
 {% block content %}
-    {{ 'monsieurbiz_searchplugin.search.result.search_result'|trans({'%query%': query}) }}
+    <h1 class="ui monster section dividing header">
+        {{ 'monsieurbiz_searchplugin.search.result.search_result'|trans({'%query%': query}) }}
+    </h1>
 
     {% if results is empty %}
         {{ 'monsieurbiz_searchplugin.search.result.no_result'|trans }}

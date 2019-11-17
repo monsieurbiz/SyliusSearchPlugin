@@ -14,6 +14,7 @@
                         $.post(monsieurbizSearchPlugin.instantUrl, { query: query })
                             .done(function( data ) {
                                 resultElement.html(data);
+                                resultElement.show();
                             });
                     }
                 }, monsieurbizSearchPlugin.keyUpTimeOut);

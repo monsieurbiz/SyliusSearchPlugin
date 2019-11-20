@@ -1,5 +1,5 @@
 monsieurbiz_sylius_search_search:
-    path: /search/{query}
+    path: /search/{query}/{page<\d+>?1}
     methods: [GET]
     defaults:
         _controller: monsieurbiz_sylius_search.controller.search:searchAction

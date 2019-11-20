@@ -13,5 +13,6 @@
                 {% include '@MonsieurbizSyliusSearchPlugin/Search/_box.html.twig' with {'result': result} %}
             {% endfor %}
         </div>
+        {% include '@MonsieurbizSyliusSearchPlugin/Search/_paging.html.twig' with {'pager': pager} %}
     {% endif %}
 {% endblock %}

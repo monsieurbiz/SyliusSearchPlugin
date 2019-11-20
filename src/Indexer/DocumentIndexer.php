@@ -183,13 +183,14 @@ class DocumentIndexer
      * @param string $locale
      * @param string $query
      * @param int $maxItems
+     * @param int $page
      * @return array
      */
-    public function search(string $locale, string $query, int $maxItems): array
+    public function search(string $locale, string $query, int $maxItems, int $page)
     {
         try {
             $results = $this->client->getIndex($this->getIndexName($locale))->search(
-                json_decode($this->getSearch($query), true), $maxItems
+                json_decode($this->getSearch($query, $page, $maxItems), true), $maxItems, $page
             );
         } catch (ReadFileException $exception) {
             $results = [];
@@ -197,9 +198,13 @@ class DocumentIndexer
             $results = [];
         }
 
-        $searchResults = [];
+        $searchResults = [
+            'total' => $results->getTotalHits(),
+            'results' => []
+        ];
+
         foreach ($results as $result) {
-            $searchResults[] = $result->getModel();
+            $searchResults['results'][] = $result->getModel();
         }
 
         return $searchResults;
@@ -262,15 +267,20 @@ class DocumentIndexer
      * Retrieve the JSON to send to Elasticsearch for search
      *
      * @param null $query
+     * @param int $page
      * @return mixed|string
      * @throws ReadFileException
      */
-    private function getSearch($query = null)
+    private function getSearch($query = null, int $page = 0, $max)
     {
         $elasticJson = $this->searchRequestProvider->getSearchJson();
 
         if ($query) {
             $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
+        }
+
+        if ($page) {
+            $elasticJson = str_replace('{{FROM}}', $page * $max - $max, $elasticJson);
         }
 
         return $elasticJson;

@@ -1,0 +1,12 @@
+<span class="paging-help">{{ pagingHelp.start }}-{{ pagingHelp.end }} sur {{ pagingHelp.total }}</span>
+<ul class="paging">
+    {% for page in pager %}
+        <li>
+            {% if currentPage == page %}
+                {{ page }}
+            {% else %}
+                <a href="{{ path('monsieurbiz_sylius_search_search', {query:query, page:page}) }}">{{ page }}</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

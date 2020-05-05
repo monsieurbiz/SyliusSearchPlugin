@@ -56,6 +56,14 @@ services:
     tags:
       - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.javascripts, method: onBlockEvent }
 
+  # Add form search in header
+  monsieurbiz_sylius_search.block_event_listener.layout.header:
+    class: Sylius\Bundle\UiBundle\Block\BlockEventListener
+    arguments:
+      - '@@MonsieurBizSyliusSearchPlugin/Header/form.html.twig'
+    tags:
+      - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.header, method: onBlockEvent }
+
   # Event when a product is added / modified / deleted
   monsieurbiz_sylius_search.event_listener.document_listener:
     class: MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener

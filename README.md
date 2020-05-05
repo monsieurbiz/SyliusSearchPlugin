@@ -63,7 +63,7 @@ You need to have `analysis-icu` and `analysis-phonetic` elasticsearch plugin ins
 ### Development 
 
 Elasticsearch is available on `9200` port : http://127.0.0.1:9200/  
-Cerebro on port `9000` : http://127.0.0.1:9000/#/overview?host=http:%2F%2Felasticsearch:9200 
+Cerebro on port `9000` : http://127.0.0.1:9000/#/overview?host=http:%2F%2Felasticsearch:9200  
 Kibana on port `5601` : http://127.0.0.1:5601/ 
 
 On your machine, Elasticsearch is available at http://127.0.0.1:9200/  
@@ -266,6 +266,11 @@ public function getUrlParams(DocumentResult $document): UrlParamsProvider {
     throw new NotSupportedTypeException(sprintf('Object type "%s" not supported to get URL', $this->getType()));
 }
 ```
+
+## Display search form in front
+
+A Twig method is available to display the form : `search_form()`. You can pass a parameter to specify a custom template.  
+By default, the form is display on `sonata.block.event.sylius.shop.layout.header` event.
 
 ## Front customization
 

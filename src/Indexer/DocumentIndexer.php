@@ -6,6 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Indexer;
 
 use Elastica\Exception\Connection\HttpException;
 use Elastica\Exception\ResponseException;
+use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
@@ -15,6 +16,7 @@ use Elastica\Document;
 use JoliCode\Elastically\Client;
 use JoliCode\Elastically\IndexBuilder;
 use JoliCode\Elastically\Indexer;
+use MonsieurBiz\SyliusSearchPlugin\Model\ResultSet;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
@@ -196,26 +198,23 @@ class DocumentIndexer
      * @param string $locale
      * @param string $query
      * @param int $maxItems
-     * @return array
+     * @param int $page
+     * @return ResultSet
      */
-    public function search(string $locale, string $query, int $maxItems): array
+    public function search(string $locale, string $query, int $maxItems, int $page): ResultSet
     {
         try {
+            /** @var ElasticallyResultSet $results */
             $results = $this->client->getIndex($this->getIndexName($locale))->search(
-                json_decode($this->getSearch($query), true), $maxItems
+                json_decode($this->getSearchJson($query, $page, $maxItems), true), $maxItems
             );
         } catch (ReadFileException $exception) {
-            $results = [];
+            return new ResultSet($maxItems);
         } catch (HttpException  $exception) {
-            $results = [];
+            return new ResultSet($maxItems);
         }
 
-        $searchResults = [];
-        foreach ($results as $result) {
-            $searchResults[] = $result->getModel();
-        }
-
-        return $searchResults;
+        return new ResultSet($maxItems, $results);
     }
 
     /**
@@ -224,25 +223,21 @@ class DocumentIndexer
      * @param string $locale
      * @param string $query
      * @param int $maxItems
-     * @return array
+     * @return ResultSet
      */
-    public function instant(string $locale, string $query, int $maxItems): array
+    public function instant(string $locale, string $query, int $maxItems): ResultSet
     {
         try {
+            /** @var ElasticallyResultSet $results */
             $results = $this->client->getIndex($this->getIndexName($locale))->search(
-                json_decode($this->getInstant($query), true), $maxItems
+                json_decode($this->getInstantJson($query), true), $maxItems
             );
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            $results = [];
+            return new ResultSet($maxItems);
         }
 
-        $searchResults = [];
-        foreach ($results as $result) {
-            $searchResults[] = $result->getModel();
-        }
-
-        return $searchResults;
+        return new ResultSet($maxItems, $results);
     }
 
     /**
@@ -275,17 +270,21 @@ class DocumentIndexer
     /**
      * Retrieve the JSON to send to Elasticsearch for search
      *
-     * @param null $query
-     * @return mixed|string
+     * @param string $query
+     * @param int $page
+     * @param int $size
+     * @return string
      * @throws ReadFileException
      */
-    private function getSearch($query = null)
+    private function getSearchJson(string $query, int $page, int $size): string
     {
         $elasticJson = $this->searchRequestProvider->getSearchJson();
 
-        if ($query) {
-            $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
-        }
+        $from = ($page - 1) * $size;
+
+        $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
+        $elasticJson = str_replace('{{FROM}}', max(0, $from), $elasticJson);
+        $elasticJson = str_replace('{{SIZE}}', max(1, $size), $elasticJson);
 
         return $elasticJson;
     }
@@ -293,17 +292,14 @@ class DocumentIndexer
     /**
      * Retrieve the JSON to send to Elasticsearch for instant search
      *
-     * @param null $query
+     * @param string $query
      * @return mixed|string
      * @throws ReadFileException
      */
-    private function getInstant($query = null)
+    private function getInstantJson(string $query)
     {
         $elasticJson = $this->searchRequestProvider->getInstantJson();
-
-        if ($query) {
-            $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
-        }
+        $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
 
         return $elasticJson;
     }

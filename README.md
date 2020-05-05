@@ -16,6 +16,10 @@
 
 A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and [Elastically](https://github.com/jolicode/elastically).
 
+![Search results](screenshot_search.jpg)
+
+![Instant search](screenshot_instant.jpg)
+
 ## Installation
 
 Require the plugin :  

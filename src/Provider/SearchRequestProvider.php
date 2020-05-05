@@ -28,7 +28,7 @@ class SearchRequestProvider
     /**
      * Get search JSON query
      *
-     * @return false|string
+     * @return string
      * @throws ReadFileException
      */
     public function getSearchJson()

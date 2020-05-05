@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Monsieurbiz\SyliusSearchPlugin\Provider;
+namespace MonsieurBiz\SyliusSearchPlugin\Provider;
 
 class UrlParamsProvider
 {

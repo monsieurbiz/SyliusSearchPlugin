@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Twig\Extension;
+namespace MonsieurBiz\SyliusSearchPlugin\Twig\Extension;
 
-use Monsieurbiz\SyliusSearchPlugin\Exception\MissingLocaleException;
-use Monsieurbiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
-use Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult;
-use Monsieurbiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
+use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
+use MonsieurBiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

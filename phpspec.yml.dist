@@ -1,4 +1,4 @@
 suites:
     main:
-        namespace: Monsieurbiz\SyliusSearchPlugin
-        psr4_prefix: Monsieurbiz\SyliusSearchPlugin
+        namespace: MonsieurBiz\SyliusSearchPlugin
+        psr4_prefix: MonsieurBiz\SyliusSearchPlugin

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Provider;
+namespace MonsieurBiz\SyliusSearchPlugin\Provider;
 
-use Monsieurbiz\SyliusSearchPlugin\Exception\ReadFileException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 
 class SearchRequestProvider
 {

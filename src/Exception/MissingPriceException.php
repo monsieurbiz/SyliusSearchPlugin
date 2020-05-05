@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Exception;
+namespace MonsieurBiz\SyliusSearchPlugin\Exception;
 
 use Exception;
 

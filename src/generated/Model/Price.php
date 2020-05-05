@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Do no edit it directly.
  */
 
-namespace Monsieurbiz\SyliusSearchPlugin\generated\Model;
+namespace MonsieurBiz\SyliusSearchPlugin\generated\Model;
 
 class Price
 {

@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Indexer;
+namespace MonsieurBiz\SyliusSearchPlugin\Indexer;
 
 use Elastica\Exception\Connection\HttpException;
-use Monsieurbiz\SyliusSearchPlugin\Exception\MissingParamException;
-use Monsieurbiz\SyliusSearchPlugin\Exception\ReadFileException;
-use Monsieurbiz\SyliusSearchPlugin\Model\DocumentableInterface;
-use Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult;
+use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
 use Elastica\Document;
 use JoliCode\Elastically\Client;
 use JoliCode\Elastically\IndexBuilder;
 use JoliCode\Elastically\Indexer;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
-use Monsieurbiz\SyliusSearchPlugin\Provider\SearchRequestProvider;
-use Monsieurbiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider;
+use MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider;
+use MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider;
 use Webmozart\Assert\Assert;
 
 

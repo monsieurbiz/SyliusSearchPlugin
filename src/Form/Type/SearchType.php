@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Form\Type;
+namespace MonsieurBiz\SyliusSearchPlugin\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

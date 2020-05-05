@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Do no edit it directly.
  */
 
-namespace Monsieurbiz\SyliusSearchPlugin\generated\Normalizer;
+namespace MonsieurBiz\SyliusSearchPlugin\generated\Normalizer;
 
 use Jane\JsonSchemaRuntime\Reference;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -25,12 +25,12 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === 'Monsieurbiz\\SyliusSearchPlugin\\generated\\Model\\Document';
+        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Document';
     }
 
     public function supportsNormalization($data, $format = null)
     {
-        return $data instanceof \Monsieurbiz\SyliusSearchPlugin\generated\Model\Document;
+        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\generated\Model\Document;
     }
 
     public function denormalize($data, $class, $format = null, array $context = [])
@@ -44,7 +44,7 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
         if (isset($data->{'$recursiveRef'})) {
             return new Reference($data->{'$recursiveRef'}, $context['document-origin']);
         }
-        $object = new \Monsieurbiz\SyliusSearchPlugin\generated\Model\Document();
+        $object = new \MonsieurBiz\SyliusSearchPlugin\generated\Model\Document();
         if (property_exists($data, 'type') && $data->{'type'} !== null) {
             $object->setType($data->{'type'});
         }
@@ -73,21 +73,21 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
         if (property_exists($data, 'attributes') && $data->{'attributes'} !== null) {
             $values_1 = [];
             foreach ($data->{'attributes'} as $value_1) {
-                $values_1[] = $this->denormalizer->denormalize($value_1, 'Monsieurbiz\\SyliusSearchPlugin\\generated\\Model\\Attributes', 'json', $context);
+                $values_1[] = $this->denormalizer->denormalize($value_1, 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Attributes', 'json', $context);
             }
             $object->setAttributes($values_1);
         }
         if (property_exists($data, 'price') && $data->{'price'} !== null) {
             $values_2 = [];
             foreach ($data->{'price'} as $value_2) {
-                $values_2[] = $this->denormalizer->denormalize($value_2, 'Monsieurbiz\\SyliusSearchPlugin\\generated\\Model\\Price', 'json', $context);
+                $values_2[] = $this->denormalizer->denormalize($value_2, 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Price', 'json', $context);
             }
             $object->setPrice($values_2);
         }
         if (property_exists($data, 'original_price') && $data->{'original_price'} !== null) {
             $values_3 = [];
             foreach ($data->{'original_price'} as $value_3) {
-                $values_3[] = $this->denormalizer->denormalize($value_3, 'Monsieurbiz\\SyliusSearchPlugin\\generated\\Model\\Price', 'json', $context);
+                $values_3[] = $this->denormalizer->denormalize($value_3, 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Price', 'json', $context);
             }
             $object->setOriginalPrice($values_3);
         }

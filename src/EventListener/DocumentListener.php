@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\EventListener;
+namespace MonsieurBiz\SyliusSearchPlugin\EventListener;
 
 
-use Monsieurbiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
-use Monsieurbiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webmozart\Assert\Assert;
 

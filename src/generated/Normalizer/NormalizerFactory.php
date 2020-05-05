@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Do no edit it directly.
  */
 
-namespace Monsieurbiz\SyliusSearchPlugin\generated\Normalizer;
+namespace MonsieurBiz\SyliusSearchPlugin\generated\Normalizer;
 
 class NormalizerFactory
 {

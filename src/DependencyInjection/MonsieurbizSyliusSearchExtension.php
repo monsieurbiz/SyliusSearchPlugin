@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\DependencyInjection;
+namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-final class MonsieurbizSyliusSearchExtension extends Extension
+final class MonsieurBizSyliusSearchExtension extends Extension
 {
     CONST EXTENSION_CONFIG_NAME = 'monsieurbiz_sylius_search';
 

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Model;
+namespace MonsieurBiz\SyliusSearchPlugin\Model;
 
-use Monsieurbiz\SyliusSearchPlugin\Exception\MissingAttributeException;
-use Monsieurbiz\SyliusSearchPlugin\Exception\MissingLocaleException;
-use Monsieurbiz\SyliusSearchPlugin\Exception\MissingParamException;
-use Monsieurbiz\SyliusSearchPlugin\Exception\MissingPriceException;
-use Monsieurbiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
-use Monsieurbiz\SyliusSearchPlugin\generated\Model\Attributes;
-use Monsieurbiz\SyliusSearchPlugin\generated\Model\Document;
-use Monsieurbiz\SyliusSearchPlugin\generated\Model\Price;
-use Monsieurbiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
+use MonsieurBiz\SyliusSearchPlugin\Exception\MissingAttributeException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\MissingPriceException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
+use MonsieurBiz\SyliusSearchPlugin\generated\Model\Attributes;
+use MonsieurBiz\SyliusSearchPlugin\generated\Model\Document;
+use MonsieurBiz\SyliusSearchPlugin\generated\Model\Price;
+use MonsieurBiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
 
 class DocumentResult extends Document
 {

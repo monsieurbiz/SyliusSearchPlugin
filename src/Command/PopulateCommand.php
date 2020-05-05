@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Command;
+namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
-use Monsieurbiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

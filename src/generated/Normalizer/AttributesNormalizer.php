@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Do no edit it directly.
  */
 
-namespace Monsieurbiz\SyliusSearchPlugin\generated\Normalizer;
+namespace MonsieurBiz\SyliusSearchPlugin\generated\Normalizer;
 
 use Jane\JsonSchemaRuntime\Reference;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -25,12 +25,12 @@ class AttributesNormalizer implements DenormalizerInterface, NormalizerInterface
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === 'Monsieurbiz\\SyliusSearchPlugin\\generated\\Model\\Attributes';
+        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Attributes';
     }
 
     public function supportsNormalization($data, $format = null)
     {
-        return $data instanceof \Monsieurbiz\SyliusSearchPlugin\generated\Model\Attributes;
+        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\generated\Model\Attributes;
     }
 
     public function denormalize($data, $class, $format = null, array $context = [])
@@ -44,7 +44,7 @@ class AttributesNormalizer implements DenormalizerInterface, NormalizerInterface
         if (isset($data->{'$recursiveRef'})) {
             return new Reference($data->{'$recursiveRef'}, $context['document-origin']);
         }
-        $object = new \Monsieurbiz\SyliusSearchPlugin\generated\Model\Attributes();
+        $object = new \MonsieurBiz\SyliusSearchPlugin\generated\Model\Attributes();
         if (property_exists($data, 'code') && $data->{'code'} !== null) {
             $object->setCode($data->{'code'});
         }

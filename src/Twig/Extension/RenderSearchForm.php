@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Twig\Extension;
+namespace MonsieurBiz\SyliusSearchPlugin\Twig\Extension;
 
-use Monsieurbiz\SyliusSearchPlugin\Form\Type\SearchType;
+use MonsieurBiz\SyliusSearchPlugin\Form\Type\SearchType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,7 +36,7 @@ class RenderSearchForm extends AbstractExtension
 
     public function createForm($template = null)
     {
-        $template = $template ?? '@MonsieurbizSyliusSearchPlugin/form.html.twig';
+        $template = $template ?? '@MonsieurBizSyliusSearchPlugin/form.html.twig';
 
         return new Markup($this->templatingEngine->render($template, [
             'form' => $this->formFactory->create(SearchType::class)->createView(),

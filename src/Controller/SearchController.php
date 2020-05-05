@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Monsieurbiz\SyliusSearchPlugin\Controller;
+namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
-use Monsieurbiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
-use Monsieurbiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
-use Monsieurbiz\SyliusSearchPlugin\Model\DocumentResult;
-use Monsieurbiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl;
+use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
+use MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -92,7 +92,7 @@ class SearchController extends AbstractController
             }
         }
 
-        return $this->templatingEngine->renderResponse('@MonsieurbizSyliusSearchPlugin/Search/result.html.twig', [
+        return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'query' => $query,
             'resultNumber' => count($searchResults),
             'results' => $searchResults,
@@ -114,7 +114,7 @@ class SearchController extends AbstractController
 
         $searchResults = $this->documentIndexer->instant($request->getLocale(), $query, self::MAX_DISPLAYED_ITEMS_INSTANT);
 
-        return $this->templatingEngine->renderResponse('@MonsieurbizSyliusSearchPlugin/Instant/result.html.twig', [
+        return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
             'query' => $query,
             'resultNumber' => count($searchResults),
             'results' => $searchResults,

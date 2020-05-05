@@ -24,17 +24,6 @@ services:
     resource: '../../Controller'
     tags: ['controller.service_arguments']
 
-  # Controller to handle the search.
-  monsieurbiz_sylius_search.controller.search:
-    class: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController
-    public: true
-    arguments:
-      - "@templating.engine.twig"
-      - '@MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer'
-      - "@sylius.context.channel"
-      - "@sylius.context.currency"
-    tags: ['controller.service_arguments']
-
   # Client configuration.
   JoliCode\Elastically\Client:
     arguments:
@@ -74,14 +63,19 @@ services:
       - { name: kernel.event_listener, event: sylius.product.post_update, method: saveDocument }
       - { name: kernel.event_listener, event: sylius.product.pre_delete, method: deleteDocument }
 
-  # TODO Make it work in plugin, actually added in `config/services.yaml` to works
   MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider:
     arguments:
       $searchPath: '%monsieurbiz_sylius_search.search_file%'
       $instantPath: '%monsieurbiz_sylius_search.instant_file%'
 
-  # TODO Make it work in plugin, actually added in `config/services.yaml` to works
   # Provider to retrieve repositories to index
   MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider:
     arguments:
       $documentableClasses: '%monsieurbiz_sylius_search.documentable_classes%'
+
+
+  MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:
+    arguments:
+      $limits: '%monsieurbiz_sylius_search.limits%'
+      $searchDefaultLimit: '%monsieurbiz_sylius_search.search_default_limit%'
+      $instantDefaultLimit: '%monsieurbiz_sylius_search.instant_default_limit%'

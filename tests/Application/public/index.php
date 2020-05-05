@@ -1,6 +1,6 @@
 <?php
 
-use Tests\Monsieurbiz\SyliusSearchPlugin\Application\Kernel;
+use Tests\MonsieurBiz\SyliusSearchPlugin\Application\Kernel;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
 

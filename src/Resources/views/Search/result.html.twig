@@ -9,6 +9,9 @@
     {% if resultSet.totalHits == 0 %}
         {{ 'monsieurbiz_searchplugin.search.result.no_result'|trans }}
     {% else %}
+        {% include '@MonsieurBizSyliusSearchPlugin/Search/_pagination.html.twig' %}
+        <div class="ui clearing hidden divider"></div>
+
         <div class="ui three cards" id="products">
             {% for result in resultSet.results %}
                 {% include '@MonsieurBizSyliusSearchPlugin/Search/_box.html.twig' with {'result': result} %}

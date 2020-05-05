@@ -19,10 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SearchController extends AbstractController
 {
-    const MAX_DISPLAYED_ITEMS_PER_PAGE = 9;
-    const DISPLAYED_PAGES_PAGER = 5;
-    const MAX_DISPLAYED_ITEMS_INSTANT = 10;
-
     /** @var EngineInterface */
     private $templatingEngine;
 
@@ -35,23 +31,41 @@ class SearchController extends AbstractController
     /** @var CurrencyContextInterface */
     private $currencyContext;
 
+    /** @var int[] */
+    private $limits;
+
+    /** @var int */
+    private $searchDefaultLimit;
+
+    /** @var int */
+    private $instantDefaultLimit;
+
     /**
      * SearchController constructor.
      * @param EngineInterface $templatingEngine
      * @param DocumentIndexer $documentIndexer
      * @param ChannelContextInterface $channelContext
      * @param CurrencyContextInterface $currencyContext
+     * @param array $limits
+     * @param int $searchDefaultLimit
+     * @param int $instantDefaultLimit
      */
     public function __construct(
         EngineInterface $templatingEngine,
         DocumentIndexer $documentIndexer,
         ChannelContextInterface $channelContext,
-        CurrencyContextInterface $currencyContext
+        CurrencyContextInterface $currencyContext,
+        array $limits,
+        int $searchDefaultLimit,
+        int $instantDefaultLimit
     ) {
         $this->templatingEngine = $templatingEngine;
         $this->documentIndexer = $documentIndexer;
         $this->channelContext = $channelContext;
         $this->currencyContext = $currencyContext;
+        $this->limits = $limits;
+        $this->searchDefaultLimit = $searchDefaultLimit;
+        $this->instantDefaultLimit = $instantDefaultLimit;
     }
 
     /**
@@ -63,20 +77,15 @@ class SearchController extends AbstractController
     public function postAction(Request $request)
     {
         $query = $request->request->get('monsieurbiz_searchplugin_search')['query'] ?? null;
-        $page = (int) ($request->request->get('monsieurbiz_searchplugin_search')['page'] ?? null);
 
-        $requestParam = [];
-        $requestParam['query'] = urlencode($query);
-
-        if ($page) {
-            $requestParam['page'] = $page;
-        }
-
-        return new RedirectResponse($this->generateUrl('monsieurbiz_sylius_search_search', $requestParam));
+        return new RedirectResponse(
+            $this->generateUrl('monsieurbiz_sylius_search_search',
+                ['query' => urlencode($query)])
+        );
     }
 
     /**
-     * Perform the search action & display results.
+     * Perform the search action & display results. User can add page, limit or sorting.
      *
      * @param Request $request
      * @return Response
@@ -85,13 +94,18 @@ class SearchController extends AbstractController
     {
         $query = htmlspecialchars(urldecode($request->get('query')));
         $page = max(1, (int) $request->get('page'));
+        $limit = max(1, (int) $request->get('limit'));
+
+        if (!in_array($limit, $this->limits)) {
+            $limit = $this->searchDefaultLimit;
+        }
 
         // Perform search
         /** @var ResultSet $resultSet */
         $resultSet = $this->documentIndexer->search(
             $request->getLocale(),
             $query,
-            self::MAX_DISPLAYED_ITEMS_PER_PAGE,
+            $limit,
             $page
         );
 
@@ -113,6 +127,7 @@ class SearchController extends AbstractController
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'query' => $query,
+            'limits' => $this->limits,
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
@@ -135,7 +150,7 @@ class SearchController extends AbstractController
         $resultSet = $this->documentIndexer->instant(
             $request->getLocale(),
             $query,
-            self::MAX_DISPLAYED_ITEMS_PER_PAGE
+            $this->instantDefaultLimit
         );
 
         // Display instant result list

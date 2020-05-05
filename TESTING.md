@@ -62,3 +62,17 @@ and `tests/Application/.env.test`. You can also add custom configuration in `tes
     $ (cd tests/Application && bin/console sylius:fixtures:load -e dev)
     $ (cd tests/Application && bin/console server:run -d public -e dev)
     ```
+
+### Reindex Elasticsearch
+
+- Using `test` environment:
+
+    ```bash
+    $ (cd tests/Application && bin/console monsieurbiz:search:populate -e test)
+    ```
+    
+- Using `dev` environment:
+
+    ```bash
+    $ (cd tests/Application && bin/console monsieurbiz:search:populate -e dev)
+    ```

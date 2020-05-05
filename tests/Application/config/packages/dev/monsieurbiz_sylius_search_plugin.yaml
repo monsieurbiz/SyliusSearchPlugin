@@ -1,0 +1,3 @@
+monsieur_biz_sylius_search:
+    documentable_classes :
+        - 'Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product\Product'

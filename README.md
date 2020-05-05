@@ -1,4 +1,18 @@
-# Documentation for MonsieurBizSearchPlugin
+<p align="center">
+    <a href="https://monsieurbiz.com" target="_blank">
+        <img src="https://monsieurbiz.com/logo.png" width="250px" />
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://sylius.com" target="_blank">
+        <img src="https://demo.sylius.com/assets/shop/img/logo.png" width="200px" />
+    </a>
+</p>
+
+<h1 align="center">Search</h1>
+
+[![Search Plugin license](https://img.shields.io/github/license/monsieurbiz/SyliusSearchPlugin?public)](https://github.com/monsieurbiz/SyliusSearchPlugin/blob/master/LICENSE.txt)
+[![Build Status](https://img.shields.io/github/workflow/status/monsieurbiz/SyliusSearchPlugin/PHP%20Composer)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions?query=workflow%3A%22PHP+Composer%22)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/monsieurbiz/SyliusSearchPlugin/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/monsieurbiz/SyliusSearchPlugin/?branch=master)
 
 A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and [Elastically](https://github.com/jolicode/elastically).
 
@@ -6,6 +20,8 @@ A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and 
 
 Require the plugin :  
 `composer require monsieurbiz/sylius-search-plugin`
+
+> If you are using Symfony Flex, the recipe will automatically do the actions below.
 
 Then create the config file in `config/packages/monsieurbiz_search_plugin.yaml` : 
 
@@ -41,6 +57,7 @@ MONSIEURBIZ_SEARCHPLUGIN_ES_PORT=9200
 
 ## Infrastructure
 
+The plugin was developed for Elasticsearch 7.2.x versions. 
 You need to have `analysis-icu` and `analysis-phonetic` elasticsearch plugin installed.
 
 ### Development 
@@ -53,15 +70,7 @@ On your machine, Elasticsearch is available at http://127.0.0.1:9200/
 In docker, Elasticsearch is available at http://elasticsearch:9200/  
 This is the second URL you have to put on Cerebro, Kibana and Elasticsearch if you want to connect to the cluster.  
 
-### Fortress
-
-Elasticsearch is available on : http://elasticsearch.<FORTRESS_HOST>/  
-Cerebro on : http://cerebro.<FORTRESS_HOST>/  
-Kibana on : http://kibana.<FORTRESS_HOST>/  
-
-On your machine, Elasticsearch is available at http://127.0.0.1:9200/  
-In docker, Elasticsearch is available at http://elasticsearch:9200/  
-This is the second URL you have to put on Cerebro, Kibana and Elasticsearch if you want to connect to the cluster.
+For a development infrastructure with docker, you can check the [Monsieur Biz Sylius infra](https://github.com/monsieurbiz/sylius-infra/)
 
 ## Setup
 
@@ -73,14 +82,14 @@ Run the populate [command](#Command).
 The default module configuration is : 
 
 ```yaml
-monsieur_biz_search:
-  search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
-  instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
-  documentable_classes :
-    - 'App\Entity\Product\Product'
+monsieur_biz_sylius_search:
+    search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
+    instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
+    documentable_classes :
+        - 'App\Entity\Product'
 ```
 
-You can customize it in `apps/sylius/config/packages/monsieur_biz_search.yaml`.
+You can customize it in `config/packages/monsieurbiz_sylius_search_plugin.yaml`.
 
 `search_file` is the JSON used to perform the search.
 `instant_file` is the JSON used to perform the search.
@@ -178,19 +187,19 @@ $document->addAttribute('description', 'Description', [$this->getTranslation($lo
 You can customize the search with your custom JSON files and modifying : 
 
 ```yaml
-monsieur_biz_search:
-  search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
-  instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
+monsieur_biz_sylius_search:
+    search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
+    instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
 ```
 
 ## Indexed Documents
 
-Indexed documents are all entities defines in `monsieur_biz_search.documentable_classes` dans implements `DocumentableInterface`.
+Indexed documents are all entities defined in `monsieur_biz_search.documentable_classes` dans implements `DocumentableInterface`.
 
 ```yaml
-monsieur_biz_search:
-   :
-    - 'App\Entity\Product'
+monsieur_biz_sylius_search:
+    documentable_classes :
+        - 'App\Entity\Product'
 ```
 
 ## Command
@@ -237,24 +246,24 @@ public function getUrlParams(DocumentResult $document): UrlParamsProvider {
 ## Front customization
 
 You can override all templates in your theme to : 
-- Customize search results display page (`apps/sylius/src/MonsieurBizSearchPlugin/Resources/views/Search/`)
-- Customize instant search display block (`apps/sylius/src/MonsieurBizSearchPlugin/Resources/views/Instant/`)
-- Customize JS parameters (`apps/sylius/src/MonsieurBizSearchPlugin/Resources/views/Instant/instant_javascript.html.twig`)
+- Customize search results display page (`src/MonsieurBizSearchPlugin/Resources/views/Search/`)
+- Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Instant/`)
+- Customize JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/Instant/instant_javascript.html.twig`)
 
 ## Jane
 
 We are using [Jane](https://github.com/janephp/janephp) to create a DTO (Data-transfer object).
-Generated classes are on `apps/sylius/src/MonsieurBizSearchPlugin/generated` folder.
-Jane configuration and JSON Schema are on `apps/sylius/src/MonsieurBizSearchPlugin/Resources/config/jane` folder.
+Generated classes are on `src/MonsieurBizSearchPlugin/generated` folder.
+Jane configuration and JSON Schema are on `src/MonsieurBizSearchPlugin/Resources/config/jane` folder.
 
 ## Elastically
 
-The [Elastically](https://github.com/jolicode/elastically) Client is configured in `apps/sylius/src/MonsieurBizSearchPlugin/Resources/config/services.yaml` file.
+The [Elastically](https://github.com/jolicode/elastically) Client is configured in `src/MonsieurBizSearchPlugin/Resources/config/services.yaml` file.
 You can customize it if you want in `config/services.yaml`.
-Analyzers and YAML mappings are on `apps/sylius/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch` folder.
+Analyzers and YAML mappings are on `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch` folder.
 
 You can also find JSON used bu plugin to perform the search on Elasticsearch : 
-- `apps/sylius/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json`
-- `apps/sylius/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json`
+- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json`
+- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json`
 
 These JSON can be customized in another folder if you change the plugin config.

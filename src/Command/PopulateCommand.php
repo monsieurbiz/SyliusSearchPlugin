@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
+use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
 use MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,7 +41,11 @@ class PopulateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln(sprintf('Generating index'));
-        $this->documentIndexer->indexAll();
+        try {
+            $this->documentIndexer->indexAll();
+        } catch (ReadOnlyIndexException $exception) {
+            $output->writeln('Cannot purge old index. Please to do it manually if needed.');
+        }
         $output->writeln(sprintf('Generated index'));
     }
 }

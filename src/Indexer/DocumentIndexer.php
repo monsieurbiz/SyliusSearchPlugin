@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Indexer;
 
 use Elastica\Exception\Connection\HttpException;
+use Elastica\Exception\ResponseException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
+use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
 use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
 use Elastica\Document;
 use JoliCode\Elastically\Client;
 use JoliCode\Elastically\IndexBuilder;
 use JoliCode\Elastically\Indexer;
+use Psr\Log\LoggerInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider;
@@ -41,23 +44,29 @@ class DocumentIndexer
     /** @var array */
     private $locales = [];
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * PopulateCommand constructor.
      * @param Client $client
      * @param DocumentRepositoryProvider $documentRepositoryProvider
      * @param RepositoryInterface $localeRepository
      * @param SearchRequestProvider $searchRequestProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Client $client,
         DocumentRepositoryProvider $documentRepositoryProvider,
         RepositoryInterface $localeRepository,
-        SearchRequestProvider $searchRequestProvider
+        SearchRequestProvider $searchRequestProvider,
+        LoggerInterface $logger
     ) {
         $this->client = $client;
         $this->documentRepositoryProvider = $documentRepositoryProvider;
         $this->localeRepository = $localeRepository;
         $this->searchRequestProvider = $searchRequestProvider;
+        $this->logger = $logger;
     }
 
     /**
@@ -116,7 +125,11 @@ class DocumentIndexer
 
         $this->getIndexer()->flush();
         $this->getIndexer()->refresh($this->getIndexName($locale));
-        $this->getIndexBuilder()->purgeOldIndices($this->getIndexName($locale));
+        try {
+            $this->getIndexBuilder()->purgeOldIndices($this->getIndexName($locale));
+        } catch(ResponseException $exception) {
+            throw new ReadOnlyIndexException($exception->getMessage());
+        }
     }
 
     /**
@@ -220,6 +233,7 @@ class DocumentIndexer
                 json_decode($this->getInstant($query), true), $maxItems
             );
         } catch (ReadFileException $exception) {
+            $this->logger->critical($exception->getMessage());
             $results = [];
         }
 

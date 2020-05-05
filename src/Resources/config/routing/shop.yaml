@@ -2,16 +2,16 @@ monsieurbiz_sylius_search_search:
     path: /search/{query}
     methods: [GET]
     defaults:
-        _controller: monsieurbiz_sylius_search.controller.search:searchAction
+        _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:searchAction
 
 monsieurbiz_sylius_search_post:
     path: /search
     methods: [POST]
     defaults:
-        _controller: monsieurbiz_sylius_search.controller.search:postAction
+        _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:postAction
 
 monsieurbiz_sylius_search_instant:
     path: /instant
     methods: [POST]
     defaults:
-        _controller: monsieurbiz_sylius_search.controller.search:instantAction
+        _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:instantAction

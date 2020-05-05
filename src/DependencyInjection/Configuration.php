@@ -27,6 +27,13 @@ final class Configuration implements ConfigurationInterface
             ->scalarNode('search_file')->end()
             ->scalarNode('instant_file')->end()
             ->variableNode('documentable_classes')->end()
+            ->arrayNode('limits')
+                ->performNoDeepMerging()
+                ->integerPrototype()->end()
+                ->defaultValue([10, 25, 50])
+                ->end()
+            ->integerNode('search_default_limit')->defaultValue(10)->end()
+            ->integerNode('instant_default_limit')->defaultValue(10)->end()
             ->end()
         ;
 

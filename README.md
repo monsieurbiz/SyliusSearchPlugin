@@ -100,7 +100,7 @@ The `{{QUERY}}` string inside is replaced in PHP by the query typed by the user.
 
 ## Documentable objects
 
-If you want to index an object in the search index, your entity have to implements `App\MonsieurBizSearchPlugin\Model\DocumentableInterface` interface : 
+If you want to index an object in the search index, your entity have to implements `MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface` interface : 
 
 ```php
 interface DocumentableInterface
@@ -113,33 +113,56 @@ interface DocumentableInterface
 Here is an exemple for the product conversion : 
 
 ```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Entity\Product;
+
+use Doctrine\ORM\Mapping as ORM;
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
+use Sylius\Component\Core\Model\Product as BaseProduct;
+use Sylius\Component\Core\Model\ProductTranslation;
+use Sylius\Component\Product\Model\ProductTranslationInterface;
+
+/**
+ * @ORM\MappedSuperclass
+ * @ORM\Table(name="sylius_product")
+ */
+class Product extends BaseProduct implements DocumentableInterface
+{
+    protected function createTranslation(): ProductTranslationInterface
+    {
+        return new ProductTranslation();
+    }
     public function getDocumentType(): string
     {
         return 'product';
     }
-    
+
     public function convertToDocument(string $locale): DocumentResult
     {
         $document = new DocumentResult();
-        
+
         // Document data
         $document->setType($this->getDocumentType());
         $document->setCode($this->getCode());
         $document->setId($this->getId());
         $document->setEnabled($this->isEnabled());
         $document->setSlug($this->getTranslation($locale)->getSlug());
-    
-        /** @var Image $image */
+
+        /** @var \Sylius\Component\Core\Model\Image $image */
         if ($image = $this->getImages()->first()) {
             $document->setImage($image->getPath());
         }
-        
-        /** @var Channel $channel */
+
+        /** @var \Sylius\Component\Core\Model\Channel $channel */
         foreach ($this->getChannels() as $channel) {
             $document->addChannel($channel->getCode());
-    
+
             // TODO Get cheapest variant
-            /** @var ProductVariant $variant */
+            /** @var \Sylius\Component\Core\Model\ProductVariant $variant */
             if ($variant = $this->getVariants()->first()) {
                 $price = $variant->getChannelPricingForChannel($channel);
                 // TODO Index all currencies
@@ -149,13 +172,13 @@ Here is an exemple for the product conversion :
                 }
             }
         }
-        
+
         $document->addAttribute('name', 'Name', [$this->getTranslation($locale)->getName()], $locale, 50);
         $document->addAttribute('description', 'Description', [$this->getTranslation($locale)->getDescription()], $locale, 10);
         $document->addAttribute('short_description', 'Short description', [$this->getTranslation($locale)->getShortDescription()], $locale, 10);
-    
+
         // TODO : Add fallback locale
-        /** @var AttributeValueInterface $attribute */
+        /** @var \Sylius\Component\Attribute\Model\AttributeValueInterface $attribute */
         foreach ($this->getAttributesByLocale($locale, $locale) as $attribute) {
             $attributeValues = [];
             if (isset($attribute->getAttribute()->getConfiguration()['choices'])) {
@@ -169,6 +192,7 @@ Here is an exemple for the product conversion :
         }
         return $document;
     }
+}
 ```
 
 You can add everything you want !

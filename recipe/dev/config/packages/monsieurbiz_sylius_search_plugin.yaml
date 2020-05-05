@@ -1,7 +1,7 @@
 imports:
     - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
 
-monsieurbiz_sylius_search:
+monsieur_biz_sylius_search:
     search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
     instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
     documentable_classes :

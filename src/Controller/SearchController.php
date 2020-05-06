@@ -75,7 +75,6 @@ class SearchController extends AbstractController
         int $searchDefaultLimit,
         int $instantDefaultLimit
     ) {
-        dump(get_class($taxonContext));
         $this->templatingEngine = $templatingEngine;
         $this->documentSearch = $documentSearch;
         $this->channelContext = $channelContext;

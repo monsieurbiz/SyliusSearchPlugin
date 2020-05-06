@@ -21,6 +21,7 @@ class SearchRequestProvider
      * SearchRequestProvider constructor.
      * @param string $searchPath
      * @param string $instantPath
+     * @param string $taxonPath
      */
     public function __construct(string $searchPath, string $instantPath, string $taxonPath)
     {

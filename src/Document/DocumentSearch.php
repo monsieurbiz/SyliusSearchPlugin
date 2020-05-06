@@ -12,6 +12,7 @@ use JoliCode\Elastically\Client;
 use MonsieurBiz\SyliusSearchPlugin\Model\ResultSet;
 use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider;
+use Sylius\Component\Channel\Context\ChannelContextInterface;
 
 
 class DocumentSearch extends AbstractDocumentIndex
@@ -22,19 +23,25 @@ class DocumentSearch extends AbstractDocumentIndex
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var ChannelContextInterface */
+    private $channelContext;
+
     /**
      * PopulateCommand constructor.
      * @param Client $client
      * @param SearchRequestProvider $searchRequestProvider
+     * @param ChannelContextInterface $channelContext
      * @param LoggerInterface $logger
      */
     public function __construct(
         Client $client,
         SearchRequestProvider $searchRequestProvider,
+        ChannelContextInterface $channelContext,
         LoggerInterface $logger
     ) {
         parent::__construct($client);
         $this->searchRequestProvider = $searchRequestProvider;
+        $this->channelContext = $channelContext;
         $this->logger = $logger;
     }
 
@@ -109,6 +116,7 @@ class DocumentSearch extends AbstractDocumentIndex
         $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
         $elasticJson = str_replace('{{FROM}}', max(0, $from), $elasticJson);
         $elasticJson = str_replace('{{SIZE}}', max(1, $size), $elasticJson);
+        $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
 
         return $elasticJson;
     }
@@ -124,6 +132,7 @@ class DocumentSearch extends AbstractDocumentIndex
     {
         $elasticJson = $this->searchRequestProvider->getInstantJson();
         $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
+        $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
 
         return $elasticJson;
     }

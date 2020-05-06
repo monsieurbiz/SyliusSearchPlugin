@@ -6,6 +6,11 @@
           "term": {
             "enabled": true
           }
+        },
+        {
+          "term": {
+            "channel": "{{CHANNEL}}"
+          }
         }
       ],
       "must": {

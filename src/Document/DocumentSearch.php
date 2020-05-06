@@ -136,6 +136,7 @@ class DocumentSearch extends AbstractDocumentIndex
      * @param string $query
      * @param int $page
      * @param int $size
+     * @param array $sorting
      * @return string
      * @throws ReadFileException
      */
@@ -202,7 +203,7 @@ class DocumentSearch extends AbstractDocumentIndex
 
         foreach ($sorting as $field => $order) {
             $elasticJson = str_replace('{{SORT_ORDER}}', $order, $elasticJson);
-            $parameters = $this->getSortParamByField($field);
+            $parameters = $this->getSortParamByField($field, $taxon);
             $elasticJson = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $elasticJson);
             $elasticJson = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $elasticJson);
             $elasticJson = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $elasticJson);
@@ -213,7 +214,12 @@ class DocumentSearch extends AbstractDocumentIndex
         return $elasticJson;
     }
 
-    private function getSortParamByField(string $field): array
+    /**
+     * @param string $field
+     * @param string $taxon
+     * @return array
+     */
+    private function getSortParamByField(string $field, string $taxon = ''): array
     {
         switch($field) {
             case 'name':
@@ -236,6 +242,13 @@ class DocumentSearch extends AbstractDocumentIndex
                     'sort_nested_path' => 'price',
                     'sort_filter_field' => 'price.channel',
                     'sort_filter_value' => $this->channelContext->getChannel()->getCode(),
+                ];
+            case 'position':
+                return [
+                    'sort_field' => 'taxon.position',
+                    'sort_nested_path' => 'taxon',
+                    'sort_filter_field' => 'taxon.code',
+                    'sort_filter_value' => $taxon,
                 ];
             default:
                 return [

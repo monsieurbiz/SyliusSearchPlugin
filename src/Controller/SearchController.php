@@ -132,7 +132,7 @@ class SearchController extends AbstractController
         $sorting = $this->cleanSorting($request->get('sorting'), $this->searchSorting);
 
         if (!is_array($sorting) || empty($sorting)) {
-            $sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES
+            $sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
         }
 
         if (!in_array($limit, $this->searchLimits)) {
@@ -217,7 +217,7 @@ class SearchController extends AbstractController
         $sorting = $this->cleanSorting($request->get('sorting'), $this->taxonSorting);
 
         if (!is_array($sorting) || empty($sorting)) {
-            $sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES
+            $sorting['position'] = self::SORT_ASC; // Product position in taxon
         }
 
         if (!in_array($limit, $this->taxonLimits)) {

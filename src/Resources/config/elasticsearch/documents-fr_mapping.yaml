@@ -37,6 +37,8 @@ mappings:
       properties:
         currency:
           type: keyword
+        channel:
+          type: keyword
         value:
           type: integer
     original_price:

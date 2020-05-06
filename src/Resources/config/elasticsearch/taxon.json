@@ -11,17 +11,26 @@
           "term": {
             "channel": "{{CHANNEL}}"
           }
-        },
-        {
-          "term": {
-            "taxon": "{{TAXON}}"
+        }
+      ],
+      "must": {
+        "nested": {
+          "path": "taxon",
+          "query": {
+            "bool": {
+              "must": {
+                "term": {
+                  "taxon.code": { "value": "{{TAXON}}" }
+                }
+              }
+            }
           }
         }
-      ]
+      }
     }
   },
-  "from": "{{FROM}}",
-  "size": "{{SIZE}}",
+  "from" : "{{FROM}}",
+  "size" : "{{SIZE}}",
   "sort" : [
     {
       "{{SORT_FIELD}}": {

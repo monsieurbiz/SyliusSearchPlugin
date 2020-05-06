@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
+use MonsieurBiz\SyliusSearchPlugin\Context\TaxonContextInterface;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
 use MonsieurBiz\SyliusSearchPlugin\Document\DocumentSearch;
@@ -31,8 +32,17 @@ class SearchController extends AbstractController
     /** @var CurrencyContextInterface */
     private $currencyContext;
 
+    /** @var TaxonContextInterface */
+    private $taxonContext;
+
     /** @var int[] */
-    private $limits;
+    private $taxonLimits;
+
+    /** @var int[] */
+    private $searchLimits;
+
+    /** @var int */
+    private $taxonDefaultLimit;
 
     /** @var int */
     private $searchDefaultLimit;
@@ -46,7 +56,10 @@ class SearchController extends AbstractController
      * @param DocumentSearch $documentSearch
      * @param ChannelContextInterface $channelContext
      * @param CurrencyContextInterface $currencyContext
-     * @param array $limits
+     * @param TaxonContextInterface $taxonContext
+     * @param array $taxonLimits
+     * @param array $searchLimits
+     * @param int $taxonDefaultLimit
      * @param int $searchDefaultLimit
      * @param int $instantDefaultLimit
      */
@@ -55,15 +68,22 @@ class SearchController extends AbstractController
         DocumentSearch $documentSearch,
         ChannelContextInterface $channelContext,
         CurrencyContextInterface $currencyContext,
-        array $limits,
+        TaxonContextInterface $taxonContext,
+        array $taxonLimits,
+        array $searchLimits,
+        int $taxonDefaultLimit,
         int $searchDefaultLimit,
         int $instantDefaultLimit
     ) {
+        dump(get_class($taxonContext));
         $this->templatingEngine = $templatingEngine;
         $this->documentSearch = $documentSearch;
         $this->channelContext = $channelContext;
         $this->currencyContext = $currencyContext;
-        $this->limits = $limits;
+        $this->taxonContext = $taxonContext;
+        $this->taxonLimits = $taxonLimits;
+        $this->searchLimits = $searchLimits;
+        $this->taxonDefaultLimit = $taxonDefaultLimit;
         $this->searchDefaultLimit = $searchDefaultLimit;
         $this->instantDefaultLimit = $instantDefaultLimit;
     }
@@ -96,7 +116,7 @@ class SearchController extends AbstractController
         $page = max(1, (int) $request->get('page'));
         $limit = max(1, (int) $request->get('limit'));
 
-        if (!in_array($limit, $this->limits)) {
+        if (!in_array($limit, $this->searchLimits)) {
             $limit = $this->searchDefaultLimit;
         }
 
@@ -127,7 +147,7 @@ class SearchController extends AbstractController
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'query' => $query,
-            'limits' => $this->limits,
+            'limits' => $this->searchLimits,
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
@@ -156,6 +176,42 @@ class SearchController extends AbstractController
         // Display instant result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
             'query' => $query,
+            'resultSet' => $resultSet,
+            'channel' => $this->channelContext->getChannel(),
+            'currencyCode' => $this->currencyContext->getCurrencyCode(),
+        ]);
+    }
+
+    /**
+     * Perform the taxon action & display results.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function taxonAction(Request $request): Response
+    {
+        $taxon = $this->taxonContext->getTaxon();
+
+        $page = max(1, (int) $request->get('page'));
+        $limit = max(1, (int) $request->get('limit'));
+
+        if (!in_array($limit, $this->taxonLimits)) {
+            $limit = $this->taxonDefaultLimit;
+        }
+
+        // Perform search
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->documentSearch->taxon(
+            $request->getLocale(),
+            $taxon->getCode(),
+            $limit,
+            $page
+        );
+
+        // Display result list
+        return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
+            'taxon' => $taxon,
+            'limits' => $this->taxonLimits,
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),

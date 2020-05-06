@@ -80,6 +80,8 @@ services:
 
   MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:
     arguments:
-      $limits: '%monsieurbiz_sylius_search.limits%'
+      $taxonLimits: '%monsieurbiz_sylius_search.taxon_limits%'
+      $searchLimits: '%monsieurbiz_sylius_search.search_limits%'
+      $taxonDefaultLimit: '%monsieurbiz_sylius_search.taxon_default_limit%'
       $searchDefaultLimit: '%monsieurbiz_sylius_search.search_default_limit%'
       $instantDefaultLimit: '%monsieurbiz_sylius_search.instant_default_limit%'

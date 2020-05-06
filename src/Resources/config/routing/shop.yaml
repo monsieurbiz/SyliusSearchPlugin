@@ -3,6 +3,8 @@ monsieurbiz_sylius_search_search:
     methods: [GET]
     defaults:
         _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:searchAction
+    requirements:
+        query: .+
 
 monsieurbiz_sylius_search_post:
     path: /search
@@ -15,3 +17,11 @@ monsieurbiz_sylius_search_instant:
     methods: [POST]
     defaults:
         _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:instantAction
+
+monsieurbiz_sylius_search_taxon:
+    path: /taxons/{slug}
+    methods: [GET]
+    defaults:
+        _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:taxonAction
+    requirements:
+        slug: .+

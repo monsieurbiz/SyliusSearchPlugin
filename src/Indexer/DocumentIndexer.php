@@ -209,8 +209,13 @@ class DocumentIndexer
                 json_decode($this->getSearchJson($query, $page, $maxItems), true), $maxItems
             );
         } catch (ReadFileException $exception) {
+            $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems);
         } catch (HttpException  $exception) {
+            $this->logger->critical($exception->getMessage());
+            return new ResultSet($maxItems);
+        } catch (ResponseException  $exception) {
+            $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems);
         }
 

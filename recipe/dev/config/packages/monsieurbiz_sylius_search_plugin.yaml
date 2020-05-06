@@ -9,6 +9,8 @@ monsieur_biz_sylius_search:
         - 'App\Entity\Product'
     taxon_limits: [9, 18, 27]
     search_limits: [9, 18, 27]
+    taxon_sorting: ['name', 'price', 'created_at']
+    search_sorting: ['name', 'price', 'created_at']
     taxon_default_limit: 9
     search_default_limit: 9
     instant_default_limit: 10

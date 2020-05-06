@@ -41,6 +41,16 @@ final class Configuration implements ConfigurationInterface
             ->integerNode('taxon_default_limit')->defaultValue(10)->end()
             ->integerNode('search_default_limit')->defaultValue(10)->end()
             ->integerNode('instant_default_limit')->defaultValue(10)->end()
+            ->arrayNode('taxon_sorting')
+                ->performNoDeepMerging()
+                ->scalarPrototype()->end()
+                ->defaultValue(['name'])
+                ->end()
+            ->arrayNode('search_sorting')
+                ->performNoDeepMerging()
+                ->scalarPrototype()->end()
+                ->defaultValue(['name'])
+                ->end()
             ->end()
         ;
 

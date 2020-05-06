@@ -28,6 +28,15 @@
             "type": "string"
           }
         },
+        "main_taxon": {
+          "type": "string"
+        },
+        "taxon": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "attributes": {
           "type": "array",
           "items": {

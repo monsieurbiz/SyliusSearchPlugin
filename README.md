@@ -61,7 +61,7 @@ MONSIEURBIZ_SEARCHPLUGIN_ES_PORT=9200
 
 ## Setup
 
-Make your `Product` entity implements [DocumentableInterface](#Documentable objects) and use the `DocumentableProductTrait`.  
+Make your `Product` entity implements [DocumentableInterface](#documentable-objects) and use the `DocumentableProductTrait`.  
 Run the populate [command](#Command).
 
 ## Infrastructure
@@ -239,6 +239,7 @@ By default, the form is displayed on `sonata.block.event.sylius.shop.layout.head
 You can override all templates in your theme to : 
 - Customize search results display page (`src/MonsieurBizSearchPlugin/Resources/views/Search/`)
 - Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Instant/`)
+- Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Taxon/`)
 - Customize JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/Instant/instant_javascript.html.twig`)
 
 ## Jane
@@ -260,7 +261,8 @@ You can customize it if you want in `config/services.yaml`.
 Analyzers and YAML mappings are on `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch` folder.
 
 You can also find JSON used bu plugin to perform the search on Elasticsearch : 
-- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json`
 - `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json`
+- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json`
+- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/taxon.json`
 
 These JSON can be customized in another folder if you change the plugin config.

@@ -13,6 +13,7 @@
             </div>
             <div class="twelve wide column">
                 {% include '@MonsieurBizSyliusSearchPlugin/Taxon/_pagination.html.twig' %}
+                {% include '@MonsieurBizSyliusSearchPlugin/Taxon/_sorting.html.twig' %}
                 <div class="ui clearing hidden divider"></div>
 
                 <div class="ui three cards" id="products">
@@ -22,7 +23,7 @@
                 </div>
 
                 <div class="ui hidden divider"></div>
-                
+
                 {{ pagination.simple(resultSet.pager) }}
             </div>
         </div>

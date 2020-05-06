@@ -31,9 +31,10 @@ class ResultSet
      * @param int $maxItems
      * @param ElasticallyResultSet|null $resultSet
      */
-    public function __construct(int $maxItems, ?ElasticallyResultSet $resultSet = null)
+    public function __construct(int $maxItems, int $page, ?ElasticallyResultSet $resultSet = null)
     {
         $this->maxItems = $maxItems;
+        $this->page = $page;
 
         // Empty result set
         if ($resultSet === null) {
@@ -58,6 +59,7 @@ class ResultSet
         $adapter = new ResultSetAdapter($this);
         $this->pager = new Pagerfanta($adapter);
         $this->pager->setMaxPerPage($this->maxItems);
+        $this->pager->setCurrentPage($this->page);
     }
 
     /**

@@ -210,16 +210,16 @@ class DocumentIndexer
             );
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems);
+            return new ResultSet($maxItems, $page);
         } catch (HttpException  $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems);
+            return new ResultSet($maxItems, $page);
         } catch (ResponseException  $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems);
+            return new ResultSet($maxItems, $page);
         }
 
-        return new ResultSet($maxItems, $results);
+        return new ResultSet($maxItems, $page, $results);
     }
 
     /**
@@ -239,10 +239,10 @@ class DocumentIndexer
             );
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems);
+            return new ResultSet($maxItems, 1);
         }
 
-        return new ResultSet($maxItems, $results);
+        return new ResultSet($maxItems, 1, $results);
     }
 
     /**

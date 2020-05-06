@@ -1,0 +1,25 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "enabled": true
+          }
+        },
+        {
+          "term": {
+            "channel": "{{CHANNEL}}"
+          }
+        },
+        {
+          "term": {
+            "taxon": "{{TAXON}}"
+          }
+        }
+      ]
+    }
+  },
+  "from": "{{FROM}}",
+  "size": "{{SIZE}}"
+}

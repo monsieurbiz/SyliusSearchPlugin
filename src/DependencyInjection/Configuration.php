@@ -26,6 +26,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('search_file')->end()
             ->scalarNode('instant_file')->end()
+            ->scalarNode('taxon_file')->end()
             ->variableNode('documentable_classes')->end()
             ->arrayNode('limits')
                 ->performNoDeepMerging()

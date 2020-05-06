@@ -19,9 +19,17 @@ mappings:
         name:
           type: text
           analyzer: search_standard
+          fields:
+            keyword:
+              type: keyword
         value:
           type: text
           analyzer: search_standard
+          fields:
+            keyword:
+              type: keyword
+        code:
+          type: keyword
         score:
           type: rank_feature
     price:

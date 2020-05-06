@@ -58,6 +58,16 @@ class Product extends BaseProduct implements DocumentableInterface
             }
         }
 
+        /** @var \Sylius\Component\Core\Model\Taxon $taxon */
+        if ($mainTaxon = $this->getMainTaxon()) {
+            $document->setMainTaxon($mainTaxon->getCode());
+        }
+
+        /** @var \Sylius\Component\Core\Model\Taxon $taxon */
+        foreach ($this->getTaxons() as $taxon) {
+            $document->addTaxon($taxon->getCode());
+        }
+
         $document->addAttribute('name', 'Name', [$this->getTranslation($locale)->getName()], $locale, 50);
         $document->addAttribute('description', 'Description', [$this->getTranslation($locale)->getDescription()], $locale, 10);
         $document->addAttribute('short_description', 'Short description', [$this->getTranslation($locale)->getShortDescription()], $locale, 10);

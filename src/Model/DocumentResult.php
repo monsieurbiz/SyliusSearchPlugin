@@ -123,6 +123,17 @@ class DocumentResult extends Document
     }
 
     /**
+     * @param string $taxon
+     * @return DocumentResult
+     */
+    public function addTaxon(string $taxon): self
+    {
+        $this->setTaxon($this->getTaxon() ? array_unique(array_merge($this->getTaxon(), [$taxon])) : [$taxon]);
+
+        return $this;
+    }
+
+    /**
      * @param string $channel
      * @param string $currency
      * @param int $value

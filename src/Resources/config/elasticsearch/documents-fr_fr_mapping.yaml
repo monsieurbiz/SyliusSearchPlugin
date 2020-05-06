@@ -9,6 +9,10 @@ mappings:
       type: boolean
     channel:
       type: keyword
+    mainTaxon:
+      type: keyword
+    taxon:
+      type: keyword
     attributes:
       type: nested
       properties:

@@ -33,6 +33,8 @@ services:
         elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch'
         elastically_serializer: 'MonsieurBiz\SyliusSearchPlugin\generated\Normalizer\JaneObjectNormalizer'
         elastically_index_class_mapping:
+          # @TODO Add it in config
+          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
           documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
           documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
           documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult

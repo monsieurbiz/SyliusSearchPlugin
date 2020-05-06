@@ -8,6 +8,7 @@ use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Core\Model\Image;
+use Sylius\Component\Core\Model\ProductTaxon;
 use Sylius\Component\Core\Model\ProductVariant;
 use Sylius\Component\Core\Model\Taxon;
 use Sylius\Component\Currency\Model\CurrencyInterface;
@@ -117,9 +118,9 @@ trait DocumentableProductTrait
             $document->setMainTaxon($mainTaxon->getCode());
         }
 
-        /** @var Taxon $taxon */
-        foreach ($this->getTaxons() as $taxon) {
-            $document->addTaxon($taxon->getCode());
+        /** @var ProductTaxon $productTaxon */
+        foreach ($this->getProductTaxons() as $productTaxon) {
+            $document->addTaxon($productTaxon->getTaxon()->getCode(), $productTaxon->getPosition());
         }
 
         return $document;

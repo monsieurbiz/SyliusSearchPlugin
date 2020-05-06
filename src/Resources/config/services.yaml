@@ -57,7 +57,7 @@ services:
   monsieurbiz_sylius_search.event_listener.document_listener:
     class: MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener
     arguments:
-      - '@MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer'
+      - '@MonsieurBiz\SyliusSearchPlugin\Document\DocumentIndexer'
     tags:
       - { name: kernel.event_listener, event: sylius.product.post_create, method: saveDocument }
       - { name: kernel.event_listener, event: sylius.product.post_update, method: saveDocument }

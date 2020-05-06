@@ -5,7 +5,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
-use MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Document\DocumentSearch;
 use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
 use MonsieurBiz\SyliusSearchPlugin\Model\ResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl;
@@ -22,8 +22,8 @@ class SearchController extends AbstractController
     /** @var EngineInterface */
     private $templatingEngine;
 
-    /** @var DocumentIndexer */
-    private $documentIndexer;
+    /** @var DocumentSearch */
+    private $documentSearch;
 
     /** @var ChannelContextInterface */
     private $channelContext;
@@ -43,7 +43,7 @@ class SearchController extends AbstractController
     /**
      * SearchController constructor.
      * @param EngineInterface $templatingEngine
-     * @param DocumentIndexer $documentIndexer
+     * @param DocumentSearch $documentSearch
      * @param ChannelContextInterface $channelContext
      * @param CurrencyContextInterface $currencyContext
      * @param array $limits
@@ -52,7 +52,7 @@ class SearchController extends AbstractController
      */
     public function __construct(
         EngineInterface $templatingEngine,
-        DocumentIndexer $documentIndexer,
+        DocumentSearch $documentSearch,
         ChannelContextInterface $channelContext,
         CurrencyContextInterface $currencyContext,
         array $limits,
@@ -60,7 +60,7 @@ class SearchController extends AbstractController
         int $instantDefaultLimit
     ) {
         $this->templatingEngine = $templatingEngine;
-        $this->documentIndexer = $documentIndexer;
+        $this->documentSearch = $documentSearch;
         $this->channelContext = $channelContext;
         $this->currencyContext = $currencyContext;
         $this->limits = $limits;
@@ -102,7 +102,7 @@ class SearchController extends AbstractController
 
         // Perform search
         /** @var ResultSet $resultSet */
-        $resultSet = $this->documentIndexer->search(
+        $resultSet = $this->documentSearch->search(
             $request->getLocale(),
             $query,
             $limit,
@@ -147,7 +147,7 @@ class SearchController extends AbstractController
 
         // Perform instant search
         /** @var ResultSet $resultSet */
-        $resultSet = $this->documentIndexer->instant(
+        $resultSet = $this->documentSearch->instant(
             $request->getLocale(),
             $query,
             $this->instantDefaultLimit

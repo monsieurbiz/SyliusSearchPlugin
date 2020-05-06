@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\EventListener;
 
 
-use MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Document\DocumentIndexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webmozart\Assert\Assert;

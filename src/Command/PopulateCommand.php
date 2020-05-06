@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
-use MonsieurBiz\SyliusSearchPlugin\Indexer\DocumentIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Document\DocumentIndexer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

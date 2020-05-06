@@ -85,3 +85,5 @@ services:
       $taxonDefaultLimit: '%monsieurbiz_sylius_search.taxon_default_limit%'
       $searchDefaultLimit: '%monsieurbiz_sylius_search.search_default_limit%'
       $instantDefaultLimit: '%monsieurbiz_sylius_search.instant_default_limit%'
+      $taxonSorting: '%monsieurbiz_sylius_search.taxon_sorting%'
+      $searchSorting: '%monsieurbiz_sylius_search.search_sorting%'

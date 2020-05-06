@@ -20,6 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SearchController extends AbstractController
 {
+    const SORT_ASC = 'asc';
+    const SORT_DESC = 'desc';
+
     /** @var EngineInterface */
     private $templatingEngine;
 
@@ -50,6 +53,12 @@ class SearchController extends AbstractController
     /** @var int */
     private $instantDefaultLimit;
 
+    /** @var string[] */
+    private $taxonSorting;
+
+    /** @var string[] */
+    private $searchSorting;
+
     /**
      * SearchController constructor.
      * @param EngineInterface $templatingEngine
@@ -62,6 +71,8 @@ class SearchController extends AbstractController
      * @param int $taxonDefaultLimit
      * @param int $searchDefaultLimit
      * @param int $instantDefaultLimit
+     * @param array $taxonSorting
+     * @param array $searchSorting
      */
     public function __construct(
         EngineInterface $templatingEngine,
@@ -73,7 +84,9 @@ class SearchController extends AbstractController
         array $searchLimits,
         int $taxonDefaultLimit,
         int $searchDefaultLimit,
-        int $instantDefaultLimit
+        int $instantDefaultLimit,
+        array $taxonSorting,
+        array $searchSorting
     ) {
         $this->templatingEngine = $templatingEngine;
         $this->documentSearch = $documentSearch;
@@ -85,6 +98,8 @@ class SearchController extends AbstractController
         $this->taxonDefaultLimit = $taxonDefaultLimit;
         $this->searchDefaultLimit = $searchDefaultLimit;
         $this->instantDefaultLimit = $instantDefaultLimit;
+        $this->taxonSorting = $taxonSorting;
+        $this->searchSorting = $searchSorting;
     }
 
     /**
@@ -193,6 +208,11 @@ class SearchController extends AbstractController
 
         $page = max(1, (int) $request->get('page'));
         $limit = max(1, (int) $request->get('limit'));
+        $sorting = $this->cleanSorting($request->get('sorting'), $this->taxonSorting);
+
+        if (!is_array($sorting) || empty($sorting)) {
+            $sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES
+        }
 
         if (!in_array($limit, $this->taxonLimits)) {
             $limit = $this->taxonDefaultLimit;
@@ -204,7 +224,8 @@ class SearchController extends AbstractController
             $request->getLocale(),
             $taxon->getCode(),
             $limit,
-            $page
+            $page,
+            $sorting
         );
 
         // Display result list
@@ -215,5 +236,25 @@ class SearchController extends AbstractController
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
         ]);
+    }
+
+    /**
+     * Be sure given sort in available
+     * @param $sorting
+     * @param $availableSorting
+     * @return array
+     */
+    private function cleanSorting(?array $sorting, array $availableSorting): array
+    {
+        if (!is_array($sorting)) {
+            return  [];
+        }
+
+        foreach ($sorting as $field => $order) {
+            if (!in_array($field, $availableSorting) || !in_array($order, [self::SORT_ASC, self::SORT_DESC])) {
+                unset($sorting[$field]);
+            }
+        }
+        return $sorting;
     }
 }

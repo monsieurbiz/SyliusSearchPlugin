@@ -21,5 +21,18 @@
     }
   },
   "from": "{{FROM}}",
-  "size": "{{SIZE}}"
+  "size": "{{SIZE}}",
+  "sort" : [
+    {
+      "{{SORT_FIELD}}": {
+        "order" : "{{SORT_ORDER}}",
+        "nested": {
+          "path": "{{SORT_NESTED_PATH}}",
+          "filter": {
+            "term" : { "{{SORT_FILTER_FIELD}}" : "{{SORT_FILTER_VALUE}}" }
+          }
+        }
+      }
+    }
+  ]
 }

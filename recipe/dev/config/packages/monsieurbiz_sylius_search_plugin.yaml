@@ -6,7 +6,7 @@ monsieur_biz_sylius_search:
     instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/instant.json'
     taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/taxon.json'
     documentable_classes :
-        - 'App\Entity\Product'
+        - 'App\Entity\Product\Product'
     taxon_limits: [9, 18, 27]
     search_limits: [9, 18, 27]
     taxon_sorting: ['name', 'price', 'created_at']

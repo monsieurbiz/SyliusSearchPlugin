@@ -59,6 +59,11 @@ MONSIEURBIZ_SEARCHPLUGIN_ES_PORT=9200
 ###< MonsieurBizSearchPlugin ###
 ```
 
+## Setup
+
+Make your `Product` entity implements [DocumentableInterface](#Documentable objects) and use the `DocumentableProductTrait`.  
+Run the populate [command](#Command).
+
 ## Infrastructure
 
 The plugin was developed for Elasticsearch 7.2.x versions. 
@@ -76,31 +81,37 @@ This is the second URL you have to put on Cerebro, Kibana and Elasticsearch if y
 
 For a development infrastructure with docker, you can check the [Monsieur Biz Sylius infra](https://github.com/monsieurbiz/sylius-infra/)
 
-## Setup
-
-Make your `Product` entity implements [DocumentableInterface](#Documentable objects).
-Run the populate [command](#Command).
-
 ## Configuration
 
 The default module configuration is : 
 
 ```yaml
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
-    instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
+    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/search.json'
+    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/instant.json'
+    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/taxon.json'
     documentable_classes :
-        - 'App\Entity\Product'
+        - 'App\Entity\Product\Product'
+    taxon_limits: [9, 18, 27]
+    search_limits: [9, 18, 27]
+    taxon_sorting: ['name', 'price', 'created_at']
+    search_sorting: ['name', 'price', 'created_at']
+    taxon_default_limit: 9
+    search_default_limit: 9
+    instant_default_limit: 10
 ```
 
 You can customize it in `config/packages/monsieurbiz_sylius_search_plugin.yaml`.
 
-`search_file` is the JSON used to perform the search.
-`instant_file` is the JSON used to perform the search.
+`search_file` is the JSON used to perform the search.  
+`instant_file` is the JSON used to perform the instant search.  
+`taxon_file` is the JSON used to perform the taxon view.
 
 The `{{QUERY}}` string inside is replaced in PHP by the query typed by the user.
 
 `documentable_classes` is an array of entities which can be indexed in Elasticsearch.
+
+You can also change available sortings and limits.
 
 ## Documentable objects
 
@@ -114,7 +125,7 @@ interface DocumentableInterface
 }
 ```
 
-Here is an exemple for the product conversion : 
+Here is an example for the product conversion using the plugin Trait to convert products : 
 
 ```php
 <?php
@@ -124,8 +135,8 @@ declare(strict_types=1);
 namespace App\Entity\Product;
 
 use Doctrine\ORM\Mapping as ORM;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait;
 use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
 use Sylius\Component\Core\Model\Product as BaseProduct;
 use Sylius\Component\Core\Model\ProductTranslation;
 use Sylius\Component\Product\Model\ProductTranslationInterface;
@@ -136,65 +147,11 @@ use Sylius\Component\Product\Model\ProductTranslationInterface;
  */
 class Product extends BaseProduct implements DocumentableInterface
 {
+    use DocumentableProductTrait;
+
     protected function createTranslation(): ProductTranslationInterface
     {
         return new ProductTranslation();
-    }
-    public function getDocumentType(): string
-    {
-        return 'product';
-    }
-
-    public function convertToDocument(string $locale): DocumentResult
-    {
-        $document = new DocumentResult();
-
-        // Document data
-        $document->setType($this->getDocumentType());
-        $document->setCode($this->getCode());
-        $document->setId($this->getId());
-        $document->setEnabled($this->isEnabled());
-        $document->setSlug($this->getTranslation($locale)->getSlug());
-
-        /** @var \Sylius\Component\Core\Model\Image $image */
-        if ($image = $this->getImages()->first()) {
-            $document->setImage($image->getPath());
-        }
-
-        /** @var \Sylius\Component\Core\Model\Channel $channel */
-        foreach ($this->getChannels() as $channel) {
-            $document->addChannel($channel->getCode());
-
-            // TODO Get cheapest variant
-            /** @var \Sylius\Component\Core\Model\ProductVariant $variant */
-            if ($variant = $this->getVariants()->first()) {
-                $price = $variant->getChannelPricingForChannel($channel);
-                // TODO Index all currencies
-                $document->addPrice($channel->getCode(), $channel->getBaseCurrency()->getCode(), $price->getPrice());
-                if ($originalPrice = $price->getOriginalPrice()) {
-                    $document->addOriginalPrice($channel->getCode(), $channel->getBaseCurrency()->getCode(), $originalPrice);
-                }
-            }
-        }
-
-        $document->addAttribute('name', 'Name', [$this->getTranslation($locale)->getName()], $locale, 50);
-        $document->addAttribute('description', 'Description', [$this->getTranslation($locale)->getDescription()], $locale, 10);
-        $document->addAttribute('short_description', 'Short description', [$this->getTranslation($locale)->getShortDescription()], $locale, 10);
-
-        // TODO : Add fallback locale
-        /** @var \Sylius\Component\Attribute\Model\AttributeValueInterface $attribute */
-        foreach ($this->getAttributesByLocale($locale, $locale) as $attribute) {
-            $attributeValues = [];
-            if (isset($attribute->getAttribute()->getConfiguration()['choices'])) {
-                foreach ($attribute->getValue() as $value) {
-                    $attributeValues[] = $attribute->getAttribute()->getConfiguration()['choices'][$value][$locale];
-                }
-            } else {
-                $attributeValues[] = $attribute->getValue();
-            }
-            $document->addAttribute($attribute->getCode(), $attribute->getName(), $attributeValues, $attribute->getLocaleCode(), 1);
-        }
-        return $document;
     }
 }
 ```
@@ -203,7 +160,7 @@ You can add everything you want !
 
 ## Score by attribute
 
-Each document attribute can have a `score`. It means it can be more important than another.
+Each document attribute can have a `score`. It means it can be more important than another.  
 For example, the product name in the exemple above has a score of `50`, and the description a score of `10` : 
 ```php
 $document->addAttribute('name', 'Name', [$this->getTranslation($locale)->getName()], $locale, 50);
@@ -218,6 +175,7 @@ You can customize the search with your custom JSON files and modifying :
 monsieur_biz_sylius_search:
     search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
     instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
+    taxon_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/taxon.json'
 ```
 
 ## Indexed Documents
@@ -227,7 +185,7 @@ Indexed documents are all entities defined in `monsieur_biz_search.documentable_
 ```yaml
 monsieur_biz_sylius_search:
     documentable_classes :
-        - 'App\Entity\Product'
+        - 'App\Entity\Product\Product'
 ```
 
 ## Command
@@ -255,7 +213,7 @@ If your entity implements `DocumentableInterface`, you can add listeners to mana
 
 ## Url Params
 
-If you add a new entity in search index. You have to be able to generate an URL when you display it.
+If you add a new entity in search index. You have to be able to generate an URL when you display it.  
 In order to do that, you can customize the `RenderDocumentUrl` twig extension : 
 ```php
 public function getUrlParams(DocumentResult $document): UrlParamsProvider {
@@ -273,8 +231,8 @@ public function getUrlParams(DocumentResult $document): UrlParamsProvider {
 
 ## Display search form in front
 
-A Twig method is available to display the form : `search_form()`. You can pass a parameter to specify a custom template.  
-By default, the form is display on `sonata.block.event.sylius.shop.layout.header` event.
+A Twig method is available to display the form : `search_form()`. You can pass a parameter to specify a custom template.      
+By default, the form is displayed on `sonata.block.event.sylius.shop.layout.header` event.
 
 ## Front customization
 
@@ -285,14 +243,20 @@ You can override all templates in your theme to :
 
 ## Jane
 
-We are using [Jane](https://github.com/janephp/janephp) to create a DTO (Data-transfer object).
-Generated classes are on `src/MonsieurBizSearchPlugin/generated` folder.
-Jane configuration and JSON Schema are on `src/MonsieurBizSearchPlugin/Resources/config/jane` folder.
+We are using [Jane](https://github.com/janephp/janephp) to create a DTO (Data-transfer object).  
+Generated classes are on `src/MonsieurBizSearchPlugin/generated` folder.  
+Jane configuration and JSON Schema are on `src/MonsieurBizSearchPlugin/Resources/config/jane` folder. 
+
+To rebuild generated class during plugin development, we are using : 
+
+```bash
+symfony php vendor/bin/jane generate --config-file=src/Resources/config/jane/dto-config.php
+```
 
 ## Elastically
 
-The [Elastically](https://github.com/jolicode/elastically) Client is configured in `src/MonsieurBizSearchPlugin/Resources/config/services.yaml` file.
-You can customize it if you want in `config/services.yaml`.
+The [Elastically](https://github.com/jolicode/elastically) Client is configured in `src/MonsieurBizSearchPlugin/Resources/config/services.yaml` file.  
+You can customize it if you want in `config/services.yaml`.  
 Analyzers and YAML mappings are on `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch` folder.
 
 You can also find JSON used bu plugin to perform the search on Elasticsearch : 

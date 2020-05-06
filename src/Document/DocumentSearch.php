@@ -46,7 +46,7 @@ class DocumentSearch extends AbstractDocumentIndex
     }
 
     /**
-     * Search documents for a given locale, query and a max number items
+     * Search documents for a given locale, query and, max number items and page
      *
      * @param string $locale
      * @param string $query
@@ -57,22 +57,11 @@ class DocumentSearch extends AbstractDocumentIndex
     public function search(string $locale, string $query, int $maxItems, int $page): ResultSet
     {
         try {
-            /** @var ElasticallyResultSet $results */
-            $results = $this->getClient()->getIndex($this->getIndexName($locale))->search(
-                json_decode($this->getSearchJson($query, $page, $maxItems), true), $maxItems
-            );
+            return $this->jsonSearch($locale, $this->getSearchJson($query, $page, $maxItems), $maxItems, $page);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, $page);
-        } catch (HttpException  $exception) {
-            $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
-        } catch (ResponseException  $exception) {
-            $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
         }
-
-        return new ResultSet($maxItems, $page, $results);
     }
 
     /**
@@ -86,16 +75,57 @@ class DocumentSearch extends AbstractDocumentIndex
     public function instant(string $locale, string $query, int $maxItems): ResultSet
     {
         try {
-            /** @var ElasticallyResultSet $results */
-            $results = $this->getClient()->getIndex($this->getIndexName($locale))->search(
-                json_decode($this->getInstantJson($query), true), $maxItems
-            );
+            return $this->jsonSearch($locale, $this->getInstantJson($query), $maxItems, 1);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, 1);
         }
+    }
 
-        return new ResultSet($maxItems, 1, $results);
+    /**
+     * Taxon search documents for a given locale, taxon code, max number items and page
+     *
+     * @param string $locale
+     * @param string $taxon
+     * @param int $maxItems
+     * @param int $page
+     * @return ResultSet
+     */
+    public function taxon(string $locale, string $taxon, int $maxItems, int $page): ResultSet
+    {
+        try {
+            return $this->jsonSearch($locale, $this->getTaxonJson($taxon, $page, $maxItems), $maxItems, $page);
+        } catch (ReadFileException $exception) {
+            $this->logger->critical($exception->getMessage());
+            return new ResultSet($maxItems, $page);
+        }
+    }
+
+    /**
+     * Perform search for a given JSON
+     *
+     * @param string $locale
+     * @param string $json
+     * @param int $maxItems
+     * @param int $page
+     * @return ResultSet
+     */
+    private function jsonSearch(string $locale, string $json, int $maxItems, int $page)
+    {
+        try {
+            /** @var ElasticallyResultSet $results */
+            $results = $this->getClient()->getIndex($this->getIndexName($locale))->search(
+                json_decode($json, true), $maxItems
+            );
+        } catch (HttpException $exception) {
+            $this->logger->critical($exception->getMessage());
+            return new ResultSet($maxItems, $page);
+        } catch (ResponseException $exception) {
+            $this->logger->critical($exception->getMessage());
+            return new ResultSet($maxItems, $page);
+        }
+
+        return new ResultSet($maxItems, $page, $results);
     }
 
     /**
@@ -132,6 +162,29 @@ class DocumentSearch extends AbstractDocumentIndex
     {
         $elasticJson = $this->searchRequestProvider->getInstantJson();
         $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
+        $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
+
+        return $elasticJson;
+    }
+
+    /**
+     * Retrieve the JSON to send to Elasticsearch for taxon search
+     *
+     * @param string $taxon
+     * @param int $page
+     * @param int $size
+     * @return mixed|string
+     * @throws ReadFileException
+     */
+    private function getTaxonJson(string $taxon, int $page, int $size): string
+    {
+        $elasticJson = $this->searchRequestProvider->getTaxonJson();
+
+        $from = ($page - 1) * $size;
+
+        $elasticJson = str_replace('{{TAXON}}', $taxon, $elasticJson);
+        $elasticJson = str_replace('{{FROM}}', max(0, $from), $elasticJson);
+        $elasticJson = str_replace('{{SIZE}}', max(1, $size), $elasticJson);
         $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
 
         return $elasticJson;

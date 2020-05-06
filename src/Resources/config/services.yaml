@@ -70,6 +70,7 @@ services:
     arguments:
       $searchPath: '%monsieurbiz_sylius_search.search_file%'
       $instantPath: '%monsieurbiz_sylius_search.instant_file%'
+      $taxonPath: '%monsieurbiz_sylius_search.taxon_file%'
 
   # Provider to retrieve repositories to index
   MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider:

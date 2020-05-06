@@ -12,7 +12,7 @@ class JaneObjectNormalizer implements DenormalizerInterface, NormalizerInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
-    protected $normalizers = array('MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Document' => 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Normalizer\\DocumentNormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Price' => 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Normalizer\\PriceNormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Attributes' => 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Normalizer\\AttributesNormalizer', '\\Jane\\JsonSchemaRuntime\\Reference' => '\\Jane\\JsonSchemaRuntime\\Normalizer\\ReferenceNormalizer'), $normalizersCache = array();
+    protected $normalizers = array('MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Document' => 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Normalizer\\DocumentNormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Price' => 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Normalizer\\PriceNormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Attributes' => 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Normalizer\\AttributesNormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Taxon' => 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Normalizer\\TaxonNormalizer', '\\Jane\\JsonSchemaRuntime\\Reference' => '\\Jane\\JsonSchemaRuntime\\Normalizer\\ReferenceNormalizer'), $normalizersCache = array();
     public function supportsDenormalization($data, $type, $format = null)
     {
         return array_key_exists($type, $this->normalizers);

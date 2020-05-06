@@ -93,6 +93,17 @@
           "type": "integer"
         }
       }
+    },
+    "Taxon": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "position": {
+          "type": "integer"
+        }
+      }
     }
   }
 }

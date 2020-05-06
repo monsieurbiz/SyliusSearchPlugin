@@ -22,9 +22,10 @@
                 </div>
 
                 <div class="ui hidden divider"></div>
+                
+                {{ pagination.simple(resultSet.pager) }}
             </div>
         </div>
 
-        {{ pagination.simple(resultSet.pager) }}
     {% endif %}
 {% endblock %}

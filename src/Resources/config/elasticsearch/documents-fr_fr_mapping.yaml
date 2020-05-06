@@ -12,7 +12,12 @@ mappings:
     mainTaxon:
       type: keyword
     taxon:
-      type: keyword
+      type: nested
+      properties:
+        code:
+          type: keyword
+        position:
+          type: integer
     attributes:
       type: nested
       properties:

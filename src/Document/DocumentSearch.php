@@ -52,12 +52,13 @@ class DocumentSearch extends AbstractDocumentIndex
      * @param string $query
      * @param int $maxItems
      * @param int $page
+     * @param array $sorting
      * @return ResultSet
      */
-    public function search(string $locale, string $query, int $maxItems, int $page): ResultSet
+    public function search(string $locale, string $query, int $maxItems, int $page, array $sorting): ResultSet
     {
         try {
-            return $this->jsonSearch($locale, $this->getSearchJson($query, $page, $maxItems), $maxItems, $page);
+            return $this->jsonSearch($locale, $this->getSearchJson($query, $page, $maxItems, $sorting), $maxItems, $page);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, $page);
@@ -138,7 +139,7 @@ class DocumentSearch extends AbstractDocumentIndex
      * @return string
      * @throws ReadFileException
      */
-    private function getSearchJson(string $query, int $page, int $size): string
+    private function getSearchJson(string $query, int $page, int $size, array $sorting): string
     {
         $elasticJson = $this->searchRequestProvider->getSearchJson();
 
@@ -148,6 +149,16 @@ class DocumentSearch extends AbstractDocumentIndex
         $elasticJson = str_replace('{{FROM}}', max(0, $from), $elasticJson);
         $elasticJson = str_replace('{{SIZE}}', max(1, $size), $elasticJson);
         $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
+
+        foreach ($sorting as $field => $order) {
+            $elasticJson = str_replace('{{SORT_ORDER}}', $order, $elasticJson);
+            $parameters = $this->getSortParamByField($field);
+            $elasticJson = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $elasticJson);
+            $elasticJson = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $elasticJson);
+            $elasticJson = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $elasticJson);
+            $elasticJson = str_replace('{{SORT_FILTER_VALUE}}', $parameters['sort_filter_value'] ?? '', $elasticJson);
+            break; // only 1
+        }
 
         return $elasticJson;
     }

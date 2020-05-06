@@ -129,6 +129,11 @@ class SearchController extends AbstractController
         $query = htmlspecialchars(urldecode($request->get('query')));
         $page = max(1, (int) $request->get('page'));
         $limit = max(1, (int) $request->get('limit'));
+        $sorting = $this->cleanSorting($request->get('sorting'), $this->searchSorting);
+
+        if (!is_array($sorting) || empty($sorting)) {
+            $sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES
+        }
 
         if (!in_array($limit, $this->searchLimits)) {
             $limit = $this->searchDefaultLimit;
@@ -140,7 +145,8 @@ class SearchController extends AbstractController
             $request->getLocale(),
             $query,
             $limit,
-            $page
+            $page,
+            $sorting
         );
 
         // Redirect to document if only one result

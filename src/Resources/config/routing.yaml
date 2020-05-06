@@ -1,3 +1,5 @@
 monsieurbiz_sylius_search_shop:
   resource: "routing/shop.yaml"
   prefix: /{_locale}
+  requirements:
+    _locale: ^[a-z]{2}(?:_[A-Z]{2})?$

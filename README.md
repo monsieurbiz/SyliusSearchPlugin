@@ -31,13 +31,21 @@ Then create the config file in `config/packages/monsieurbiz_search_plugin.yaml` 
 
 ```yaml
 imports:
-  - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
+    - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
 
-monsieurbiz_sylius_search:
-  search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
-  instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
-  documentable_classes :
-    - 'App\Entity\Product'
+monsieur_biz_sylius_search:
+    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/search.json'
+    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/instant.json'
+    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/taxon.json'
+    documentable_classes :
+        - 'App\Entity\Product\Product'
+    taxon_limits: [9, 18, 27]
+    search_limits: [9, 18, 27]
+    taxon_sorting: ['name', 'price', 'created_at']
+    search_sorting: ['name', 'price', 'created_at']
+    taxon_default_limit: 9
+    search_default_limit: 9
+    instant_default_limit: 10
 ```
 
 Import routes in `config/routes.yaml` :

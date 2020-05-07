@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Adapter;
 
-use MonsieurBiz\SyliusSearchPlugin\Model\ResultSet;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Pagerfanta\Adapter\AdapterInterface;
 
 class ResultSetAdapter implements AdapterInterface

@@ -129,7 +129,7 @@ If you want to index an object in the search index, your entity have to implemen
 interface DocumentableInterface
 {
     public function getDocumentType(): string;
-    public function convertToDocument(string $locale): DocumentResult;
+    public function convertToDocument(string $locale): Result;
 }
 ```
 
@@ -224,7 +224,7 @@ If your entity implements `DocumentableInterface`, you can add listeners to mana
 If you add a new entity in search index. You have to be able to generate an URL when you display it.  
 In order to do that, you can customize the `RenderDocumentUrl` twig extension : 
 ```php
-public function getUrlParams(DocumentResult $document): UrlParamsProvider {
+public function getUrlParams(Result $document): UrlParamsProvider {
     switch ($document->getType()) {
         case "product" :
             return new UrlParamsProvider('sylius_shop_product_show', ['slug' => $document->getSlug(), '_locale' => $document->getLocale()]);

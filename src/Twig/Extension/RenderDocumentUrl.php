@@ -6,7 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Twig\Extension;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -22,12 +22,12 @@ class RenderDocumentUrl extends AbstractExtension
     }
 
     /**
-     * @param DocumentResult $document
+     * @param Result $document
      * @return UrlParamsProvider
      * @throws MissingLocaleException
      * @throws NotSupportedTypeException
      */
-    public function getUrlParams(DocumentResult $document): UrlParamsProvider {
+    public function getUrlParams(Result $document): UrlParamsProvider {
         switch ($document->getType()) {
             case "product" :
                 return new UrlParamsProvider('sylius_shop_product_show', ['slug' => $document->getSlug(), '_locale' => $document->getLocale()]);

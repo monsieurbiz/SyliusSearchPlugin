@@ -7,8 +7,8 @@ use MonsieurBiz\SyliusSearchPlugin\Context\TaxonContextInterface;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
 use MonsieurBiz\SyliusSearchPlugin\Document\DocumentSearch;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
-use MonsieurBiz\SyliusSearchPlugin\Model\ResultSet;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
@@ -151,7 +151,7 @@ class SearchController extends AbstractController
 
         // Redirect to document if only one result
         if ($resultSet->getTotalHits() === 1) {
-            /** @var DocumentResult $document */
+            /** @var Result $document */
             $document = current($resultSet->getResults());
             try {
                 $renderDocumentUrl = new RenderDocumentUrl();

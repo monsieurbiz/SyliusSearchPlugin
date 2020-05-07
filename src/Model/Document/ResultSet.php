@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Model;
+namespace MonsieurBiz\SyliusSearchPlugin\Model\Document;
 
 use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use JoliCode\Elastically\Result;
@@ -11,7 +11,7 @@ use Pagerfanta\Pagerfanta;
 
 class ResultSet
 {
-    /** @var DocumentResult[] */
+    /** @var Result[] */
     private $results;
 
     /** @var int */
@@ -63,7 +63,7 @@ class ResultSet
     }
 
     /**
-     * @return DocumentResult[]
+     * @return Result[]
      */
     public function getResults(): array
     {

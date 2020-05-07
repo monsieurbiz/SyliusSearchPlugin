@@ -8,7 +8,7 @@ use Elastica\Exception\ResponseException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use Elastica\Document;
 use JoliCode\Elastically\Client;
 use Psr\Log\LoggerInterface;
@@ -130,11 +130,11 @@ class DocumentIndexer extends AbstractDocumentIndex
     /**
      * Index a document for one locale
      *
-     * @param DocumentResult $document
+     * @param Result $document
      * @param string $locale
      * @throws MissingParamException
      */
-    public function indexOneByLocale(DocumentResult $document, string $locale): void
+    public function indexOneByLocale(Result $document, string $locale): void
     {
         $this->getIndexer()->scheduleIndex(
             $this->getIndexName($locale),
@@ -159,11 +159,11 @@ class DocumentIndexer extends AbstractDocumentIndex
     /**
      * Remove a document for all locales
      *
-     * @param DocumentResult $document
+     * @param Result $document
      * @param string $locale
      * @throws MissingParamException
      */
-    public function removeOneByLocale(DocumentResult $document, string $locale): void
+    public function removeOneByLocale(Result $document, string $locale): void
     {
         $this->getIndexer()->scheduleDelete(
             $this->getIndexName($locale),

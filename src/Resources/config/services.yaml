@@ -34,10 +34,10 @@ services:
         elastically_serializer: 'MonsieurBiz\SyliusSearchPlugin\generated\Normalizer\JaneObjectNormalizer'
         elastically_index_class_mapping:
           # @TODO Add it in config
-          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
-          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
-          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
-          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
+          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
         elastically_bulk_size: 100
 
   # Add JS for instant search

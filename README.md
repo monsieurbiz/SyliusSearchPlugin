@@ -123,13 +123,13 @@ You can also change available sortings and limits.
 
 ## Documentable objects
 
-If you want to index an object in the search index, your entity have to implements `MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface` interface : 
+If you want to index an object in the search index, your entity have to implements `MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface` interface : 
 
 ```php
 interface DocumentableInterface
 {
     public function getDocumentType(): string;
-    public function convertToDocument(string $locale): DocumentResult;
+    public function convertToDocument(string $locale): Result;
 }
 ```
 
@@ -144,7 +144,7 @@ namespace App\Entity\Product;
 
 use Doctrine\ORM\Mapping as ORM;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Sylius\Component\Core\Model\Product as BaseProduct;
 use Sylius\Component\Core\Model\ProductTranslation;
 use Sylius\Component\Product\Model\ProductTranslationInterface;
@@ -203,16 +203,16 @@ A symfony command is available to populate index : `console monsieurbiz:search:p
 ## Index on save
 
 For product entity, we have a listener to add / update / delete document on save.
-It is the `App\MonsieurBizSearchPlugin\EventListener\DocumentListener` class which : 
+It is the `MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener` class which : 
 - `saveDocument` on `post_create` dans `post_update`
 - `removeDocument` on `pre_delete`
 
 If your entity implements `DocumentableInterface`, you can add listeners to manage entities modifications (Replace `<YOUR_ENTITY>` with your) :
 ```yaml
     app.event_listener.document_listener:
-        class: App\MonsieurBizSearchPlugin\EventListener\DocumentListener
+        class: MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener
         arguments:
-            - '@App\MonsieurBizSearchPlugin\Indexer\DocumentIndexer'
+            - '@MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Indexer'
         tags:
             - { name: kernel.event_listener, event: sylius.<YOUR_ENTITY>.post_create, method: saveDocument }
             - { name: kernel.event_listener, event: sylius.<YOUR_ENTITY>.post_update, method: saveDocument }
@@ -224,7 +224,7 @@ If your entity implements `DocumentableInterface`, you can add listeners to mana
 If you add a new entity in search index. You have to be able to generate an URL when you display it.  
 In order to do that, you can customize the `RenderDocumentUrl` twig extension : 
 ```php
-public function getUrlParams(DocumentResult $document): UrlParamsProvider {
+public function getUrlParams(Result $document): UrlParamsProvider {
     switch ($document->getType()) {
         case "product" :
             return new UrlParamsProvider('sylius_shop_product_show', ['slug' => $document->getSlug(), '_locale' => $document->getLocale()]);

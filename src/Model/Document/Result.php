@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Model;
+namespace MonsieurBiz\SyliusSearchPlugin\Model\Document;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingAttributeException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
@@ -15,7 +15,7 @@ use MonsieurBiz\SyliusSearchPlugin\generated\Model\Price;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
 use MonsieurBiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
 
-class DocumentResult extends Document
+class Result extends Document
 {
     /**
      * Document ID in elasticsearch
@@ -114,7 +114,7 @@ class DocumentResult extends Document
 
     /**
      * @param string $channel
-     * @return DocumentResult
+     * @return Result
      */
     public function addChannel(string $channel): self
     {
@@ -126,7 +126,7 @@ class DocumentResult extends Document
     /**
      * @param string $code
      * @param int $position
-     * @return DocumentResult
+     * @return Result
      */
     public function addTaxon(string $code, int $position): self
     {
@@ -141,7 +141,7 @@ class DocumentResult extends Document
      * @param string $channel
      * @param string $currency
      * @param int $value
-     * @return DocumentResult
+     * @return Result
      */
     public function addPrice(string $channel, string $currency, int $value): self
     {
@@ -156,7 +156,7 @@ class DocumentResult extends Document
      * @param string $channel
      * @param string $currency
      * @param int $value
-     * @return DocumentResult
+     * @return Result
      */
     public function addOriginalPrice(string $channel, string $currency, int $value): self
     {
@@ -173,7 +173,7 @@ class DocumentResult extends Document
      * @param array $value
      * @param string $locale
      * @param int $score
-     * @return DocumentResult
+     * @return Result
      */
     public function addAttribute(string $code, string $name, array $value, string $locale, int $score): self
     {

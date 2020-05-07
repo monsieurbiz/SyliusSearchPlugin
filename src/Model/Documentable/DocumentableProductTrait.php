@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Core\Model\Image;
@@ -25,11 +25,11 @@ trait DocumentableProductTrait
 
     /**
      * @param string $locale
-     * @return DocumentResult
+     * @return Result
      */
-    public function convertToDocument(string $locale): DocumentResult
+    public function convertToDocument(string $locale): Result
     {
-        $document = new DocumentResult();
+        $document = new Result();
 
         // Document data
         $document->setType($this->getDocumentType());
@@ -55,10 +55,10 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param DocumentResult $document
-     * @return DocumentResult
+     * @param Result $document
+     * @return Result
      */
-    protected function addImagesInDocument(DocumentResult $document): DocumentResult
+    protected function addImagesInDocument(Result $document): Result
     {
         /** @var Image $image */
         if ($image = $this->getImages()->first()) {
@@ -69,10 +69,10 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param DocumentResult $document
-     * @return DocumentResult
+     * @param Result $document
+     * @return Result
      */
-    protected function addChannelsInDocument(DocumentResult $document): DocumentResult
+    protected function addChannelsInDocument(Result $document): Result
     {
         /** @var Channel $channel */
         foreach ($this->getChannels() as $channel) {
@@ -83,10 +83,10 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param DocumentResult $document
-     * @return DocumentResult
+     * @param Result $document
+     * @return Result
      */
-    protected function addPricesInDocument(DocumentResult $document): DocumentResult
+    protected function addPricesInDocument(Result $document): Result
     {
         /** @var Channel $channel */
         foreach ($this->getChannels() as $channel) {
@@ -108,10 +108,10 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param DocumentResult $document
-     * @return DocumentResult
+     * @param Result $document
+     * @return Result
      */
-    protected function addTaxonsInDocument(DocumentResult $document): DocumentResult
+    protected function addTaxonsInDocument(Result $document): Result
     {
         /** @var Taxon $taxon */
         if ($mainTaxon = $this->getMainTaxon()) {
@@ -127,11 +127,11 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param DocumentResult $document
+     * @param Result $document
      * @param string $locale
-     * @return DocumentResult
+     * @return Result
      */
-    protected function addAttributesInDocument(DocumentResult $document, string $locale): DocumentResult
+    protected function addAttributesInDocument(Result $document, string $locale): Result
     {
         // TODO : Add fallback locale
         /** @var AttributeValueInterface $attribute */

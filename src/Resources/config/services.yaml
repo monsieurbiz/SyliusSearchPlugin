@@ -34,10 +34,10 @@ services:
         elastically_serializer: 'MonsieurBiz\SyliusSearchPlugin\generated\Normalizer\JaneObjectNormalizer'
         elastically_index_class_mapping:
           # @TODO Add it in config
-          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
-          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
-          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
-          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
+          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
         elastically_bulk_size: 100
 
   # Add JS for instant search
@@ -60,7 +60,7 @@ services:
   monsieurbiz_sylius_search.event_listener.document_listener:
     class: MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener
     arguments:
-      - '@MonsieurBiz\SyliusSearchPlugin\Document\DocumentIndexer'
+      - '@MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Indexer'
     tags:
       - { name: kernel.event_listener, event: sylius.product.post_create, method: saveDocument }
       - { name: kernel.event_listener, event: sylius.product.post_update, method: saveDocument }

@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\EventListener;
 
 
-use MonsieurBiz\SyliusSearchPlugin\Document\DocumentIndexer;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Indexer;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webmozart\Assert\Assert;
 
 final class DocumentListener
 {
-    /** @var DocumentIndexer */
+    /** @var Indexer */
     private $documentIndexer;
 
     /**
      * DocumentListener constructor.
-     * @param DocumentIndexer $documentIndexer
+     * @param Indexer $documentIndexer
      */
-    public function __construct(DocumentIndexer $documentIndexer)
+    public function __construct(Indexer $documentIndexer)
     {
         $this->documentIndexer = $documentIndexer;
     }

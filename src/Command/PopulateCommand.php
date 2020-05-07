@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
-use MonsieurBiz\SyliusSearchPlugin\Document\DocumentIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Indexer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,15 +17,15 @@ class PopulateCommand extends Command
     protected static $defaultName = 'monsieurbiz:search:populate';
 
     /**
-     * @var DocumentIndexer
+     * @var Indexer
      */
     protected $documentIndexer;
 
     /**
      * PopulateCommand constructor.
-     * @param DocumentIndexer $documentIndexer
+     * @param Indexer $documentIndexer
      */
-    public function __construct(DocumentIndexer $documentIndexer)
+    public function __construct(Indexer $documentIndexer)
     {
         $this->documentIndexer = $documentIndexer;
         parent::__construct(static::$defaultName);

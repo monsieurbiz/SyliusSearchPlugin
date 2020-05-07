@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Document;
+namespace MonsieurBiz\SyliusSearchPlugin\Model\Document\Index;
 
 use Elastica\Exception\Connection\HttpException;
 use Elastica\Exception\ResponseException;
 use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
-use MonsieurBiz\SyliusSearchPlugin\Model\ResultSet;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 
 
-class DocumentSearch extends AbstractDocumentIndex
+class Search extends AbstractIndex
 {
     /** @var SearchRequestProvider */
     private $searchRequestProvider;

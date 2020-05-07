@@ -6,7 +6,7 @@ namespace Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product;
 
 use Doctrine\ORM\Mapping as ORM;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Sylius\Component\Core\Model\Product as BaseProduct;
 use Sylius\Component\Core\Model\ProductTranslation;
 use Sylius\Component\Product\Model\ProductTranslationInterface;

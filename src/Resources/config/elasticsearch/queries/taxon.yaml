@@ -1,0 +1,28 @@
+---
+# Taxon query, sorts and filters are managed dynamically
+query:
+  bool:
+    filter:
+      - term:
+          enabled: true
+      - term:
+          channel: "{{CHANNEL}}"
+    must:
+      nested:
+        path: taxon
+        query:
+          bool:
+            must:
+              term:
+                taxon.code:
+                  value: "{{TAXON}}"
+from: "{{FROM}}"
+size: "{{SIZE}}"
+sort:
+  - "{{SORT_FIELD}}":
+      order: "{{SORT_ORDER}}"
+      nested:
+        path: "{{SORT_NESTED_PATH}}"
+        filter:
+          term:
+            "{{SORT_FILTER_FIELD}}": "{{SORT_FILTER_VALUE}}"

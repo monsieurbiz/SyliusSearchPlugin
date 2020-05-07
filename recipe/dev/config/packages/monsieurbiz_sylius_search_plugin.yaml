@@ -2,9 +2,9 @@ imports:
     - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
 
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/search.json'
-    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/instant.json'
-    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/taxon.json'
+    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
+    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
+    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/taxon.yaml'
     documentable_classes :
         - 'App\Entity\Product\Product'
     taxon_limits: [9, 18, 27]

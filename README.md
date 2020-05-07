@@ -34,9 +34,9 @@ imports:
     - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
 
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/search.json'
-    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/instant.json'
-    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/taxon.json'
+    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
+    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
+    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/taxon.yaml'
     documentable_classes :
         - 'App\Entity\Product\Product'
     taxon_limits: [9, 18, 27]
@@ -95,9 +95,9 @@ The default module configuration is :
 
 ```yaml
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/search.json'
-    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/instant.json'
-    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/taxon.json'
+    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
+    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
+    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/taxon.yaml'
     documentable_classes :
         - 'App\Entity\Product\Product'
     taxon_limits: [9, 18, 27]
@@ -111,9 +111,9 @@ monsieur_biz_sylius_search:
 
 You can customize it in `config/packages/monsieurbiz_sylius_search_plugin.yaml`.
 
-`search_file` is the JSON used to perform the search.  
-`instant_file` is the JSON used to perform the instant search.  
-`taxon_file` is the JSON used to perform the taxon view.
+`search_file` is the query used to perform the search.  
+`instant_file` is the query used to perform the instant search.  
+`taxon_file` is the query used to perform the taxon view.
 
 The `{{QUERY}}` string inside is replaced in PHP by the query typed by the user.
 
@@ -177,13 +177,13 @@ $document->addAttribute('description', 'Description', [$this->getTranslation($lo
 
 ## Improve search accuracy
 
-You can customize the search with your custom JSON files and modifying : 
+You can customize the search with your custom query files and modifying : 
 
 ```yaml
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json'
-    instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json'
-    taxon_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/taxon.json'
+    search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings/queries.yaml'
+    instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings/queries.yaml'
+    taxon_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings/queries.yaml'
 ```
 
 ## Indexed Documents
@@ -266,11 +266,11 @@ symfony php vendor/bin/jane generate --config-file=src/Resources/config/jane/dto
 
 The [Elastically](https://github.com/jolicode/elastically) Client is configured in `src/MonsieurBizSearchPlugin/Resources/config/services.yaml` file.  
 You can customize it if you want in `config/services.yaml`.  
-Analyzers and YAML mappings are on `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch` folder.
+Analyzers and YAML mappings are on `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings` folder.
 
-You can also find JSON used bu plugin to perform the search on Elasticsearch : 
-- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/search.json`
-- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/instant.json`
-- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/taxon.json`
+You can also find YAML used by plugin to perform the search on Elasticsearch : 
+- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/queries/search.yaml`
+- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/queries/instant.yaml`
+- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/queries/taxon.yaml`
 
-These JSON can be customized in another folder if you change the plugin config.
+These queries can be customized in another folder if you change the plugin config.

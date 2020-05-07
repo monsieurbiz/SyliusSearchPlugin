@@ -15,7 +15,7 @@ class DocumentRepositoryProvider
     private $documentableClasses;
 
     /**
-     * SearchRequestProvider constructor.
+     * SearchQueryProvider constructor.
      * @param EntityManagerInterface $entityManager
      * @param array $documentableClasses
      */

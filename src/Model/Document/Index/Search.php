@@ -11,14 +11,15 @@ use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
-use MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider;
+use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Symfony\Component\Yaml\Yaml;
 
 
 class Search extends AbstractIndex
 {
-    /** @var SearchRequestProvider */
-    private $searchRequestProvider;
+    /** @var SearchQueryProvider */
+    private $searchQueryProvider;
 
     /** @var LoggerInterface */
     private $logger;
@@ -29,36 +30,36 @@ class Search extends AbstractIndex
     /**
      * PopulateCommand constructor.
      * @param Client $client
-     * @param SearchRequestProvider $searchRequestProvider
+     * @param SearchQueryProvider $searchQueryProvider
      * @param ChannelContextInterface $channelContext
      * @param LoggerInterface $logger
      */
     public function __construct(
         Client $client,
-        SearchRequestProvider $searchRequestProvider,
+        SearchQueryProvider $searchQueryProvider,
         ChannelContextInterface $channelContext,
         LoggerInterface $logger
     ) {
         parent::__construct($client);
-        $this->searchRequestProvider = $searchRequestProvider;
+        $this->searchQueryProvider = $searchQueryProvider;
         $this->channelContext = $channelContext;
         $this->logger = $logger;
     }
 
     /**
-     * Search documents for a given locale, query and, max number items and page
+     * Search documents for a given locale, search terms, max number items and page
      *
      * @param string $locale
-     * @param string $query
+     * @param string $search
      * @param int $maxItems
      * @param int $page
      * @param array $sorting
      * @return ResultSet
      */
-    public function search(string $locale, string $query, int $maxItems, int $page, array $sorting): ResultSet
+    public function search(string $locale, string $search, int $maxItems, int $page, array $sorting): ResultSet
     {
         try {
-            return $this->jsonSearch($locale, $this->getSearchJson($query, $page, $maxItems, $sorting), $maxItems, $page);
+            return $this->query($locale, $this->getSearchQuery($search, $page, $maxItems, $sorting), $maxItems, $page);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, $page);
@@ -69,14 +70,14 @@ class Search extends AbstractIndex
      * Instant search documents for a given locale, query and a max number items
      *
      * @param string $locale
-     * @param string $query
+     * @param string $search
      * @param int $maxItems
      * @return ResultSet
      */
-    public function instant(string $locale, string $query, int $maxItems): ResultSet
+    public function instant(string $locale, string $search, int $maxItems): ResultSet
     {
         try {
-            return $this->jsonSearch($locale, $this->getInstantJson($query), $maxItems, 1);
+            return $this->query($locale, $this->getInstantQuery($search), $maxItems, 1);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, 1);
@@ -96,7 +97,7 @@ class Search extends AbstractIndex
     public function taxon(string $locale, string $taxon, int $maxItems, int $page, array $sorting): ResultSet
     {
         try {
-            return $this->jsonSearch($locale, $this->getTaxonJson($taxon, $page, $maxItems, $sorting), $maxItems, $page);
+            return $this->query($locale, $this->getTaxonQuery($taxon, $page, $maxItems, $sorting), $maxItems, $page);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, $page);
@@ -104,20 +105,20 @@ class Search extends AbstractIndex
     }
 
     /**
-     * Perform search for a given JSON
+     * Perform search for a given query
      *
      * @param string $locale
-     * @param string $json
+     * @param string $query
      * @param int $maxItems
      * @param int $page
      * @return ResultSet
      */
-    private function jsonSearch(string $locale, string $json, int $maxItems, int $page)
+    private function query(string $locale, string $query, int $maxItems, int $page)
     {
         try {
             /** @var ElasticallyResultSet $results */
             $results = $this->getClient()->getIndex($this->getIndexName($locale))->search(
-                json_decode($json, true), $maxItems
+                Yaml::parse($query), $maxItems
             );
         } catch (HttpException $exception) {
             $this->logger->critical($exception->getMessage());
@@ -131,57 +132,57 @@ class Search extends AbstractIndex
     }
 
     /**
-     * Retrieve the JSON to send to Elasticsearch for search
+     * Retrieve the query to send to Elasticsearch for search
      *
-     * @param string $query
+     * @param string $search
      * @param int $page
      * @param int $size
      * @param array $sorting
      * @return string
      * @throws ReadFileException
      */
-    private function getSearchJson(string $query, int $page, int $size, array $sorting): string
+    private function getSearchQuery(string $search, int $page, int $size, array $sorting): string
     {
-        $elasticJson = $this->searchRequestProvider->getSearchJson();
+        $query = $this->searchQueryProvider->getSearchQuery();
 
         $from = ($page - 1) * $size;
 
-        $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
-        $elasticJson = str_replace('{{FROM}}', max(0, $from), $elasticJson);
-        $elasticJson = str_replace('{{SIZE}}', max(1, $size), $elasticJson);
-        $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
+        $query = str_replace('{{QUERY}}', $search, $query);
+        $query = str_replace('{{FROM}}', max(0, $from), $query);
+        $query = str_replace('{{SIZE}}', max(1, $size), $query);
+        $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         foreach ($sorting as $field => $order) {
-            $elasticJson = str_replace('{{SORT_ORDER}}', $order, $elasticJson);
+            $query = str_replace('{{SORT_ORDER}}', $order, $query);
             $parameters = $this->getSortParamByField($field);
-            $elasticJson = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $elasticJson);
-            $elasticJson = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $elasticJson);
-            $elasticJson = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $elasticJson);
-            $elasticJson = str_replace('{{SORT_FILTER_VALUE}}', $parameters['sort_filter_value'] ?? '', $elasticJson);
+            $query = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $query);
+            $query = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $query);
+            $query = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $query);
+            $query = str_replace('{{SORT_FILTER_VALUE}}', $parameters['sort_filter_value'] ?? '', $query);
             break; // only 1
         }
 
-        return $elasticJson;
+        return $query;
     }
 
     /**
-     * Retrieve the JSON to send to Elasticsearch for instant search
+     * Retrieve the query to send to Elasticsearch for instant search
      *
-     * @param string $query
+     * @param string $search
      * @return mixed|string
      * @throws ReadFileException
      */
-    private function getInstantJson(string $query)
+    private function getInstantQuery(string $search)
     {
-        $elasticJson = $this->searchRequestProvider->getInstantJson();
-        $elasticJson = str_replace('{{QUERY}}', $query, $elasticJson);
-        $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
+        $query = $this->searchQueryProvider->getInstantQuery();
+        $query = str_replace('{{QUERY}}', $search, $query);
+        $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
-        return $elasticJson;
+        return $query;
     }
 
     /**
-     * Retrieve the JSON to send to Elasticsearch for taxon search
+     * Retrieve the query to send to Elasticsearch for taxon search
      *
      * @param string $taxon
      * @param int $page
@@ -190,28 +191,28 @@ class Search extends AbstractIndex
      * @return mixed|string
      * @throws ReadFileException
      */
-    private function getTaxonJson(string $taxon, int $page, int $size, array $sorting): string
+    private function getTaxonQuery(string $taxon, int $page, int $size, array $sorting): string
     {
-        $elasticJson = $this->searchRequestProvider->getTaxonJson();
+        $query = $this->searchQueryProvider->getTaxonQuery();
 
         $from = ($page - 1) * $size;
 
-        $elasticJson = str_replace('{{TAXON}}', $taxon, $elasticJson);
-        $elasticJson = str_replace('{{FROM}}', max(0, $from), $elasticJson);
-        $elasticJson = str_replace('{{SIZE}}', max(1, $size), $elasticJson);
-        $elasticJson = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $elasticJson);
+        $query = str_replace('{{TAXON}}', $taxon, $query);
+        $query = str_replace('{{FROM}}', max(0, $from), $query);
+        $query = str_replace('{{SIZE}}', max(1, $size), $query);
+        $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         foreach ($sorting as $field => $order) {
-            $elasticJson = str_replace('{{SORT_ORDER}}', $order, $elasticJson);
+            $query = str_replace('{{SORT_ORDER}}', $order, $query);
             $parameters = $this->getSortParamByField($field, $taxon);
-            $elasticJson = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $elasticJson);
-            $elasticJson = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $elasticJson);
-            $elasticJson = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $elasticJson);
-            $elasticJson = str_replace('{{SORT_FILTER_VALUE}}', $parameters['sort_filter_value'] ?? '', $elasticJson);
+            $query = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $query);
+            $query = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $query);
+            $query = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $query);
+            $query = str_replace('{{SORT_FILTER_VALUE}}', $parameters['sort_filter_value'] ?? '', $query);
             break; // only 1
         }
 
-        return $elasticJson;
+        return $query;
     }
 
     /**

@@ -1,0 +1,24 @@
+---
+# Instant search query, sorts and filters are managed dynamically
+query:
+  bool:
+    filter:
+      - term:
+          enabled: true
+      - term:
+          channel: "{{CHANNEL}}"
+    must:
+      nested:
+        path: attributes
+        query:
+          bool:
+            must:
+              multi_match:
+                query: "{{QUERY}}"
+                fields:
+                  - attributes.value
+                fuzziness: 1
+            should:
+              rank_feature:
+                field: attributes.score
+                boost: 100

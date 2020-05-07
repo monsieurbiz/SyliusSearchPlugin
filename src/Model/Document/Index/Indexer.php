@@ -14,7 +14,7 @@ use JoliCode\Elastically\Client;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
-use MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider;
+use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
 use MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider;
 use Webmozart\Assert\Assert;
 
@@ -37,7 +37,7 @@ class Indexer extends AbstractIndex
      * @param Client $client
      * @param DocumentRepositoryProvider $documentRepositoryProvider
      * @param RepositoryInterface $localeRepository
-     * @param SearchRequestProvider $searchRequestProvider
+     * @param SearchQueryProvider $searchQueryProvider
      * @param LoggerInterface $logger
      */
     public function __construct(

@@ -6,7 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Provider;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 
-class SearchRequestProvider
+class SearchQueryProvider
 {
     /** @var string */
     private $searchPath;
@@ -18,7 +18,7 @@ class SearchRequestProvider
     private $taxonPath;
 
     /**
-     * SearchRequestProvider constructor.
+     * SearchQueryProvider constructor.
      * @param string $searchPath
      * @param string $instantPath
      * @param string $taxonPath
@@ -31,47 +31,51 @@ class SearchRequestProvider
     }
 
     /**
-     * Get search JSON query
+     * Get search query
      *
      * @return string
      * @throws ReadFileException
      */
-    public function getSearchJson()
+    public function getSearchQuery()
     {
-        $json = @file_get_contents($this->searchPath);
-        if ($json === false) {
-            throw new ReadFileException(sprintf('Error while opening file "%s".', $this->searchPath));
-        }
-        return $json;
+        return $this->getQuery($this->searchPath);
     }
 
     /**
-     * Get instant JSON query
+     * Get instant query
      *
      * @return false|string
      * @throws ReadFileException
      */
-    public function getInstantJson()
+    public function getInstantQuery()
     {
-        $json = @file_get_contents($this->instantPath);
-        if ($json === false) {
-            throw new ReadFileException(sprintf('Error while opening file "%s".', $this->searchPath));
-        }
-        return $json;
+        return $this->getQuery($this->instantPath);
     }
 
     /**
-     * Get taxon JSON query
+     * Get taxon query
      *
      * @return false|string
      * @throws ReadFileException
      */
-    public function getTaxonJson()
+    public function getTaxonQuery()
     {
-        $json = @file_get_contents($this->taxonPath);
-        if ($json === false) {
-            throw new ReadFileException(sprintf('Error while opening file "%s".', $this->searchPath));
+        return $this->getQuery($this->taxonPath);
+    }
+
+    /**
+     * Get content from file
+     *
+     * @param $path
+     * @return false|string
+     * @throws ReadFileException
+     */
+    private function getQuery($path)
+    {
+        $query = @file_get_contents($path);
+        if ($query === false) {
+            throw new ReadFileException(sprintf('Error while opening file "%s".', $path));
         }
-        return $json;
+        return $query;
     }
 }

@@ -1,6 +1,6 @@
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/search.json'
-    instant_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/instant.json'
-    taxon_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/taxon.json'
+    search_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/search.yaml'
+    instant_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/instant.yaml'
+    taxon_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/taxon.yaml'
     documentable_classes :
         - 'Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product\Product'

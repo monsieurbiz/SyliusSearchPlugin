@@ -30,7 +30,7 @@ services:
       $config:
         host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
         port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
-        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch'
+        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
         elastically_serializer: 'MonsieurBiz\SyliusSearchPlugin\generated\Normalizer\JaneObjectNormalizer'
         elastically_index_class_mapping:
           # @TODO Add it in config
@@ -66,7 +66,7 @@ services:
       - { name: kernel.event_listener, event: sylius.product.post_update, method: saveDocument }
       - { name: kernel.event_listener, event: sylius.product.pre_delete, method: deleteDocument }
 
-  MonsieurBiz\SyliusSearchPlugin\Provider\SearchRequestProvider:
+  MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider:
     arguments:
       $searchPath: '%monsieurbiz_sylius_search.search_file%'
       $instantPath: '%monsieurbiz_sylius_search.instant_file%'

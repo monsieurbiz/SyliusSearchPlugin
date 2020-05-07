@@ -10,3 +10,7 @@ monsieurbiz_searchplugin:
     result:
       search_result: 'Search results for "%query%"'
       no_result: 'No result.'
+  filters:
+      filter_results: 'Filter results'
+      apply_filters: 'Apply filters'
+      no_filter: 'No filter available'

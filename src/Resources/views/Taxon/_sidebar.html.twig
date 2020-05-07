@@ -1,5 +1,7 @@
 {{ sonata_block_render_event('sylius.shop.product.index.before_vertical_menu', {'taxon': taxon}) }}
 
+
+
 <div class="ui fluid vertical menu">
     <div class="header item">{{ taxon.name }}</div>
     {% for child in taxon.children %}
@@ -11,5 +13,7 @@
         </a>
     {% endif %}
 </div>
+
+{% include '@MonsieurBizSyliusSearchPlugin/Taxon/_filters.html.twig' %}
 
 {{ sonata_block_render_event('sylius.shop.product.index.after_vertical_menu', {'taxon': taxon}) }}

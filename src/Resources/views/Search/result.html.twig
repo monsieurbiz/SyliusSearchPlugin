@@ -2,14 +2,13 @@
 {% import '@SyliusUi/Macro/pagination.html.twig' as pagination %}
 
 {% block content %}
-    <h1 class="ui monster section dividing header">
-        {{ 'monsieurbiz_searchplugin.search.result.search_result'|trans({'%query%': query}) }}
-    </h1>
+    {% include '@MonsieurBizSyliusSearchPlugin/Search/_header.html.twig' %}
 
     {% if resultSet.totalHits == 0 %}
         {{ 'monsieurbiz_searchplugin.search.result.no_result'|trans }}
     {% else %}
         {% include '@MonsieurBizSyliusSearchPlugin/Search/_pagination.html.twig' %}
+        {% include '@MonsieurBizSyliusSearchPlugin/Search/_sorting.html.twig' %}
         <div class="ui clearing hidden divider"></div>
 
         <div class="ui three cards" id="products">

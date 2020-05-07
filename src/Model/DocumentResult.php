@@ -12,6 +12,7 @@ use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Attributes;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Document;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Price;
+use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
 use MonsieurBiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
 
 class DocumentResult extends Document
@@ -118,6 +119,20 @@ class DocumentResult extends Document
     public function addChannel(string $channel): self
     {
         $this->setChannel($this->getChannel() ? array_unique(array_merge($this->getChannel(), [$channel])) : [$channel]);
+
+        return $this;
+    }
+
+    /**
+     * @param string $code
+     * @param int $position
+     * @return DocumentResult
+     */
+    public function addTaxon(string $code, int $position): self
+    {
+        $taxon = new Taxon();
+        $taxon->setCode($code)->setPosition($position);
+        $this->setTaxon($this->getTaxon() ? array_merge($this->getTaxon(), [$taxon]) : [$taxon]);
 
         return $this;
     }

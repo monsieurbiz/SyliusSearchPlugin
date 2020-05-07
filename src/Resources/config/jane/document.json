@@ -28,6 +28,15 @@
             "type": "string"
           }
         },
+        "main_taxon": {
+          "type": "string"
+        },
+        "taxon": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "attributes": {
           "type": "array",
           "items": {
@@ -81,6 +90,17 @@
           "type": "string"
         },
         "score": {
+          "type": "integer"
+        }
+      }
+    },
+    "Taxon": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "position": {
           "type": "integer"
         }
       }

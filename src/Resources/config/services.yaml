@@ -31,7 +31,10 @@ services:
         host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
         port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
         elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch'
+        elastically_serializer: 'MonsieurBiz\SyliusSearchPlugin\generated\Normalizer\JaneObjectNormalizer'
         elastically_index_class_mapping:
+          # @TODO Add it in config
+          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
           documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
           documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
           documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult
@@ -67,6 +70,7 @@ services:
     arguments:
       $searchPath: '%monsieurbiz_sylius_search.search_file%'
       $instantPath: '%monsieurbiz_sylius_search.instant_file%'
+      $taxonPath: '%monsieurbiz_sylius_search.taxon_file%'
 
   # Provider to retrieve repositories to index
   MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider:
@@ -76,6 +80,10 @@ services:
 
   MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:
     arguments:
-      $limits: '%monsieurbiz_sylius_search.limits%'
+      $taxonLimits: '%monsieurbiz_sylius_search.taxon_limits%'
+      $searchLimits: '%monsieurbiz_sylius_search.search_limits%'
+      $taxonDefaultLimit: '%monsieurbiz_sylius_search.taxon_default_limit%'
       $searchDefaultLimit: '%monsieurbiz_sylius_search.search_default_limit%'
       $instantDefaultLimit: '%monsieurbiz_sylius_search.instant_default_limit%'
+      $taxonSorting: '%monsieurbiz_sylius_search.taxon_sorting%'
+      $searchSorting: '%monsieurbiz_sylius_search.search_sorting%'

@@ -14,15 +14,20 @@ class SearchRequestProvider
     /** @var string */
     private $instantPath;
 
+    /** @var string */
+    private $taxonPath;
+
     /**
      * SearchRequestProvider constructor.
      * @param string $searchPath
      * @param string $instantPath
+     * @param string $taxonPath
      */
-    public function __construct(string $searchPath, string $instantPath)
+    public function __construct(string $searchPath, string $instantPath, string $taxonPath)
     {
         $this->searchPath = $searchPath;
         $this->instantPath = $instantPath;
+        $this->taxonPath = $taxonPath;
     }
 
     /**
@@ -49,6 +54,21 @@ class SearchRequestProvider
     public function getInstantJson()
     {
         $json = @file_get_contents($this->instantPath);
+        if ($json === false) {
+            throw new ReadFileException(sprintf('Error while opening file "%s".', $this->searchPath));
+        }
+        return $json;
+    }
+
+    /**
+     * Get taxon JSON query
+     *
+     * @return false|string
+     * @throws ReadFileException
+     */
+    public function getTaxonJson()
+    {
+        $json = @file_get_contents($this->taxonPath);
         if ($json === false) {
             throw new ReadFileException(sprintf('Error while opening file "%s".', $this->searchPath));
         }

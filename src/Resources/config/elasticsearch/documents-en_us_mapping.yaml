@@ -9,21 +9,40 @@ mappings:
       type: boolean
     channel:
       type: keyword
+    mainTaxon:
+      type: keyword
+    taxon:
+      type: nested
+      properties:
+        code:
+          type: keyword
+        position:
+          type: integer
     attributes:
       type: nested
       properties:
         name:
           type: text
           analyzer: search_standard
+          fields:
+            keyword:
+              type: keyword
         value:
           type: text
           analyzer: search_standard
+          fields:
+            keyword:
+              type: keyword
+        code:
+          type: keyword
         score:
           type: rank_feature
     price:
       type: nested
       properties:
         currency:
+          type: keyword
+        channel:
           type: keyword
         value:
           type: integer

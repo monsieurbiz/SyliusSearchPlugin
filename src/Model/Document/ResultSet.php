@@ -12,7 +12,7 @@ use Pagerfanta\Pagerfanta;
 class ResultSet
 {
     /** @var Result[] */
-    private $results;
+    private $results = [];
 
     /** @var int */
     private $totalHits;
@@ -24,7 +24,7 @@ class ResultSet
     private $page;
 
     /** @var Filter[] */
-    private $filters;
+    private $filters = [];
 
     /** @var Pagerfanta */
     private $pager;
@@ -80,7 +80,6 @@ class ResultSet
         $filterAggregations = $aggregations['filters'];
         $attributeAggregations = $aggregations['attributes'];
         unset($filterAggregations['doc_count']);
-        unset($attributeAggregations['doc_count']);
 
         // Retrieve filters labels in aggregations
         $attributes = [];
@@ -97,6 +96,9 @@ class ResultSet
 
         // Retrieve filters values in aggregations
         foreach ($filterAggregations as $field => $aggregation) {
+            if ($aggregation['doc_count'] === 0) {
+                continue;
+            }
             $filter = new Filter($attributes[$field] ?? $field);
             $buckets = $aggregation['values']['buckets'] ?? [];
             foreach ($buckets as $bucket) {

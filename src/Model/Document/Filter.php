@@ -12,14 +12,9 @@ class Filter
     private $label;
 
     /**
-     * @var int
-     */
-    private $count;
-
-    /**
      * @var FilterValue[]
      */
-    private $values;
+    private $values = [];
 
     /**
      * Filter constructor.
@@ -36,14 +31,6 @@ class Filter
     public function getLabel(): string
     {
         return $this->label;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCount(): int
-    {
-        return $this->count;
     }
 
     /**

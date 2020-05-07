@@ -4,30 +4,23 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Provider;
 
+use MonsieurBiz\SyliusSearchPlugin\Exception\MissingConfigFileException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
+use MonsieurBiz\SyliusSearchPlugin\Model\Config\FilesConfig;
 
 class SearchQueryProvider
 {
-    /** @var string */
-    private $searchPath;
-
-    /** @var string */
-    private $instantPath;
-
-    /** @var string */
-    private $taxonPath;
+    /** @var FilesConfig */
+    private $filesConfig;
 
     /**
      * SearchQueryProvider constructor.
-     * @param string $searchPath
-     * @param string $instantPath
-     * @param string $taxonPath
+     * @param array $files
+     * @throws MissingConfigFileException
      */
-    public function __construct(string $searchPath, string $instantPath, string $taxonPath)
+    public function __construct(array $files)
     {
-        $this->searchPath = $searchPath;
-        $this->instantPath = $instantPath;
-        $this->taxonPath = $taxonPath;
+        $this->filesConfig = new FilesConfig($files);
     }
 
     /**
@@ -38,7 +31,7 @@ class SearchQueryProvider
      */
     public function getSearchQuery()
     {
-        return $this->getQuery($this->searchPath);
+        return $this->getQuery($this->filesConfig->getSearchPath());
     }
 
     /**
@@ -49,7 +42,7 @@ class SearchQueryProvider
      */
     public function getInstantQuery()
     {
-        return $this->getQuery($this->instantPath);
+        return $this->getQuery($this->filesConfig->getInstantPath());
     }
 
     /**
@@ -60,7 +53,7 @@ class SearchQueryProvider
      */
     public function getTaxonQuery()
     {
-        return $this->getQuery($this->taxonPath);
+        return $this->getQuery($this->filesConfig->getTaxonPath());
     }
 
     /**

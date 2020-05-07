@@ -6,6 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 use MonsieurBiz\SyliusSearchPlugin\Context\TaxonContextInterface;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Search;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
@@ -38,26 +39,8 @@ class SearchController extends AbstractController
     /** @var TaxonContextInterface */
     private $taxonContext;
 
-    /** @var int[] */
-    private $taxonLimits;
-
-    /** @var int[] */
-    private $searchLimits;
-
-    /** @var int */
-    private $taxonDefaultLimit;
-
-    /** @var int */
-    private $searchDefaultLimit;
-
-    /** @var int */
-    private $instantDefaultLimit;
-
-    /** @var string[] */
-    private $taxonSorting;
-
-    /** @var string[] */
-    private $searchSorting;
+    /** @var GridConfig */
+    private $gridConfig;
 
     /**
      * SearchController constructor.
@@ -66,13 +49,7 @@ class SearchController extends AbstractController
      * @param ChannelContextInterface $channelContext
      * @param CurrencyContextInterface $currencyContext
      * @param TaxonContextInterface $taxonContext
-     * @param array $taxonLimits
-     * @param array $searchLimits
-     * @param int $taxonDefaultLimit
-     * @param int $searchDefaultLimit
-     * @param int $instantDefaultLimit
-     * @param array $taxonSorting
-     * @param array $searchSorting
+     * @param array $gridConfig
      */
     public function __construct(
         EngineInterface $templatingEngine,
@@ -80,26 +57,14 @@ class SearchController extends AbstractController
         ChannelContextInterface $channelContext,
         CurrencyContextInterface $currencyContext,
         TaxonContextInterface $taxonContext,
-        array $taxonLimits,
-        array $searchLimits,
-        int $taxonDefaultLimit,
-        int $searchDefaultLimit,
-        int $instantDefaultLimit,
-        array $taxonSorting,
-        array $searchSorting
+        array $gridConfig
     ) {
         $this->templatingEngine = $templatingEngine;
         $this->documentSearch = $documentSearch;
         $this->channelContext = $channelContext;
         $this->currencyContext = $currencyContext;
         $this->taxonContext = $taxonContext;
-        $this->taxonLimits = $taxonLimits;
-        $this->searchLimits = $searchLimits;
-        $this->taxonDefaultLimit = $taxonDefaultLimit;
-        $this->searchDefaultLimit = $searchDefaultLimit;
-        $this->instantDefaultLimit = $instantDefaultLimit;
-        $this->taxonSorting = $taxonSorting;
-        $this->searchSorting = $searchSorting;
+        $this->gridConfig = new GridConfig($gridConfig);
     }
 
     /**
@@ -129,14 +94,14 @@ class SearchController extends AbstractController
         $query = htmlspecialchars(urldecode($request->get('query')));
         $page = max(1, (int) $request->get('page'));
         $limit = max(1, (int) $request->get('limit'));
-        $sorting = $this->cleanSorting($request->get('sorting'), $this->searchSorting);
+        $sorting = $this->cleanSorting($request->get('sorting'), $this->gridConfig->getSearchSorting());
 
         if (!is_array($sorting) || empty($sorting)) {
             $sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
         }
 
-        if (!in_array($limit, $this->searchLimits)) {
-            $limit = $this->searchDefaultLimit;
+        if (!in_array($limit, $this->gridConfig->getSearchLimits())) {
+            $limit = $this->gridConfig->getSearchDefaultLimit();
         }
 
         // Perform search
@@ -167,7 +132,7 @@ class SearchController extends AbstractController
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'query' => $query,
-            'limits' => $this->searchLimits,
+            'limits' => $this->gridConfig->getSearchLimits(),
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
@@ -190,7 +155,7 @@ class SearchController extends AbstractController
         $resultSet = $this->documentSearch->instant(
             $request->getLocale(),
             $query,
-            $this->instantDefaultLimit
+            $this->gridConfig->getInstantDefaultLimit()
         );
 
         // Display instant result list
@@ -214,14 +179,14 @@ class SearchController extends AbstractController
 
         $page = max(1, (int) $request->get('page'));
         $limit = max(1, (int) $request->get('limit'));
-        $sorting = $this->cleanSorting($request->get('sorting'), $this->taxonSorting);
+        $sorting = $this->cleanSorting($request->get('sorting'), $this->gridConfig->getTaxonSorting());
 
         if (!is_array($sorting) || empty($sorting)) {
             $sorting['position'] = self::SORT_ASC; // Product position in taxon
         }
 
-        if (!in_array($limit, $this->taxonLimits)) {
-            $limit = $this->taxonDefaultLimit;
+        if (!in_array($limit, $this->gridConfig->getTaxonLimits())) {
+            $limit = $this->gridConfig->getTaxonDefaultLimit();
         }
 
         // Perform search
@@ -237,7 +202,7 @@ class SearchController extends AbstractController
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
             'taxon' => $taxon,
-            'limits' => $this->taxonLimits,
+            'limits' => $this->gridConfig->getTaxonLimits(),
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),

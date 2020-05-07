@@ -1,6 +1,11 @@
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/search.yaml'
-    instant_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/instant.yaml'
-    taxon_file: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/taxon.yaml'
+    files:
+        search: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/search.yaml'
+        instant: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/instant.yaml'
+        taxon: '%kernel.project_dir%/../../src/Resources/config/elasticsearch/queries/taxon.yaml'
     documentable_classes :
         - 'Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product\Product'
+    grid:
+        filters:
+            attributes: ['t_shirt_material', 't_shirt_brand']
+            options: []

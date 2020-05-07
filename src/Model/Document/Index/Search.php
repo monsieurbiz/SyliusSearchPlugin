@@ -9,6 +9,7 @@ use Elastica\Exception\ResponseException;
 use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
+use MonsieurBiz\SyliusSearchPlugin\Helper\AggregationHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SortHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
@@ -55,12 +56,13 @@ class Search extends AbstractIndex
      * @param int $maxItems
      * @param int $page
      * @param array $sorting
+     * @param array $filters
      * @return ResultSet
      */
-    public function search(string $locale, string $search, int $maxItems, int $page, array $sorting): ResultSet
+    public function search(string $locale, string $search, int $maxItems, int $page, array $sorting, array $filters): ResultSet
     {
         try {
-            return $this->query($locale, $this->getSearchQuery($search, $page, $maxItems, $sorting), $maxItems, $page);
+            return $this->query($locale, $this->getSearchQuery($search, $page, $maxItems, $sorting, $filters), $maxItems, $page);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, $page);
@@ -93,12 +95,13 @@ class Search extends AbstractIndex
      * @param int $maxItems
      * @param int $page
      * @param array $sorting
+     * @param array $filters
      * @return ResultSet
      */
-    public function taxon(string $locale, string $taxon, int $maxItems, int $page, array $sorting): ResultSet
+    public function taxon(string $locale, string $taxon, int $maxItems, int $page, array $sorting, array $filters): ResultSet
     {
         try {
-            return $this->query($locale, $this->getTaxonQuery($taxon, $page, $maxItems, $sorting), $maxItems, $page);
+            return $this->query($locale, $this->getTaxonQuery($taxon, $page, $maxItems, $sorting, $filters), $maxItems, $page);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, $page);
@@ -139,10 +142,11 @@ class Search extends AbstractIndex
      * @param int $page
      * @param int $size
      * @param array $sorting
-     * @return string
+     * @param array $filters
+     * @return array
      * @throws ReadFileException
      */
-    private function getSearchQuery(string $search, int $page, int $size, array $sorting): array
+    private function getSearchQuery(string $search, int $page, int $size, array $sorting, array $filters): array
     {
         $query = $this->searchQueryProvider->getSearchQuery();
 
@@ -165,6 +169,9 @@ class Search extends AbstractIndex
             break; // only 1
         }
 
+        // Manage filters
+        $query['aggs'] = AggregationHelper::buildAggregations($filters);
+
         return $query;
     }
 
@@ -172,7 +179,7 @@ class Search extends AbstractIndex
      * Retrieve the query to send to Elasticsearch for instant search
      *
      * @param string $search
-     * @return mixed|string
+     * @return array
      * @throws ReadFileException
      */
     private function getInstantQuery(string $search): array
@@ -196,10 +203,11 @@ class Search extends AbstractIndex
      * @param int $page
      * @param int $size
      * @param array $sorting
-     * @return mixed|string
+     * @param array $filters
+     * @return array
      * @throws ReadFileException
      */
-    private function getTaxonQuery(string $taxon, int $page, int $size, array $sorting): array
+    private function getTaxonQuery(string $taxon, int $page, int $size, array $sorting, array $filters): array
     {
         $query = $this->searchQueryProvider->getTaxonQuery();
 
@@ -221,6 +229,9 @@ class Search extends AbstractIndex
             $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $taxon);
             break; // only 1
         }
+
+        // Manage filters
+        $query['aggs'] = AggregationHelper::buildAggregations($filters);
 
         return $query;
     }

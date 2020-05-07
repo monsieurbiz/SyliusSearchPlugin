@@ -117,5 +117,13 @@ class GridConfig
     {
         return $this->optionFilters;
     }
+
+    /**
+     * @return string[]
+     */
+    public function getFilters(): array
+    {
+        return array_merge($this->getAttributeFilters(), $this->getOptionFilters());
+    }
 }
 

@@ -23,12 +23,16 @@ class ResultSet
     /** @var int */
     private $page;
 
+    /** @var Filter[] */
+    private $filters;
+
     /** @var Pagerfanta */
     private $pager;
 
     /**
      * SearchResults constructor.
      * @param int $maxItems
+     * @param int $page
      * @param ElasticallyResultSet|null $resultSet
      */
     public function __construct(int $maxItems, int $page, ?ElasticallyResultSet $resultSet = null)
@@ -40,12 +44,14 @@ class ResultSet
         if ($resultSet === null) {
             $this->totalHits = 0;
             $this->results = [];
+            $this->filters = [];
         } else {
             /** @var Result $result */
             foreach ($resultSet as $result) {
                 $this->results[] = $result->getModel();
             }
             $this->totalHits = $resultSet->getTotalHits();
+            $this->initFilters($resultSet);
         }
 
         $this->initPager();
@@ -63,11 +69,59 @@ class ResultSet
     }
 
     /**
+     * Init filters array depending on result aggregations
+     *
+     * @param ElasticallyResultSet $resultSet
+     */
+    private function initFilters(ElasticallyResultSet $resultSet)
+    {
+        $aggregations = $resultSet->getAggregations();
+
+        $filterAggregations = $aggregations['filters'];
+        $attributeAggregations = $aggregations['attributes'];
+        unset($filterAggregations['doc_count']);
+        unset($attributeAggregations['doc_count']);
+
+        // Retrieve filters labels in aggregations
+        $attributes = [];
+        $attributeCodeBuckets = $attributeAggregations['codes']['buckets'] ?? [];
+        foreach ($attributeCodeBuckets as $attributeCodeBucket) {
+            $attributeCode = $attributeCodeBucket['key'];
+            $attributeNameBuckets = $attributeCodeBucket['names']['buckets'] ?? [];
+            foreach ($attributeNameBuckets as $attributeNameBucket) {
+                $attributeName = $attributeNameBucket['key'];
+                $attributes[$attributeCode] = $attributeName;
+                break;
+            }
+        }
+
+        // Retrieve filters values in aggregations
+        foreach ($filterAggregations as $field => $aggregation) {
+            $filter = new Filter($attributes[$field] ?? $field);
+            $buckets = $aggregation['values']['buckets'] ?? [];
+            foreach ($buckets as $bucket) {
+                if (isset($bucket['key']) && isset($bucket['doc_count'])) {
+                    $filter->addValue($bucket['key'], $bucket['doc_count']);
+                }
+            }
+            $this->filters[] = $filter;
+        }
+    }
+
+    /**
      * @return Result[]
      */
     public function getResults(): array
     {
         return $this->results;
+    }
+
+    /**
+     * @return Filter[]
+     */
+    public function getFilters(): array
+    {
+        return $this->filters;
     }
 
     /**

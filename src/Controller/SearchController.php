@@ -111,7 +111,8 @@ class SearchController extends AbstractController
             $query,
             $limit,
             $page,
-            $sorting
+            $sorting,
+            $this->gridConfig->getFilters()
         );
 
         // Redirect to document if only one result
@@ -196,7 +197,8 @@ class SearchController extends AbstractController
             $taxon->getCode(),
             $limit,
             $page,
-            $sorting
+            $sorting,
+            $this->gridConfig->getFilters()
         );
 
         // Display result list

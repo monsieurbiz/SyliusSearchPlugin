@@ -9,6 +9,7 @@ use Elastica\Exception\ResponseException;
 use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
+use MonsieurBiz\SyliusSearchPlugin\Helper\SortHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
@@ -158,8 +159,9 @@ class Search extends AbstractIndex
         $query['size'] =  max(1, $size);
 
         // Manage sorting
+        $channelCode = $this->channelContext->getChannel()->getCode();
         foreach ($sorting as $field => $order) {
-            $query['sort'][] = $this->getSortParamByField($field, $order);
+            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order);
             break; // only 1
         }
 
@@ -214,67 +216,13 @@ class Search extends AbstractIndex
         $query['size'] =  max(1, $size);
 
         // Manage sorting
+        $channelCode = $this->channelContext->getChannel()->getCode();
         foreach ($sorting as $field => $order) {
-            $query['sort'][] = $this->getSortParamByField($field, $order, $taxon);
+            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $taxon);
             break; // only 1
         }
 
         return $query;
-    }
-
-    /**
-     * Get query's sort array depending on sorted field
-     *
-     * @param string $field
-     * @param string $order
-     * @param string $taxon
-     * @return array
-     */
-    private function getSortParamByField(string $field, string $order = 'asc', string $taxon = ''): array
-    {
-        switch($field) {
-            case 'name':
-                return $this->buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', $field);
-            case 'created_at':
-                return $this->buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', $field);
-            case 'price':
-                return $this->buildSort('price.value', $order, 'price', 'price.channel', $this->channelContext->getChannel()->getCode());
-            case 'position':
-                return $this->buildSort('taxon.position', $order, 'taxon', 'taxon.code', $taxon);
-            default:
-                // Dummy value to have null sorting in ES and keep ES results sorting
-                return $this->buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', 'dummy');
-        }
-    }
-
-    /**
-     * Build sort array to add in query
-     *
-     * @param string $field
-     * @param string $order
-     * @param string $nestedPath
-     * @param string $sortFilterField
-     * @param string $sortFilterValue
-     * @return array
-     */
-    private function buildSort(
-        string $field,
-        string $order,
-        string $nestedPath,
-        string $sortFilterField,
-        string $sortFilterValue
-    ): array {
-        return [
-            $field => [
-                'order' => $order,
-                'nested' => [
-                    'path' => $nestedPath,
-                    'filter' => [
-                        'term' => [$sortFilterField => $sortFilterValue]
-                    ]
-                ]
-            ]
-        ];
     }
 
     /**

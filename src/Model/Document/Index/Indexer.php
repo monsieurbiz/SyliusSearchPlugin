@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Document;
+namespace MonsieurBiz\SyliusSearchPlugin\Model\Document\Index;
 
 use Elastica\Exception\ResponseException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
@@ -19,7 +19,7 @@ use MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider;
 use Webmozart\Assert\Assert;
 
 
-class DocumentIndexer extends AbstractDocumentIndex
+class Indexer extends AbstractIndex
 {
     /**
      * @var DocumentRepositoryProvider

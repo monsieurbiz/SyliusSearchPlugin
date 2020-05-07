@@ -203,16 +203,16 @@ A symfony command is available to populate index : `console monsieurbiz:search:p
 ## Index on save
 
 For product entity, we have a listener to add / update / delete document on save.
-It is the `App\MonsieurBizSearchPlugin\EventListener\DocumentListener` class which : 
+It is the `MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener` class which : 
 - `saveDocument` on `post_create` dans `post_update`
 - `removeDocument` on `pre_delete`
 
 If your entity implements `DocumentableInterface`, you can add listeners to manage entities modifications (Replace `<YOUR_ENTITY>` with your) :
 ```yaml
     app.event_listener.document_listener:
-        class: App\MonsieurBizSearchPlugin\EventListener\DocumentListener
+        class: MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener
         arguments:
-            - '@App\MonsieurBizSearchPlugin\Indexer\DocumentIndexer'
+            - '@MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Indexer'
         tags:
             - { name: kernel.event_listener, event: sylius.<YOUR_ENTITY>.post_create, method: saveDocument }
             - { name: kernel.event_listener, event: sylius.<YOUR_ENTITY>.post_update, method: saveDocument }

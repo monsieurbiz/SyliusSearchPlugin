@@ -6,7 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 use MonsieurBiz\SyliusSearchPlugin\Context\TaxonContextInterface;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
-use MonsieurBiz\SyliusSearchPlugin\Document\DocumentSearch;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Search;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl;
@@ -26,7 +26,7 @@ class SearchController extends AbstractController
     /** @var EngineInterface */
     private $templatingEngine;
 
-    /** @var DocumentSearch */
+    /** @var Search */
     private $documentSearch;
 
     /** @var ChannelContextInterface */
@@ -62,7 +62,7 @@ class SearchController extends AbstractController
     /**
      * SearchController constructor.
      * @param EngineInterface $templatingEngine
-     * @param DocumentSearch $documentSearch
+     * @param Search $documentSearch
      * @param ChannelContextInterface $channelContext
      * @param CurrencyContextInterface $currencyContext
      * @param TaxonContextInterface $taxonContext
@@ -76,7 +76,7 @@ class SearchController extends AbstractController
      */
     public function __construct(
         EngineInterface $templatingEngine,
-        DocumentSearch $documentSearch,
+        Search $documentSearch,
         ChannelContextInterface $channelContext,
         CurrencyContextInterface $currencyContext,
         TaxonContextInterface $taxonContext,

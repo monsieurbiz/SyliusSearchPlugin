@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Document;
+namespace MonsieurBiz\SyliusSearchPlugin\Model\Document\Index;
 
 use JoliCode\Elastically\Client;
 use JoliCode\Elastically\IndexBuilder;
@@ -10,7 +10,7 @@ use JoliCode\Elastically\Indexer;
 use MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider;
 
 
-abstract class AbstractDocumentIndex
+abstract class AbstractIndex
 {
     const DOCUMENT_INDEX_NAME = 'documents';
 

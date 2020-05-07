@@ -108,17 +108,17 @@ class Search extends AbstractIndex
      * Perform search for a given query
      *
      * @param string $locale
-     * @param string $query
+     * @param array $query
      * @param int $maxItems
      * @param int $page
      * @return ResultSet
      */
-    private function query(string $locale, string $query, int $maxItems, int $page)
+    private function query(string $locale, array $query, int $maxItems, int $page)
     {
         try {
             /** @var ElasticallyResultSet $results */
             $results = $this->getClient()->getIndex($this->getIndexName($locale))->search(
-                Yaml::parse($query), $maxItems
+                $query, $maxItems
             );
         } catch (HttpException $exception) {
             $this->logger->critical($exception->getMessage());
@@ -141,24 +141,25 @@ class Search extends AbstractIndex
      * @return string
      * @throws ReadFileException
      */
-    private function getSearchQuery(string $search, int $page, int $size, array $sorting): string
+    private function getSearchQuery(string $search, int $page, int $size, array $sorting): array
     {
         $query = $this->searchQueryProvider->getSearchQuery();
 
-        $from = ($page - 1) * $size;
-
+        // Replace params
         $query = str_replace('{{QUERY}}', $search, $query);
-        $query = str_replace('{{FROM}}', max(0, $from), $query);
-        $query = str_replace('{{SIZE}}', max(1, $size), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
+        // Convert query to array
+        $query = $this->parseQuery($query);
+
+        // Manage limits
+        $from = ($page - 1) * $size;
+        $query['from'] = max(0, $from);
+        $query['size'] =  max(1, $size);
+
+        // Manage sorting
         foreach ($sorting as $field => $order) {
-            $query = str_replace('{{SORT_ORDER}}', $order, $query);
-            $parameters = $this->getSortParamByField($field);
-            $query = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $query);
-            $query = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $query);
-            $query = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $query);
-            $query = str_replace('{{SORT_FILTER_VALUE}}', $parameters['sort_filter_value'] ?? '', $query);
+            $query['sort'][] = $this->getSortParamByField($field, $order);
             break; // only 1
         }
 
@@ -172,11 +173,16 @@ class Search extends AbstractIndex
      * @return mixed|string
      * @throws ReadFileException
      */
-    private function getInstantQuery(string $search)
+    private function getInstantQuery(string $search): array
     {
         $query = $this->searchQueryProvider->getInstantQuery();
+
+        // Replace params
         $query = str_replace('{{QUERY}}', $search, $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
+
+        // Convert query to array
+        $query = $this->parseQuery($query);
 
         return $query;
     }
@@ -191,24 +197,25 @@ class Search extends AbstractIndex
      * @return mixed|string
      * @throws ReadFileException
      */
-    private function getTaxonQuery(string $taxon, int $page, int $size, array $sorting): string
+    private function getTaxonQuery(string $taxon, int $page, int $size, array $sorting): array
     {
         $query = $this->searchQueryProvider->getTaxonQuery();
 
-        $from = ($page - 1) * $size;
-
+        // Replace params
         $query = str_replace('{{TAXON}}', $taxon, $query);
-        $query = str_replace('{{FROM}}', max(0, $from), $query);
-        $query = str_replace('{{SIZE}}', max(1, $size), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
+        // Convert query to array
+        $query = $this->parseQuery($query);
+
+        // Manage limits
+        $from = ($page - 1) * $size;
+        $query['from'] = max(0, $from);
+        $query['size'] =  max(1, $size);
+
+        // Manage sorting
         foreach ($sorting as $field => $order) {
-            $query = str_replace('{{SORT_ORDER}}', $order, $query);
-            $parameters = $this->getSortParamByField($field, $taxon);
-            $query = str_replace('{{SORT_FIELD}}', $parameters['sort_field'] ?? '', $query);
-            $query = str_replace('{{SORT_NESTED_PATH}}', $parameters['sort_nested_path'] ?? '', $query);
-            $query = str_replace('{{SORT_FILTER_FIELD}}', $parameters['sort_filter_field'] ?? '', $query);
-            $query = str_replace('{{SORT_FILTER_VALUE}}', $parameters['sort_filter_value'] ?? '', $query);
+            $query['sort'][] = $this->getSortParamByField($field, $order, $taxon);
             break; // only 1
         }
 
@@ -216,48 +223,66 @@ class Search extends AbstractIndex
     }
 
     /**
+     * Get query's sort array depending on sorted field
+     *
      * @param string $field
+     * @param string $order
      * @param string $taxon
      * @return array
      */
-    private function getSortParamByField(string $field, string $taxon = ''): array
+    private function getSortParamByField(string $field, string $order = 'asc', string $taxon = ''): array
     {
         switch($field) {
             case 'name':
-                return [
-                    'sort_field' => 'attributes.value.keyword',
-                    'sort_nested_path' => 'attributes',
-                    'sort_filter_field' => 'attributes.code',
-                    'sort_filter_value' => $field,
-                ];
+                return $this->buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', $field);
             case 'created_at':
-                return [
-                    'sort_field' => 'attributes.value.keyword',
-                    'sort_nested_path' => 'attributes',
-                    'sort_filter_field' => 'attributes.code',
-                    'sort_filter_value' => $field,
-                ];
+                return $this->buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', $field);
             case 'price':
-                return [
-                    'sort_field' => 'price.value',
-                    'sort_nested_path' => 'price',
-                    'sort_filter_field' => 'price.channel',
-                    'sort_filter_value' => $this->channelContext->getChannel()->getCode(),
-                ];
+                return $this->buildSort('price.value', $order, 'price', 'price.channel', $this->channelContext->getChannel()->getCode());
             case 'position':
-                return [
-                    'sort_field' => 'taxon.position',
-                    'sort_nested_path' => 'taxon',
-                    'sort_filter_field' => 'taxon.code',
-                    'sort_filter_value' => $taxon,
-                ];
+                return $this->buildSort('taxon.position', $order, 'taxon', 'taxon.code', $taxon);
             default:
-                return [
-                    'sort_field' => 'attributes.value.keyword',
-                    'sort_nested_path' => 'attributes',
-                    'sort_filter_field' => 'attributes.code',
-                    'sort_filter_value' => 'dummy', // Dummy value to have null sorting in ES
-                ];
+                // Dummy value to have null sorting in ES and keep ES results sorting
+                return $this->buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', 'dummy');
         }
+    }
+
+    /**
+     * Build sort array to add in query
+     *
+     * @param string $field
+     * @param string $order
+     * @param string $nestedPath
+     * @param string $sortFilterField
+     * @param string $sortFilterValue
+     * @return array
+     */
+    private function buildSort(
+        string $field,
+        string $order,
+        string $nestedPath,
+        string $sortFilterField,
+        string $sortFilterValue
+    ): array {
+        return [
+            $field => [
+                'order' => $order,
+                'nested' => [
+                    'path' => $nestedPath,
+                    'filter' => [
+                        'term' => [$sortFilterField => $sortFilterValue]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @param string $query
+     * @return array
+     */
+    private function parseQuery(string $query): array
+    {
+        return Yaml::parse($query);
     }
 }

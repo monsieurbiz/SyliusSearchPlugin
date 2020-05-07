@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Model;
+namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
+
+use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
 
 interface DocumentableInterface
 {

@@ -123,7 +123,7 @@ You can also change available sortings and limits.
 
 ## Documentable objects
 
-If you want to index an object in the search index, your entity have to implements `MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface` interface : 
+If you want to index an object in the search index, your entity have to implements `MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface` interface : 
 
 ```php
 interface DocumentableInterface
@@ -144,7 +144,7 @@ namespace App\Entity\Product;
 
 use Doctrine\ORM\Mapping as ORM;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Sylius\Component\Core\Model\Product as BaseProduct;
 use Sylius\Component\Core\Model\ProductTranslation;
 use Sylius\Component\Product\Model\ProductTranslationInterface;

@@ -7,7 +7,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Document;
 use Elastica\Exception\ResponseException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
-use MonsieurBiz\SyliusSearchPlugin\Model\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\DocumentResult;
 use Elastica\Document;
 use JoliCode\Elastically\Client;

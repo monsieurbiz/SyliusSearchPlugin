@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Document;
 
+use MonsieurBiz\SyliusSearchPlugin\Helper\SlugHelper;
+
 class FilterValue
 {
+    /**
+     * @var string
+     */
+    private $slug;
+
     /**
      * @var string
      */
@@ -23,8 +30,17 @@ class FilterValue
      */
     public function __construct(string $label, int $count)
     {
+        $this->slug = SlugHelper::toSlug($label);
         $this->label = $label;
         $this->count = $count;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
     }
 
     /**

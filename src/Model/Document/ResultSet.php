@@ -109,7 +109,7 @@ class ResultSet
             if ($aggregation['doc_count'] === 0) {
                 continue;
             }
-            $filter = new Filter($attributes[$field] ?? $field, $aggregation['doc_count']);
+            $filter = new Filter($field, $attributes[$field] ?? $field, $aggregation['doc_count']);
             $buckets = $aggregation['values']['buckets'] ?? [];
             foreach ($buckets as $bucket) {
                 if (isset($bucket['key']) && isset($bucket['doc_count'])) {
@@ -213,7 +213,7 @@ class ResultSet
                 }
             }
 
-            $filter = new Filter('monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
+            $filter = new Filter('taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
 
             // Get taxon code in aggregation
             $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
@@ -257,7 +257,10 @@ class ResultSet
         $priceAggregation = $aggregations['price'] ?? null;
         if ($priceAggregation && $priceAggregation['doc_count'] > 0) {
             $this->priceFilter = new RangeFilter(
+                'price',
                 'monsieurbiz_searchplugin.filters.price_filter',
+                'monsieurbiz_searchplugin.filters.price_min',
+                'monsieurbiz_searchplugin.filters.price_max',
                 (int) floor(($priceAggregation['values']['min'] ?? 0) / 100),
                 (int) ceil(($priceAggregation['values']['max'] ?? 0) / 100)
             );

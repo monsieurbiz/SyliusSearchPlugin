@@ -9,7 +9,22 @@ class RangeFilter
     /**
      * @var string
      */
+    private $code;
+
+    /**
+     * @var string
+     */
     private $label;
+
+    /**
+     * @var string
+     */
+    private $minLabel;
+
+    /**
+     * @var string
+     */
+    private $maxLabel;
 
     /**
      * @var int
@@ -23,15 +38,29 @@ class RangeFilter
 
     /**
      * Filter constructor.
+     * @param string $code
      * @param string $label
+     * @param string $minLabel
+     * @param string $maxLabel
      * @param int $min
      * @param int $max
      */
-    public function __construct(string $label, int $min, int $max)
+    public function __construct(string $code, string $label, string $minLabel, string $maxLabel, int $min, int $max)
     {
+        $this->code = $code;
         $this->label = $label;
+        $this->minLabel = $minLabel;
+        $this->maxLabel = $maxLabel;
         $this->min = $min;
         $this->max = $max;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode(): string
+    {
+        return $this->code;
     }
 
     /**
@@ -40,6 +69,22 @@ class RangeFilter
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMinLabel(): string
+    {
+        return $this->minLabel;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMaxLabel(): string
+    {
+        return $this->maxLabel;
     }
 
     /**

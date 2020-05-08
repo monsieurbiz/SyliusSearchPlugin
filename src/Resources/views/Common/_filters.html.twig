@@ -1,4 +1,4 @@
-<div class="ui fluid vertical menu">
+<div class="ui fluid vertical menu mbiz-sylius-search-filters">
     <div class="header item">
         {{ 'monsieurbiz_searchplugin.filters.filter_results' | trans }}
     </div>
@@ -10,89 +10,16 @@
     {% else %}
 
         {% if resultSet.taxonFilter is not empty %}
-            {% set filter = resultSet.taxonFilter %}
-            <div class="item">
-                <div class="field">
-                    <div id="options">
-                        <div class="field">
-                            <div class="ui teal ribbon label">{{ filter.label | trans }}</div>
-                            <div id="filter_1" class="ui dropdown" tabindex="0" style="width: 100%">
-                                <div class="grouped fields">
-                                    {% for value in filter.values %}
-                                        <div class="field" style="margin-top: 10px;">
-                                            <div class="ui toggle checkbox">
-                                                <input type="checkbox" id="options_option_mug_type_0" name="options[option_mug_type][]" value="medium_mug" tabindex="0" class="hidden">
-                                                <label for="options_option_mug_type_0">{{ value.label }} ({{ value.count }})</label></div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <div class="menu" tabindex="-1"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': resultSet.taxonFilter} %}
         {% endif %}
 
         {% if resultSet.priceFilter is not empty %}
-            {% set rangeFilter = resultSet.priceFilter %}
-            <div class="item">
-                <div class="field">
-                    <div id="options">
-                        <div class="field">
-                            <div class="ui teal ribbon label">{{ rangeFilter.label | trans }}</div>
-
-                            <div id="price">
-                                <div class="field" style="margin-top: 10px;">
-                                    <label for="price_min_price" style="margin-bottom: 5px;display: block;">{{ 'monsieurbiz_searchplugin.filters.min_price' | trans }}</label>
-                                    <div class="ui labeled input">
-                                        <div class="ui label">{{ moneySymbol }}</div>
-                                        <input type="text" id="price_min_price" name="price[min_price]" value="{{ rangeFilter.min }}"></div>
-                                </div>
-                                <div class="field" style="margin-top: 10px;">
-                                    <label for="price_max_price" style="margin-bottom: 5px;display: block;">{{ 'monsieurbiz_searchplugin.filters.max_price' | trans }}</label>
-                                    <div class="ui labeled input">
-                                        <div class="ui label">{{ moneySymbol }}</div>
-                                        <input type="text" id="price_max_price" name="price[max_price]" value="{{ rangeFilter.max }}"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MonsieurBizSyliusSearchPlugin/Common/_rangeFilter.html.twig' with {'filter': resultSet.priceFilter} %}
         {% endif %}
 
         {% for filter in resultSet.filters %}
-            <div class="item">
-                <div class="field">
-                    <div id="options">
-                        <div class="field">
-                            <div class="ui teal ribbon label">{{ filter.label }}</div>
-                            <div id="filter_1" class="ui dropdown" tabindex="0" style="width: 100%">
-                                <div class="grouped fields">
-                                    {% for value in filter.values %}
-                                        <div class="field" style="margin-top: 10px;">
-                                            <div class="ui toggle checkbox">
-                                                <input type="checkbox" id="options_option_mug_type_0" name="options[option_mug_type][]" value="medium_mug" tabindex="0" class="hidden">
-                                                <label for="options_option_mug_type_0">{{ value.label }} ({{ value.count }})</label></div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <div class="menu" tabindex="-1"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': filter} %}
         {% endfor %}
-
-        <div class="item">
-            <button type="submit" class="ui primary icon labeled button" style="width: 100%;">
-                <i class="search icon"></i>
-                {{ 'monsieurbiz_searchplugin.filters.apply_filters' | trans }}
-            </button>
-        </div>
-
     {% endif %}
 
 </div>

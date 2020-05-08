@@ -16,5 +16,5 @@ monsieurbiz_searchplugin:
       no_filter: 'Aucun filtre disponible'
       taxon_filter: 'Catégories'
       price_filter: 'Prix'
-      min_price: 'Prix minimum'
-      max_price: 'Prix maximum'
+      price_min: 'Prix minimum'
+      price_max: 'Prix maximum'

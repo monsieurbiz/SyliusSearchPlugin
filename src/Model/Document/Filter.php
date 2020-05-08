@@ -9,6 +9,11 @@ class Filter
     /**
      * @var string
      */
+    private $code;
+
+    /**
+     * @var string
+     */
     private $label;
 
     /**
@@ -23,13 +28,23 @@ class Filter
 
     /**
      * Filter constructor.
+     * @param string $code
      * @param string $label
      * @param int $count
      */
-    public function __construct(string $label, int $count)
+    public function __construct(string $code, string $label, int $count)
     {
+        $this->code = $code;
         $this->label = $label;
         $this->count = $count;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode(): string
+    {
+        return $this->code;
     }
 
     /**

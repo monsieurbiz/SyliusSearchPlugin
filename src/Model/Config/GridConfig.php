@@ -4,102 +4,182 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Config;
 
+use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownGridConfigType;
+use Sylius\Component\Core\Model\TaxonInterface;
+use Symfony\Component\HttpFoundation\Request;
+
 class GridConfig
 {
+    const SEARCH_TYPE = 'search';
+    const TAXON_TYPE = 'taxon';
+    const INSTANT_TYPE = 'instant';
+
+    const SORT_ASC = 'asc';
+    const SORT_DESC = 'desc';
+
+    const FALLBACK_LIMIT = 10;
+
+    /** @var array */
+    private $config;
+
+    /** @var string[] */
+    private $isInitialized = false;
+
+    /** @var string */
+    private $type;
+
+    /** @var string */
+    private $locale;
+
+    /** @var string */
+    private $query;
+
+    /** @var int */
+    private $page;
+
     /** @var int[] */
-    private $taxonLimits;
-
-    /** @var int[] */
-    private $searchLimits;
+    private $limits;
 
     /** @var int */
-    private $taxonDefaultLimit;
-
-    /** @var int */
-    private $searchDefaultLimit;
-
-    /** @var int */
-    private $instantDefaultLimit;
+    private $limit;
 
     /** @var string[] */
-    private $taxonSorting;
+    private $sorting;
 
-    /** @var string[] */
-    private $searchSorting;
+    /** @var TaxonInterface|null */
+    private $taxon;
 
-    /** @var string[] */
-    private $attributeFilters;
-
-    /** @var string[] */
-    private $optionFilters;
-
-    public function __construct(array $gridConfig)
+    public function __construct(array $config)
     {
-        $this->taxonLimits = $gridConfig['limits']['taxon'] ?? [];
-        $this->searchLimits = $gridConfig['limits']['search'] ?? [];
-        $this->taxonDefaultLimit = $gridConfig['default_limit']['taxon'] ?? 9;
-        $this->searchDefaultLimit = $gridConfig['default_limit']['search'] ?? 9;
-        $this->instantDefaultLimit = $gridConfig['default_limit']['instant'] ?? 10;
-        $this->taxonSorting = $gridConfig['sorting']['taxon'] ?? [];
-        $this->searchSorting = $gridConfig['sorting']['search'] ?? [];
-        $this->attributeFilters = $gridConfig['filters']['attributes'] ?? [];
-        $this->optionFilters = $gridConfig['filters']['options'] ?? [];
+        $this->config = $config;
+    }
+
+    /**
+     * @param string $type
+     * @param Request $request
+     * @param TaxonInterface|null $taxon
+     */
+    public function init(string $type, Request $request, ?TaxonInterface $taxon = null)
+    {
+        if ($this->isInitialized) {
+            return;
+        }
+
+        switch ($type) {
+            case self::SEARCH_TYPE :
+                // Set type, locale, page and query
+                $this->type = $type;
+                $this->locale = $request->getLocale();
+                $this->page = max(1, (int) $request->get('page'));
+                $this->query = htmlspecialchars(urldecode($request->get('query')));
+
+                // Set sorting
+                $availableSorting = $this->config['sorting']['search'] ?? [];
+                $this->sorting = $this->cleanSorting($request->get('sorting'), $availableSorting);
+                if (!is_array($this->sorting) || empty($this->sorting)) {
+                    $this->sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
+                }
+
+                // Set limit
+                $this->limit = max(1, (int) $request->get('limit'));
+                $this->limits = $this->config['limits']['search'] ?? [];
+                if (!in_array($this->limit, $this->limits)) {
+                    $this->limit = $this->config['default_limit']['search'] ?? self::FALLBACK_LIMIT;
+                }
+                $this->isInitialized = true;
+                break;
+            case self::TAXON_TYPE :
+                // Set type, locale, page and taxon
+                $this->type = $type;
+                $this->locale = $request->getLocale();
+                $this->page = max(1, (int) $request->get('page'));
+                $this->taxon = $taxon;
+
+                // Set sorting
+                $availableSorting = $this->config['sorting']['taxon'] ?? [];
+                $this->sorting = $this->cleanSorting($request->get('sorting'), $availableSorting);
+                if (!is_array($this->sorting) || empty($this->sorting)) {
+                    $this->sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
+                }
+
+                // Set limit
+                $this->limit = max(1, (int) $request->get('limit'));
+                $this->limits = $this->config['limits']['taxon'] ?? [];
+                if (!in_array($this->limit, $this->limits)) {
+                    $this->limit = $this->config['default_limit']['taxon'] ?? self::FALLBACK_LIMIT;
+                }
+                $this->isInitialized = true;
+                break;
+            case self::INSTANT_TYPE :
+                // Set type, locale, page and query
+                $this->type = $type;
+                $this->locale = $request->getLocale();
+                $this->page = 1;
+                $this->query = htmlspecialchars(urldecode($request->get('query')));
+
+                // Set limit
+                $this->limit = $this->config['default_limit']['instant'] ?? self::FALLBACK_LIMIT;
+                $this->isInitialized = true;
+                break;
+            default:
+                throw new UnknownGridConfigType();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQuery(): string
+    {
+        return $this->query;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPage(): int
+    {
+        return $this->page;
     }
 
     /**
      * @return int[]
      */
-    public function getTaxonLimits(): array
+    public function getLimits(): array
     {
-        return $this->taxonLimits;
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getSearchLimits(): array
-    {
-        return $this->searchLimits;
+        return $this->limits;
     }
 
     /**
      * @return int
      */
-    public function getTaxonDefaultLimit(): int
+    public function getLimit(): int
     {
-        return $this->taxonDefaultLimit;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSearchDefaultLimit(): int
-    {
-        return $this->searchDefaultLimit;
-    }
-
-    /**
-     * @return int
-     */
-    public function getInstantDefaultLimit(): int
-    {
-        return $this->instantDefaultLimit;
+        return $this->limit;
     }
 
     /**
      * @return string[]
      */
-    public function getTaxonSorting(): array
+    public function getSorting(): array
     {
-        return $this->taxonSorting;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getSearchSorting(): array
-    {
-        return $this->searchSorting;
+        return $this->sorting;
     }
 
     /**
@@ -107,7 +187,7 @@ class GridConfig
      */
     public function getAttributeFilters(): array
     {
-        return $this->attributeFilters;
+        return $this->config['filters']['attributes'] ?? [];
     }
 
     /**
@@ -115,7 +195,7 @@ class GridConfig
      */
     public function getOptionFilters(): array
     {
-        return $this->optionFilters;
+        return $this->config['filters']['options'] ?? [];
     }
 
     /**
@@ -124,6 +204,34 @@ class GridConfig
     public function getFilters(): array
     {
         return array_merge($this->getAttributeFilters(), $this->getOptionFilters());
+    }
+
+    /**
+     * @return TaxonInterface|null
+     */
+    public function getTaxon(): ?TaxonInterface
+    {
+        return $this->taxon;
+    }
+
+    /**
+     * Be sure given sort in available
+     * @param $sorting
+     * @param $availableSorting
+     * @return array
+     */
+    private function cleanSorting(?array $sorting, array $availableSorting): array
+    {
+        if (!is_array($sorting)) {
+            return  [];
+        }
+
+        foreach ($sorting as $field => $order) {
+            if (!in_array($field, $availableSorting) || !in_array($order, [self::SORT_ASC, self::SORT_DESC])) {
+                unset($sorting[$field]);
+            }
+        }
+        return $sorting;
     }
 }
 

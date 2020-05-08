@@ -76,6 +76,6 @@ services:
       $documentableClasses: '%monsieurbiz_sylius_search.documentable_classes%'
 
 
-  MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:
+  MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig:
     arguments:
-      $gridConfig: '%monsieurbiz_sylius_search.grid%'
+      $config: '%monsieurbiz_sylius_search.grid%'

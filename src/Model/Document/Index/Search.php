@@ -12,6 +12,7 @@ use JoliCode\Elastically\Client;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
 use MonsieurBiz\SyliusSearchPlugin\Helper\AggregationHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SortHelper;
+use MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
@@ -53,60 +54,64 @@ class Search extends AbstractIndex
     /**
      * Search documents for a given locale, search terms, max number items and page
      *
-     * @param string $locale
-     * @param string $search
-     * @param int $maxItems
-     * @param int $page
-     * @param array $sorting
-     * @param array $filters
+     * @param GridConfig $gridConfig
      * @return ResultSet
      */
-    public function search(string $locale, string $search, int $maxItems, int $page, array $sorting, array $filters): ResultSet
+    public function search(GridConfig $gridConfig): ResultSet
     {
         try {
-            return $this->query($locale, $this->getSearchQuery($search, $page, $maxItems, $sorting, $filters), $maxItems, $page);
+            return $this->query(
+                $gridConfig->getLocale(),
+                $this->getSearchQuery($gridConfig),
+                $gridConfig->getLimit(),
+                $gridConfig->getPage()
+            );
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
      * Instant search documents for a given locale, query and a max number items
      *
-     * @param string $locale
-     * @param string $search
-     * @param int $maxItems
+     * @param GridConfig $gridConfig
      * @return ResultSet
      */
-    public function instant(string $locale, string $search, int $maxItems): ResultSet
+    public function instant(GridConfig $gridConfig): ResultSet
     {
         try {
-            return $this->query($locale, $this->getInstantQuery($search), $maxItems, 1);
+            return $this->query(
+                $gridConfig->getLocale(),
+                $this->getInstantQuery($gridConfig),
+                $gridConfig->getLimit(),
+                $gridConfig->getPage()
+            );
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, 1);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
      * Taxon search documents for a given locale, taxon code, max number items and page
      *
-     * @param string $locale
-     * @param TaxonInterface $taxon
-     * @param int $maxItems
-     * @param int $page
-     * @param array $sorting
-     * @param array $filters
+     * @param GridConfig $gridConfig
      * @return ResultSet
      */
-    public function taxon(string $locale, TaxonInterface $taxon, int $maxItems, int $page, array $sorting, array $filters): ResultSet
+    public function taxon(GridConfig $gridConfig): ResultSet
     {
         try {
-            return $this->query($locale, $this->getTaxonQuery($taxon, $page, $maxItems, $sorting, $filters), $maxItems, $page, $taxon);
+            return $this->query(
+                $gridConfig->getLocale(),
+                $this->getTaxonQuery($gridConfig),
+                $gridConfig->getLimit(),
+                $gridConfig->getPage(),
+                $gridConfig->getTaxon()
+            );
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
@@ -141,39 +146,35 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for search
      *
-     * @param string $search
-     * @param int $page
-     * @param int $size
-     * @param array $sorting
-     * @param array $filters
+     * @param GridConfig $gridConfig
      * @return array
      * @throws ReadFileException
      */
-    private function getSearchQuery(string $search, int $page, int $size, array $sorting, array $filters): array
+    private function getSearchQuery(GridConfig $gridConfig): array
     {
         $query = $this->searchQueryProvider->getSearchQuery();
 
         // Replace params
-        $query = str_replace('{{QUERY}}', $search, $query);
+        $query = str_replace('{{QUERY}}', $gridConfig->getQuery(), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
         $query = $this->parseQuery($query);
 
         // Manage limits
-        $from = ($page - 1) * $size;
+        $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
         $query['from'] = max(0, $from);
-        $query['size'] =  max(1, $size);
+        $query['size'] =  max(1, $gridConfig->getLimit());
 
         // Manage sorting
         $channelCode = $this->channelContext->getChannel()->getCode();
-        foreach ($sorting as $field => $order) {
+        foreach ($gridConfig->getSorting() as $field => $order) {
             $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order);
             break; // only 1
         }
 
         // Manage filters
-        $query['aggs'] = AggregationHelper::buildAggregations($filters);
+        $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
 
         return $query;
     }
@@ -181,16 +182,16 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for instant search
      *
-     * @param string $search
+     * @param GridConfig $gridConfig
      * @return array
      * @throws ReadFileException
      */
-    private function getInstantQuery(string $search): array
+    private function getInstantQuery(GridConfig $gridConfig): array
     {
         $query = $this->searchQueryProvider->getInstantQuery();
 
         // Replace params
-        $query = str_replace('{{QUERY}}', $search, $query);
+        $query = str_replace('{{QUERY}}', $gridConfig->getQuery(), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
@@ -202,39 +203,35 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for taxon search
      *
-     * @param TaxonInterface $taxon
-     * @param int $page
-     * @param int $size
-     * @param array $sorting
-     * @param array $filters
+     * @param GridConfig $gridConfig
      * @return array
      * @throws ReadFileException
      */
-    private function getTaxonQuery(TaxonInterface $taxon, int $page, int $size, array $sorting, array $filters): array
+    private function getTaxonQuery(GridConfig $gridConfig): array
     {
         $query = $this->searchQueryProvider->getTaxonQuery();
 
         // Replace params
-        $query = str_replace('{{TAXON}}', $taxon->getCode(), $query);
+        $query = str_replace('{{TAXON}}', $gridConfig->getTaxon()->getCode(), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
         $query = $this->parseQuery($query);
 
         // Manage limits
-        $from = ($page - 1) * $size;
+        $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
         $query['from'] = max(0, $from);
-        $query['size'] =  max(1, $size);
+        $query['size'] =  max(1, $gridConfig->getLimit());
 
         // Manage sorting
         $channelCode = $this->channelContext->getChannel()->getCode();
-        foreach ($sorting as $field => $order) {
-            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $taxon->getCode());
+        foreach ($gridConfig->getSorting() as $field => $order) {
+            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $gridConfig->getTaxon()->getCode());
             break; // only 1
         }
 
         // Manage filters
-        $query['aggs'] = AggregationHelper::buildAggregations($filters);
+        $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
 
         return $query;
     }

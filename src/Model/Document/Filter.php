@@ -17,12 +17,19 @@ class Filter
     private $values = [];
 
     /**
+     * @var int
+     */
+    private $count;
+
+    /**
      * Filter constructor.
      * @param string $label
+     * @param int $count
      */
-    public function __construct(string $label)
+    public function __construct(string $label, int $count)
     {
         $this->label = $label;
+        $this->count = $count;
     }
 
     /**
@@ -48,5 +55,13 @@ class Filter
     public function addValue($value, $count)
     {
         $this->values[] = new FilterValue($value, $count);
+    }
+
+    /**
+     * @return int
+     */
+    public function getCount(): int
+    {
+        return $this->count;
     }
 }

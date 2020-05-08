@@ -4,11 +4,11 @@ monsieurbiz_searchplugin:
     submit: 'Lancer la recherche'
   search:
     result:
-      search_result: 'Résultats de recherche pour "%query%"'
+      search_result: 'Résultats de recherche pour "%query%" (%count%)'
       no_result: 'Pas de résultat.'
   instant:
     result:
-      search_result: 'Résultats de recherche pour "%query%"'
+      search_result: 'Résultats de recherche pour "%query%" (%count%)'
       no_result: 'Pas de résultat.'
   filters:
       filter_results: 'Filtrer les résultats'

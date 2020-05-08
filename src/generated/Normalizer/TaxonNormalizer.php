@@ -34,6 +34,12 @@ class TaxonNormalizer implements DenormalizerInterface, NormalizerInterface, Den
             return new Reference($data->{'$recursiveRef'}, $context['document-origin']);
         }
         $object = new \MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon();
+        if (property_exists($data, 'name') && $data->{'name'} !== null) {
+            $object->setName($data->{'name'});
+        }
+        elseif (property_exists($data, 'name') && $data->{'name'} === null) {
+            $object->setName(null);
+        }
         if (property_exists($data, 'code') && $data->{'code'} !== null) {
             $object->setCode($data->{'code'});
         }
@@ -51,6 +57,12 @@ class TaxonNormalizer implements DenormalizerInterface, NormalizerInterface, Den
     public function normalize($object, $format = null, array $context = array())
     {
         $data = new \stdClass();
+        if (null !== $object->getName()) {
+            $data->{'name'} = $object->getName();
+        }
+        else {
+            $data->{'name'} = null;
+        }
         if (null !== $object->getCode()) {
             $data->{'code'} = $object->getCode();
         }

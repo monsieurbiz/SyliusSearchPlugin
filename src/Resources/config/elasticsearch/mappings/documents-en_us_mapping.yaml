@@ -10,11 +10,20 @@ mappings:
     channel:
       type: keyword
     mainTaxon:
-      type: keyword
+      type: nested
+      properties:
+        code:
+          type: keyword
+        name:
+          type: keyword
+        position:
+          type: integer
     taxon:
       type: nested
       properties:
         code:
+          type: keyword
+        name:
           type: keyword
         position:
           type: integer

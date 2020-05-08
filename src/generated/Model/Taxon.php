@@ -9,6 +9,12 @@ class Taxon
      *
      * @var string|null
      */
+    protected $name;
+    /**
+     * 
+     *
+     * @var string|null
+     */
     protected $code;
     /**
      * 
@@ -16,6 +22,27 @@ class Taxon
      * @var int|null
      */
     protected $position;
+    /**
+     * 
+     *
+     * @return string|null
+     */
+    public function getName() : ?string
+    {
+        return $this->name;
+    }
+    /**
+     * 
+     *
+     * @param string|null $name
+     *
+     * @return self
+     */
+    public function setName(?string $name) : self
+    {
+        $this->name = $name;
+        return $this;
+    }
     /**
      * 
      *

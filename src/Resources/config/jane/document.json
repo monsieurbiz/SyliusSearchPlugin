@@ -29,12 +29,12 @@
           }
         },
         "main_taxon": {
-          "type": "string"
+          "$ref": "#/definitions/Taxon"
         },
         "taxon": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Taxon"
           }
         },
         "attributes": {
@@ -97,6 +97,9 @@
     "Taxon": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "code": {
           "type": "string"
         },

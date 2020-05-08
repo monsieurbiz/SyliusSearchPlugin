@@ -125,13 +125,14 @@ class Result extends Document
 
     /**
      * @param string $code
+     * @param string $name
      * @param int $position
      * @return Result
      */
-    public function addTaxon(string $code, int $position): self
+    public function addTaxon(string $code, string $name, int $position): self
     {
         $taxon = new Taxon();
-        $taxon->setCode($code)->setPosition($position);
+        $taxon->setCode($code)->setPosition($position)->setName($name);
         $this->setTaxon($this->getTaxon() ? array_merge($this->getTaxon(), [$taxon]) : [$taxon]);
 
         return $this;

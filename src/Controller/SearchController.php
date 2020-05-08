@@ -130,6 +130,10 @@ class SearchController extends AbstractController
             }
         }
 
+        // Get number formatter for currency
+        $currencyCode = $this->currencyContext->getCurrencyCode();
+        $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
+
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'query' => $query,
@@ -137,6 +141,7 @@ class SearchController extends AbstractController
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
+            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
         ]);
     }
 
@@ -201,6 +206,10 @@ class SearchController extends AbstractController
             $this->gridConfig->getFilters()
         );
 
+        // Get number formatter for currency
+        $currencyCode = $this->currencyContext->getCurrencyCode();
+        $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
+
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
             'taxon' => $taxon,
@@ -208,6 +217,7 @@ class SearchController extends AbstractController
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
+            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
         ]);
     }
 

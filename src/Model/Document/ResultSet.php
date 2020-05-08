@@ -28,6 +28,12 @@ class ResultSet
     /** @var Filter[] */
     private $filters = [];
 
+    /** @var RangeFilter|null */
+    private $priceFilter;
+
+    /** @var Filter|null */
+    private $taxonFilter;
+
     /** @var Pagerfanta */
     private $pager;
 
@@ -115,6 +121,8 @@ class ResultSet
         $this->sortFilters();
 
         $this->addTaxonFilter($aggregations, $taxon);
+
+        $this->addPriceFilter($aggregations);
     }
 
     /**
@@ -147,6 +155,22 @@ class ResultSet
     public function getPager(): Pagerfanta
     {
         return $this->pager;
+    }
+
+    /**
+     * @return Filter|null
+     */
+    public function getTaxonFilter(): ?Filter
+    {
+        return $this->taxonFilter;
+    }
+
+    /**
+     * @return RangeFilter|null
+     */
+    public function getPriceFilter(): ?RangeFilter
+    {
+        return $this->priceFilter;
     }
 
     /**
@@ -204,8 +228,7 @@ class ResultSet
                 $taxonLevelBuckets = $taxonCodeBucket['levels']['buckets'] ?? [];
                 foreach ($taxonLevelBuckets as $taxonLevelBucket) {
                     $level = $taxonLevelBucket['key'];
-                    if ($level === ($currentTaxonLevel + 1) && isset($childrenTaxon[$taxonCode])) {
-                        dump($level);
+                    if ($level === ($currentTaxonLevel + 1) && (!$taxon || isset($childrenTaxon[$taxonCode]))) {
                         // Get taxon name in aggregation
                         $taxonNameBuckets = $taxonLevelBucket['names']['buckets'] ?? [];
                         foreach ($taxonNameBuckets as $taxonNameBucket) {
@@ -219,8 +242,25 @@ class ResultSet
 
             // Put taxon filter in first if contains value
             if (count($filter->getValues())) {
-                array_unshift($this->filters , $filter);
+                $this->taxonFilter = $filter;
             }
+        }
+    }
+
+    /**
+     * Add price filter depending on aggregations
+     *
+     * @param array $aggregations
+     */
+    protected function addPriceFilter(array $aggregations)
+    {
+        $priceAggregation = $aggregations['price'] ?? null;
+        if ($priceAggregation && $priceAggregation['doc_count'] > 0) {
+            $this->priceFilter = new RangeFilter(
+                'monsieurbiz_searchplugin.filters.price_filter',
+                (int) floor(($priceAggregation['values']['min'] ?? 0) / 100),
+                (int) ceil(($priceAggregation['values']['max'] ?? 0) / 100)
+            );
         }
     }
 }

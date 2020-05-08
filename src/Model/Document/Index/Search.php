@@ -161,7 +161,10 @@ class Search extends AbstractIndex
         }
 
         // Manage filters
-        $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
+        $aggs = AggregationHelper::buildAggregations($gridConfig->getFilters());
+        if (!empty($aggs)) {
+            $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
+        }
 
         return $query;
     }
@@ -222,7 +225,10 @@ class Search extends AbstractIndex
         }
 
         // Manage filters
-        $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
+        $aggs = AggregationHelper::buildAggregations($gridConfig->getFilters());
+        if (!empty($aggs)) {
+            $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
+        }
 
         return $query;
     }

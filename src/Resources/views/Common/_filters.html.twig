@@ -3,7 +3,7 @@
         {{ 'monsieurbiz_searchplugin.filters.filter_results' | trans }}
     </div>
 
-    {% if resultSet.filters|length == 0 and resultSet.priceFilter is not defined %}
+    {% if resultSet.filters|length == 0 and resultSet.priceFilter is not defined and resultSet.taxonFilter is not defined %}
         <div class="item">
             {{ 'monsieurbiz_searchplugin.filters.no_filter'|trans }}
         </div>

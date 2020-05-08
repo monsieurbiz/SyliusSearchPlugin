@@ -43,21 +43,12 @@ class AggregationHelper
      */
     public static function buildAggregations(array $filters): array
     {
-        if (empty($filters)) {
-            return [];
-        }
-
-        $aggregations = [];
+        $attributeAggregations = [];
         foreach ($filters as $field) {
-            $aggregations[$field] = self::buildAggregation($field);
+            $attributeAggregations[$field] = self::buildAggregation($field);
         }
 
-        return [
-            'filters' => [
-                'nested' => ['path' => 'attributes'],
-                'aggs' => $aggregations
-            ],
-            // Get attributes info to be able to retrieve the attribute name from code
+        $aggregations = [
             'attributes' => [
                 'nested' => ['path' => 'attributes'],
                 'aggs' => [
@@ -101,5 +92,14 @@ class AggregationHelper
                 ]
             ],
         ];
+
+        if (!empty($attributeAggregations)) {
+            $aggregations['filters'] = [
+                'nested' => ['path' => 'attributes'],
+                'aggs' => $aggregations
+            ];
+        }
+
+        return $aggregations;
     }
 }

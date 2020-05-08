@@ -107,7 +107,7 @@ class ResultSet
         }
 
         // Retrieve filters values in aggregations
-        $filterAggregations = $aggregations['filters'];
+        $filterAggregations = $aggregations['filters'] ?? [];
         unset($filterAggregations['doc_count']);
         foreach ($filterAggregations as $field => $aggregation) {
             if ($aggregation['doc_count'] === 0) {

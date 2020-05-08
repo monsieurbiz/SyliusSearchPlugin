@@ -42,6 +42,7 @@
         },
         applyFilter: function (field, value) {
             // Changed field and value are available in case we need it
+            $(monsieurbizSearchPlugin.loaderSelector).dimmer('show');
             $(monsieurbizSearchPlugin.filterForm).submit();
         }
     });

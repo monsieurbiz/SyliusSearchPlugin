@@ -7,7 +7,12 @@
     {% if resultSet.totalHits == 0 %}
         {{ 'monsieurbiz_searchplugin.search.result.no_result'|trans }}
     {% else %}
-        <div class="ui stackable grid">
+        <div class="ui stackable grid mbiz-sylius-search-grid">
+            <div class="ui dimmer" style="border-radius: 20px; background-color: rgba(0,0,0,.6);">
+                <div class="ui massive text loader">
+                    <h3>{{ 'monsieurbiz_searchplugin.filters.loading' | trans }}</h3>
+                </div>
+            </div>
             <div class="four wide column">
                 {% include '@MonsieurBizSyliusSearchPlugin/Taxon/_sidebar.html.twig' %}
             </div>

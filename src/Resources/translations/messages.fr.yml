@@ -18,3 +18,4 @@ monsieurbiz_searchplugin:
       price_filter: 'Prix'
       price_min: 'Prix minimum'
       price_max: 'Prix maximum'
+      loading: 'Nous recherchons les meilleurs résultats selon vos critères'

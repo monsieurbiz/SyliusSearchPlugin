@@ -16,7 +16,18 @@
 
 A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and [Elastically](https://github.com/jolicode/elastically).
 
+## Features
+
+### Search with filters, sort and limits
+
 ![Search results](screenshot_search.jpg)
+
+### Taxon view with filters, sort and limits
+
+![Taxon view](screenshot_taxon.jpg)
+
+
+### Instant search while you're typing
 
 ![Instant search](screenshot_instant.jpg)
 

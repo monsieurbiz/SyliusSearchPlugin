@@ -125,6 +125,14 @@ The `{{QUERY}}` string inside is replaced in PHP by the query typed by the user.
 
 You can also change available sortings and limits.
 
+To add filters, you need to add your attributes and options in config : 
+ ```yaml
+monsieur_biz_sylius_search:
+    filters:
+        attributes: [] # Put the attributes you want to add in filters
+        options: [] # Put the options you want to add in filters
+```
+
 ## Documentable objects
 
 If you want to index an object in the search index, your entity have to implements `MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface` interface : 

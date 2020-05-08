@@ -7,5 +7,5 @@ monsieur_biz_sylius_search:
         - 'Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product\Product'
     grid:
         filters:
-            attributes: ['t_shirt_material', 't_shirt_brand']
-            options: []
+            attributes: ['cap_brand','cap_collection','cap_material','dress_brand','dress_collection','dress_material','jeans_brand','jeans_collection','jeans_material','t_shirt_brand','t_shirt_collection','t_shirt_material']
+            options: ['dress_height','dress_size','jeans_size','t_shirt_size']

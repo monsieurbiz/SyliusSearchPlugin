@@ -8,18 +8,34 @@
             {{ 'monsieurbiz_searchplugin.filters.no_filter'|trans }}
         </div>
     {% else %}
+        {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)) %}
+        <form name="filters-form" method="get" action="{{ path }}">
+            {% if resultSet.taxonFilter is not empty %}
+                {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': resultSet.taxonFilter} %}
+            {% endif %}
 
-        {% if resultSet.taxonFilter is not empty %}
-            {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': resultSet.taxonFilter} %}
-        {% endif %}
+            {% if resultSet.priceFilter is not empty %}
+                {% include '@MonsieurBizSyliusSearchPlugin/Common/_rangeFilter.html.twig' with {'filter': resultSet.priceFilter} %}
+            {% endif %}
 
-        {% if resultSet.priceFilter is not empty %}
-            {% include '@MonsieurBizSyliusSearchPlugin/Common/_rangeFilter.html.twig' with {'filter': resultSet.priceFilter} %}
-        {% endif %}
+            {% for filter in resultSet.filters %}
+                {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': filter} %}
+            {% endfor %}
 
-        {% for filter in resultSet.filters %}
-            {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': filter} %}
-        {% endfor %}
+            {# Don't loose current sorting #}
+            {% set sorting = app.request.query.get('sorting') %}
+            {% if sorting is not empty %}
+                {% for sort, order in sorting %}
+                    <input type="hidden" name="sorting[{{ sort }}]" value="{{ order }}" />
+                {% endfor %}
+            {% endif %}
+
+            {# Don't loose current limit #}
+            {% set limit = app.request.query.get('limit') %}
+            {% if limit is not empty %}
+                <input type="hidden" name="limit" value="{{ limit }}" />
+            {% endif %}
+        </form>
     {% endif %}
 
 </div>

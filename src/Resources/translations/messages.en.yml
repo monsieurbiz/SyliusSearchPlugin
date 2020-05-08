@@ -14,3 +14,4 @@ monsieurbiz_searchplugin:
       filter_results: 'Filter results'
       apply_filters: 'Apply filters'
       no_filter: 'No filter available'
+      taxon_filter: 'Categories'

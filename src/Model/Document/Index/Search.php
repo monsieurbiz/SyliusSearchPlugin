@@ -9,12 +9,14 @@ use Elastica\Exception\ResponseException;
 use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
+use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
 use MonsieurBiz\SyliusSearchPlugin\Helper\AggregationHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SortHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -91,17 +93,17 @@ class Search extends AbstractIndex
      * Taxon search documents for a given locale, taxon code, max number items and page
      *
      * @param string $locale
-     * @param string $taxon
+     * @param TaxonInterface $taxon
      * @param int $maxItems
      * @param int $page
      * @param array $sorting
      * @param array $filters
      * @return ResultSet
      */
-    public function taxon(string $locale, string $taxon, int $maxItems, int $page, array $sorting, array $filters): ResultSet
+    public function taxon(string $locale, TaxonInterface $taxon, int $maxItems, int $page, array $sorting, array $filters): ResultSet
     {
         try {
-            return $this->query($locale, $this->getTaxonQuery($taxon, $page, $maxItems, $sorting, $filters), $maxItems, $page);
+            return $this->query($locale, $this->getTaxonQuery($taxon, $page, $maxItems, $sorting, $filters), $maxItems, $page, $taxon);
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
             return new ResultSet($maxItems, $page);
@@ -115,9 +117,10 @@ class Search extends AbstractIndex
      * @param array $query
      * @param int $maxItems
      * @param int $page
+     * @param TaxonInterface|null $taxon
      * @return ResultSet
      */
-    private function query(string $locale, array $query, int $maxItems, int $page)
+    private function query(string $locale, array $query, int $maxItems, int $page, ?TaxonInterface $taxon = null)
     {
         try {
             /** @var ElasticallyResultSet $results */
@@ -132,7 +135,7 @@ class Search extends AbstractIndex
             return new ResultSet($maxItems, $page);
         }
 
-        return new ResultSet($maxItems, $page, $results);
+        return new ResultSet($maxItems, $page, $results, $taxon);
     }
 
     /**
@@ -199,7 +202,7 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for taxon search
      *
-     * @param string $taxon
+     * @param TaxonInterface $taxon
      * @param int $page
      * @param int $size
      * @param array $sorting
@@ -207,12 +210,12 @@ class Search extends AbstractIndex
      * @return array
      * @throws ReadFileException
      */
-    private function getTaxonQuery(string $taxon, int $page, int $size, array $sorting, array $filters): array
+    private function getTaxonQuery(TaxonInterface $taxon, int $page, int $size, array $sorting, array $filters): array
     {
         $query = $this->searchQueryProvider->getTaxonQuery();
 
         // Replace params
-        $query = str_replace('{{TAXON}}', $taxon, $query);
+        $query = str_replace('{{TAXON}}', $taxon->getCode(), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
@@ -226,7 +229,7 @@ class Search extends AbstractIndex
         // Manage sorting
         $channelCode = $this->channelContext->getChannel()->getCode();
         foreach ($sorting as $field => $order) {
-            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $taxon);
+            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $taxon->getCode());
             break; // only 1
         }
 

@@ -194,7 +194,7 @@ class SearchController extends AbstractController
         /** @var ResultSet $resultSet */
         $resultSet = $this->documentSearch->taxon(
             $request->getLocale(),
-            $taxon->getCode(),
+            $taxon,
             $limit,
             $page,
             $sorting,

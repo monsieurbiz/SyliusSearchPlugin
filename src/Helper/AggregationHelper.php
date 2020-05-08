@@ -7,6 +7,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 class AggregationHelper
 {
     const MAX_AGGREGATED_ATTRIBUTES_INFO = 100;
+    const MAX_AGGREGATED_TAXON_INFO = 500;
 
     /**
      * Build sort array to add in query
@@ -66,6 +67,25 @@ class AggregationHelper
                         'aggs' => [
                             'names' => [
                                 'terms' => ['field' => 'attributes.name.keyword']
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            // Get taxon info to be able to retrieve the attribute name from code
+            'taxons' => [
+                'nested' => ['path' => 'taxon'],
+                'aggs' => [
+                    'codes' => [
+                        'terms' => ['field' => 'taxon.code', 'size' => self::MAX_AGGREGATED_TAXON_INFO], // Retrieve all attributes info
+                        'aggs' => [
+                            'levels' => [
+                                'terms' => ['field' => 'taxon.level'],
+                                'aggs' => [
+                                    'names' => [
+                                        'terms' => ['field' => 'taxon.name']
+                                    ],
+                                ]
                             ],
                         ]
                     ]

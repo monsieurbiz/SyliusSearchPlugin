@@ -77,12 +77,11 @@ class ResultSet
     {
         $aggregations = $resultSet->getAggregations();
 
-        $filterAggregations = $aggregations['filters'];
-        $attributeAggregations = $aggregations['attributes'];
-        unset($filterAggregations['doc_count']);
 
         // Retrieve filters labels in aggregations
         $attributes = [];
+        $attributeAggregations = $aggregations['attributes'];
+        unset($attributeAggregations['doc_count']);
         $attributeCodeBuckets = $attributeAggregations['codes']['buckets'] ?? [];
         foreach ($attributeCodeBuckets as $attributeCodeBucket) {
             $attributeCode = $attributeCodeBucket['key'];
@@ -95,11 +94,13 @@ class ResultSet
         }
 
         // Retrieve filters values in aggregations
+        $filterAggregations = $aggregations['filters'];
+        unset($filterAggregations['doc_count']);
         foreach ($filterAggregations as $field => $aggregation) {
             if ($aggregation['doc_count'] === 0) {
                 continue;
             }
-            $filter = new Filter($attributes[$field] ?? $field);
+            $filter = new Filter($attributes[$field] ?? $field, $aggregation['doc_count']);
             $buckets = $aggregation['values']['buckets'] ?? [];
             foreach ($buckets as $bucket) {
                 if (isset($bucket['key']) && isset($bucket['doc_count'])) {
@@ -108,6 +109,7 @@ class ResultSet
             }
             $this->filters[] = $filter;
         }
+        $this->sortFilters();
     }
 
     /**
@@ -140,5 +142,14 @@ class ResultSet
     public function getPager(): Pagerfanta
     {
         return $this->pager;
+    }
+
+    private function sortFilters()
+    {
+        usort($this->filters, function($filter1, $filter2) {
+            /** @var Filter $filter1 */
+            /** @var Filter $filter2 */
+            return $filter2->getCount() > $filter1->getCount();
+        } );
     }
 }

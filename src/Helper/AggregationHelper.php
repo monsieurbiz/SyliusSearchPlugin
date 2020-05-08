@@ -6,6 +6,8 @@ namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 
 class AggregationHelper
 {
+    const MAX_AGGREGATED_ATTRIBUTES_INFO = 100;
+
     /**
      * Build sort array to add in query
      *
@@ -59,7 +61,7 @@ class AggregationHelper
                 'nested' => ['path' => 'attributes'],
                 'aggs' => [
                     'codes' => [
-                        'terms' => ['field' => 'attributes.code']
+                        'terms' => ['field' => 'attributes.code', 'size' => self::MAX_AGGREGATED_ATTRIBUTES_INFO] // Retrieve all attributes info
                         ,
                         'aggs' => [
                             'names' => [

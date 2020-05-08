@@ -92,7 +92,7 @@ class GridConfig
 
                 // Set applied filters
                 $this->appliedFilters = $request->get('attribute') ?? [];
-                $priceFilter = $request->get('price') ?? [];
+                $this->appliedFilters['price'] = $request->get('price') ?? [];
 
                 $this->isInitialized = true;
                 break;
@@ -109,10 +109,10 @@ class GridConfig
                 if (!is_array($this->sorting) || empty($this->sorting)) {
                     $this->sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
                 }
-                
+
                 // Set applied filters
                 $this->appliedFilters = $request->get('attribute') ?? [];
-                $priceFilter = $request->get('price') ?? [];
+                $this->appliedFilters['price'] = $request->get('price') ?? [];
 
                 // Set limit
                 $this->limit = max(1, (int) $request->get('limit'));

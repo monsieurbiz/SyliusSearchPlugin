@@ -7,6 +7,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 class FilterHelper
 {
     const TAXON_FILTER = 'taxon';
+    const PRICE_FILTER = 'price';
 
     /**
      * Return an array with filters for query
@@ -24,6 +25,10 @@ class FilterHelper
         foreach ($appliedFilters as $field => $values) {
             if ($field === self::TAXON_FILTER) {
                 $filters[] = self::buildTaxonFilter($values);
+            } elseif ($field === self::PRICE_FILTER) {
+                if (isset($values['min']) && isset($values['max'])) {
+                    $filters[] = self::buildPriceFilter((int) $values['min'], (int) $values['max']);
+                }
             } else {
                 $filters[] = self::buildFilter($field, $values);
             }
@@ -88,6 +93,32 @@ class FilterHelper
                     'bool' => [
                         'should' => $filterValues,
                         'minimum_should_match' => 1
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Build filter array for price to add in query
+     *
+     * @param int $min
+     * @param int $max
+     * @return array
+     */
+    public static function buildPriceFilter(int $min, int $max): array
+    {
+        return [
+            'nested' => [
+                'path' => 'price',
+                'query' => [
+                    'range' => [
+                        'price.value' => [
+                            [
+                                'gte' => $min * 100,
+                                'lte' => $max * 100,
+                            ]
+                        ]
                     ]
                 ]
             ]

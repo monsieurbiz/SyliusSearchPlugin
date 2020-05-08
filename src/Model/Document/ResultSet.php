@@ -144,11 +144,20 @@ class ResultSet
         return $this->pager;
     }
 
-    private function sortFilters()
+    /**
+     * Sort filters
+     */
+    protected function sortFilters()
     {
         usort($this->filters, function($filter1, $filter2) {
             /** @var Filter $filter1 */
             /** @var Filter $filter2 */
+
+            // If same count we display the filters with more values before
+            if ($filter1->getCount() === $filter2->getCount()) {
+                return count($filter2->getValues()) > count($filter1->getValues());
+            }
+
             return $filter2->getCount() > $filter1->getCount();
         } );
     }

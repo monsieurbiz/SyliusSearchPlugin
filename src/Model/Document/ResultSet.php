@@ -86,10 +86,14 @@ class ResultSet
     private function initFilters(ElasticallyResultSet $resultSet, ?TaxonInterface $taxon = null)
     {
         $aggregations = $resultSet->getAggregations();
+        // No aggregation so don't perform filters
+        if (empty($aggregations)) {
+            return;
+        }
 
         // Retrieve filters labels in aggregations
         $attributes = [];
-        $attributeAggregations = $aggregations['attributes'];
+        $attributeAggregations = $aggregations['attributes'] ?? [];
         unset($attributeAggregations['doc_count']);
         $attributeCodeBuckets = $attributeAggregations['codes']['buckets'] ?? [];
         foreach ($attributeCodeBuckets as $attributeCodeBucket) {

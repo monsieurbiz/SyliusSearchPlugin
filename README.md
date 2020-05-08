@@ -242,7 +242,7 @@ You can override all templates in your theme to :
 - Customize search results display page (`src/MonsieurBizSearchPlugin/Resources/views/Search/`)
 - Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Instant/`)
 - Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Taxon/`)
-- Customize JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/Instant/instant_javascript.html.twig`)
+- Customize JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/js.html.twig`)
 
 ## Jane
 

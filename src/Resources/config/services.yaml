@@ -40,11 +40,11 @@ services:
           documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
         elastically_bulk_size: 100
 
-  # Add JS for instant search
+  # Add JS for plugin
   monsieurbiz_sylius_search.block_event_listener.layout.javascripts:
     class: Sylius\Bundle\UiBundle\Block\BlockEventListener
     arguments:
-      - '@@MonsieurBizSyliusSearchPlugin/Instant/instant_javascript.html.twig'
+      - '@@MonsieurBizSyliusSearchPlugin/js.html.twig'
     tags:
       - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.javascripts, method: onBlockEvent }
 

@@ -2,6 +2,10 @@
     'use strict';
     $.fn.extend({
         instantSearch: function () {
+            // No instant if disabled
+            if (!monsieurbizSearchPlugin.instantEnabled) {
+                return;
+            }
             $(monsieurbizSearchPlugin.searchInputSelector).prop('autocomplete', 'off');
             // Init a timeout variable to be used below
             var instantSearchTimeout = null;

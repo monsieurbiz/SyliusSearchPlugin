@@ -1,5 +1,6 @@
 <script type="text/javascript">
     var monsieurbizSearchPlugin = {
+        instantEnabled: true,
         instantUrl: '{{ path('monsieurbiz_sylius_search_instant') | escape('js') }}', // URL for instant search
         searchInputSelector: '.autocomplete-search input[type=text]', // Selector for search input text field
         resultClosestSelector: '.autocomplete-search', // Selector used to display results, take the closest parent of searchInputSelector

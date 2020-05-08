@@ -18,6 +18,10 @@ mappings:
           type: keyword
         position:
           type: integer
+        level:
+          type: integer
+        product_position:
+          type: integer
     taxon:
       type: nested
       properties:
@@ -26,6 +30,10 @@ mappings:
         name:
           type: keyword
         position:
+          type: integer
+        level:
+          type: integer
+        product_position:
           type: integer
     attributes:
       type: nested

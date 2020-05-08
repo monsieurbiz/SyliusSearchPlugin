@@ -121,9 +121,10 @@ trait DocumentableProductTrait
         if ($mainTaxon = $this->getMainTaxon()) {
             $taxon = new DocumentTaxon();
             $taxon
+                ->setName($mainTaxon->getTranslation($locale)->getName())
                 ->setCode($mainTaxon->getCode())
                 ->setPosition($mainTaxon->getPosition())
-                ->setName($mainTaxon->getTranslation($locale)->getName())
+                ->setLevel($mainTaxon->getLevel())
             ;
             $document->setMainTaxon($taxon);
         }
@@ -133,6 +134,8 @@ trait DocumentableProductTrait
             $document->addTaxon(
                 $productTaxon->getTaxon()->getCode(),
                 $productTaxon->getTaxon()->getTranslation($locale)->getName(),
+                $productTaxon->getTaxon()->getPosition(),
+                $productTaxon->getTaxon()->getLevel(),
                 $productTaxon->getPosition()
             );
         }

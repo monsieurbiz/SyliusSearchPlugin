@@ -52,6 +52,18 @@ class TaxonNormalizer implements DenormalizerInterface, NormalizerInterface, Den
         elseif (property_exists($data, 'position') && $data->{'position'} === null) {
             $object->setPosition(null);
         }
+        if (property_exists($data, 'level') && $data->{'level'} !== null) {
+            $object->setLevel($data->{'level'});
+        }
+        elseif (property_exists($data, 'level') && $data->{'level'} === null) {
+            $object->setLevel(null);
+        }
+        if (property_exists($data, 'product_position') && $data->{'product_position'} !== null) {
+            $object->setProductPosition($data->{'product_position'});
+        }
+        elseif (property_exists($data, 'product_position') && $data->{'product_position'} === null) {
+            $object->setProductPosition(null);
+        }
         return $object;
     }
     public function normalize($object, $format = null, array $context = array())
@@ -74,6 +86,18 @@ class TaxonNormalizer implements DenormalizerInterface, NormalizerInterface, Den
         }
         else {
             $data->{'position'} = null;
+        }
+        if (null !== $object->getLevel()) {
+            $data->{'level'} = $object->getLevel();
+        }
+        else {
+            $data->{'level'} = null;
+        }
+        if (null !== $object->getProductPosition()) {
+            $data->{'product_position'} = $object->getProductPosition();
+        }
+        else {
+            $data->{'product_position'} = null;
         }
         return $data;
     }

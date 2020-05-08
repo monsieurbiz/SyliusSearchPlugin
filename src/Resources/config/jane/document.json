@@ -105,6 +105,12 @@
         },
         "position": {
           "type": "integer"
+        },
+        "level": {
+          "type": "integer"
+        },
+        "product_position": {
+          "type": "integer"
         }
       }
     }

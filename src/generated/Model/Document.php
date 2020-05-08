@@ -49,13 +49,13 @@ class Document
     /**
      * 
      *
-     * @var string|null
+     * @var Taxon|null
      */
     protected $mainTaxon;
     /**
      * 
      *
-     * @var string[]|null
+     * @var Taxon[]|null
      */
     protected $taxon;
     /**
@@ -226,20 +226,20 @@ class Document
     /**
      * 
      *
-     * @return string|null
+     * @return Taxon|null
      */
-    public function getMainTaxon() : ?string
+    public function getMainTaxon() : ?Taxon
     {
         return $this->mainTaxon;
     }
     /**
      * 
      *
-     * @param string|null $mainTaxon
+     * @param Taxon|null $mainTaxon
      *
      * @return self
      */
-    public function setMainTaxon(?string $mainTaxon) : self
+    public function setMainTaxon(?Taxon $mainTaxon) : self
     {
         $this->mainTaxon = $mainTaxon;
         return $this;
@@ -247,7 +247,7 @@ class Document
     /**
      * 
      *
-     * @return string[]|null
+     * @return Taxon[]|null
      */
     public function getTaxon() : ?array
     {
@@ -256,7 +256,7 @@ class Document
     /**
      * 
      *
-     * @param string[]|null $taxon
+     * @param Taxon[]|null $taxon
      *
      * @return self
      */

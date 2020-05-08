@@ -4,9 +4,18 @@ monsieurbiz_searchplugin:
     submit: 'Submit search'
   search:
     result:
-      search_result: 'Search results for "%query%"'
+      search_result: 'Search results for "%query%" (%count%)'
       no_result: 'No result.'
   instant:
     result:
-      search_result: 'Search results for "%query%"'
+      search_result: 'Search results for "%query%" (%count%)'
       no_result: 'No result.'
+  filters:
+      filter_results: 'Filter results'
+      apply_filters: 'Apply filters'
+      no_filter: 'No filter available'
+      taxon_filter: 'Categories'
+      price_filter: 'Price'
+      price_min: 'Min price'
+      price_max: 'Max price'
+      loading: 'We are looking for the best results according to your criteria'

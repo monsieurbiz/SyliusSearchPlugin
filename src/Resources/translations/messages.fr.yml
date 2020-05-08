@@ -4,9 +4,18 @@ monsieurbiz_searchplugin:
     submit: 'Lancer la recherche'
   search:
     result:
-      search_result: 'Résultats de recherche pour "%query%"'
+      search_result: 'Résultats de recherche pour "%query%" (%count%)'
       no_result: 'Pas de résultat.'
   instant:
     result:
-      search_result: 'Résultats de recherche pour "%query%"'
+      search_result: 'Résultats de recherche pour "%query%" (%count%)'
       no_result: 'Pas de résultat.'
+  filters:
+      filter_results: 'Filtrer les résultats'
+      apply_filters: 'Appliquer les filtres'
+      no_filter: 'Aucun filtre disponible'
+      taxon_filter: 'Catégories'
+      price_filter: 'Prix'
+      price_min: 'Prix minimum'
+      price_max: 'Prix maximum'
+      loading: 'Nous recherchons les meilleurs résultats selon vos critères'

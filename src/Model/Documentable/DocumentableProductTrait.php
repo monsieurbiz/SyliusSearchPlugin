@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
+use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon as DocumentTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Core\Model\Image;
-use Sylius\Component\Core\Model\ProductTaxon;
+use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductVariant;
-use Sylius\Component\Core\Model\Taxon;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Currency\Model\CurrencyInterface;
+use Sylius\Component\Product\Model\ProductOptionInterface;
 
 trait DocumentableProductTrait
 {
@@ -41,7 +43,7 @@ trait DocumentableProductTrait
         $document = $this->addImagesInDocument($document);
         $document = $this->addChannelsInDocument($document);
         $document = $this->addPricesInDocument($document);
-        $document = $this->addTaxonsInDocument($document);
+        $document = $this->addTaxonsInDocument($document, $locale);
 
 
         $document->addAttribute('name', 'Name', [$this->getTranslation($locale)->getName()], $locale, 50);
@@ -50,6 +52,7 @@ trait DocumentableProductTrait
         $document->addAttribute('created_at', 'Creation Date', [$this->getCreatedAt()], $locale, 1);
 
         $document = $this->addAttributesInDocument($document, $locale);
+        $document = $this->addOptionsInDocument($document, $locale);
 
         return $document;
     }
@@ -109,18 +112,32 @@ trait DocumentableProductTrait
 
     /**
      * @param Result $document
+     * @param string $locale
      * @return Result
      */
-    protected function addTaxonsInDocument(Result $document): Result
+    protected function addTaxonsInDocument(Result $document, string $locale): Result
     {
-        /** @var Taxon $taxon */
+        /** @var TaxonInterface $mainTaxon */
         if ($mainTaxon = $this->getMainTaxon()) {
-            $document->setMainTaxon($mainTaxon->getCode());
+            $taxon = new DocumentTaxon();
+            $taxon
+                ->setName($mainTaxon->getTranslation($locale)->getName())
+                ->setCode($mainTaxon->getCode())
+                ->setPosition($mainTaxon->getPosition())
+                ->setLevel($mainTaxon->getLevel())
+            ;
+            $document->setMainTaxon($taxon);
         }
 
-        /** @var ProductTaxon $productTaxon */
+        /** @var ProductTaxonInterface $productTaxon */
         foreach ($this->getProductTaxons() as $productTaxon) {
-            $document->addTaxon($productTaxon->getTaxon()->getCode(), $productTaxon->getPosition());
+            $document->addTaxon(
+                $productTaxon->getTaxon()->getCode(),
+                $productTaxon->getTaxon()->getTranslation($locale)->getName(),
+                $productTaxon->getTaxon()->getPosition(),
+                $productTaxon->getTaxon()->getLevel(),
+                $productTaxon->getPosition()
+            );
         }
 
         return $document;
@@ -133,7 +150,6 @@ trait DocumentableProductTrait
      */
     protected function addAttributesInDocument(Result $document, string $locale): Result
     {
-        // TODO : Add fallback locale
         /** @var AttributeValueInterface $attribute */
         foreach ($this->getAttributesByLocale($locale, $locale) as $attribute) {
             $attributeValues = [];
@@ -145,6 +161,25 @@ trait DocumentableProductTrait
                 $attributeValues[] = $attribute->getValue();
             }
             $document->addAttribute($attribute->getCode(), $attribute->getName(), $attributeValues, $attribute->getLocaleCode(), 1);
+        }
+
+        return $document;
+    }
+
+    /**
+     * @param Result $document
+     * @param string $locale
+     * @return Result
+     */
+    protected function addOptionsInDocument(Result $document, string $locale): Result
+    {
+        /** @var ProductOptionInterface $option */
+        foreach ($this->getOptions() as $option) {
+            $optionValues = [];
+            foreach ($option->getValues() as $value) {
+                $optionValues[] = $value->getTranslation($locale)->getValue();
+            }
+            $document->addAttribute($option->getCode(), $option->getTranslation($locale)->getName(), $optionValues, $locale, 1);
         }
 
         return $document;

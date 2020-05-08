@@ -6,6 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 use MonsieurBiz\SyliusSearchPlugin\Context\TaxonContextInterface;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Search;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
@@ -38,26 +39,8 @@ class SearchController extends AbstractController
     /** @var TaxonContextInterface */
     private $taxonContext;
 
-    /** @var int[] */
-    private $taxonLimits;
-
-    /** @var int[] */
-    private $searchLimits;
-
-    /** @var int */
-    private $taxonDefaultLimit;
-
-    /** @var int */
-    private $searchDefaultLimit;
-
-    /** @var int */
-    private $instantDefaultLimit;
-
-    /** @var string[] */
-    private $taxonSorting;
-
-    /** @var string[] */
-    private $searchSorting;
+    /** @var GridConfig */
+    private $gridConfig;
 
     /**
      * SearchController constructor.
@@ -66,13 +49,7 @@ class SearchController extends AbstractController
      * @param ChannelContextInterface $channelContext
      * @param CurrencyContextInterface $currencyContext
      * @param TaxonContextInterface $taxonContext
-     * @param array $taxonLimits
-     * @param array $searchLimits
-     * @param int $taxonDefaultLimit
-     * @param int $searchDefaultLimit
-     * @param int $instantDefaultLimit
-     * @param array $taxonSorting
-     * @param array $searchSorting
+     * @param array $gridConfig
      */
     public function __construct(
         EngineInterface $templatingEngine,
@@ -80,26 +57,14 @@ class SearchController extends AbstractController
         ChannelContextInterface $channelContext,
         CurrencyContextInterface $currencyContext,
         TaxonContextInterface $taxonContext,
-        array $taxonLimits,
-        array $searchLimits,
-        int $taxonDefaultLimit,
-        int $searchDefaultLimit,
-        int $instantDefaultLimit,
-        array $taxonSorting,
-        array $searchSorting
+        GridConfig $gridConfig
     ) {
         $this->templatingEngine = $templatingEngine;
         $this->documentSearch = $documentSearch;
         $this->channelContext = $channelContext;
         $this->currencyContext = $currencyContext;
         $this->taxonContext = $taxonContext;
-        $this->taxonLimits = $taxonLimits;
-        $this->searchLimits = $searchLimits;
-        $this->taxonDefaultLimit = $taxonDefaultLimit;
-        $this->searchDefaultLimit = $searchDefaultLimit;
-        $this->instantDefaultLimit = $instantDefaultLimit;
-        $this->taxonSorting = $taxonSorting;
-        $this->searchSorting = $searchSorting;
+        $this->gridConfig = $gridConfig;
     }
 
     /**
@@ -126,28 +91,12 @@ class SearchController extends AbstractController
      */
     public function searchAction(Request $request): Response
     {
-        $query = htmlspecialchars(urldecode($request->get('query')));
-        $page = max(1, (int) $request->get('page'));
-        $limit = max(1, (int) $request->get('limit'));
-        $sorting = $this->cleanSorting($request->get('sorting'), $this->searchSorting);
-
-        if (!is_array($sorting) || empty($sorting)) {
-            $sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
-        }
-
-        if (!in_array($limit, $this->searchLimits)) {
-            $limit = $this->searchDefaultLimit;
-        }
+        // Init grid config depending on request
+        $this->gridConfig->init(GridConfig::SEARCH_TYPE, $request);
 
         // Perform search
         /** @var ResultSet $resultSet */
-        $resultSet = $this->documentSearch->search(
-            $request->getLocale(),
-            $query,
-            $limit,
-            $page,
-            $sorting
-        );
+        $resultSet = $this->documentSearch->search($this->gridConfig);
 
         // Redirect to document if only one result
         if ($resultSet->getTotalHits() === 1) {
@@ -164,13 +113,18 @@ class SearchController extends AbstractController
             }
         }
 
+        // Get number formatter for currency
+        $currencyCode = $this->currencyContext->getCurrencyCode();
+        $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
+
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
-            'query' => $query,
-            'limits' => $this->searchLimits,
+            'query' => $this->gridConfig->getQuery(),
+            'limits' => $this->gridConfig->getLimits(),
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
+            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
         ]);
     }
 
@@ -182,20 +136,16 @@ class SearchController extends AbstractController
      */
     public function instantAction(Request $request): Response
     {
-        $query = $request->request->get('query') ?? null;
-        $query = htmlspecialchars($query);
+        // Init grid config depending on request
+        $this->gridConfig->init(GridConfig::INSTANT_TYPE, $request);
 
         // Perform instant search
         /** @var ResultSet $resultSet */
-        $resultSet = $this->documentSearch->instant(
-            $request->getLocale(),
-            $query,
-            $this->instantDefaultLimit
-        );
+        $resultSet = $this->documentSearch->instant($this->gridConfig);
 
         // Display instant result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
-            'query' => $query,
+            'query' => $this->gridConfig->getQuery(),
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
@@ -210,57 +160,25 @@ class SearchController extends AbstractController
      */
     public function taxonAction(Request $request): Response
     {
-        $taxon = $this->taxonContext->getTaxon();
-
-        $page = max(1, (int) $request->get('page'));
-        $limit = max(1, (int) $request->get('limit'));
-        $sorting = $this->cleanSorting($request->get('sorting'), $this->taxonSorting);
-
-        if (!is_array($sorting) || empty($sorting)) {
-            $sorting['position'] = self::SORT_ASC; // Product position in taxon
-        }
-
-        if (!in_array($limit, $this->taxonLimits)) {
-            $limit = $this->taxonDefaultLimit;
-        }
+        // Init grid config depending on request
+        $this->gridConfig->init(GridConfig::TAXON_TYPE, $request, $this->taxonContext->getTaxon());
 
         // Perform search
         /** @var ResultSet $resultSet */
-        $resultSet = $this->documentSearch->taxon(
-            $request->getLocale(),
-            $taxon->getCode(),
-            $limit,
-            $page,
-            $sorting
-        );
+        $resultSet = $this->documentSearch->taxon($this->gridConfig);
+
+        // Get number formatter for currency
+        $currencyCode = $this->currencyContext->getCurrencyCode();
+        $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
 
         // Display result list
         return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
-            'taxon' => $taxon,
-            'limits' => $this->taxonLimits,
+            'taxon' => $this->gridConfig->getTaxon(),
+            'limits' => $this->gridConfig->getLimits(),
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
+            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
         ]);
-    }
-
-    /**
-     * Be sure given sort in available
-     * @param $sorting
-     * @param $availableSorting
-     * @return array
-     */
-    private function cleanSorting(?array $sorting, array $availableSorting): array
-    {
-        if (!is_array($sorting)) {
-            return  [];
-        }
-
-        foreach ($sorting as $field => $order) {
-            if (!in_array($field, $availableSorting) || !in_array($order, [self::SORT_ASC, self::SORT_DESC])) {
-                unset($sorting[$field]);
-            }
-        }
-        return $sorting;
     }
 }

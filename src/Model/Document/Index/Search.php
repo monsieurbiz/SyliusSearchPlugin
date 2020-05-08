@@ -9,11 +9,17 @@ use Elastica\Exception\ResponseException;
 use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
+use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
+use MonsieurBiz\SyliusSearchPlugin\Helper\AggregationHelper;
+use MonsieurBiz\SyliusSearchPlugin\Helper\FilterHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SortHelper;
+use MonsieurBiz\SyliusSearchPlugin\Model\ArrayObject;
+use MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -50,120 +56,112 @@ class Search extends AbstractIndex
     /**
      * Search documents for a given locale, search terms, max number items and page
      *
-     * @param string $locale
-     * @param string $search
-     * @param int $maxItems
-     * @param int $page
-     * @param array $sorting
+     * @param GridConfig $gridConfig
      * @return ResultSet
      */
-    public function search(string $locale, string $search, int $maxItems, int $page, array $sorting): ResultSet
+    public function search(GridConfig $gridConfig): ResultSet
     {
         try {
-            return $this->query($locale, $this->getSearchQuery($search, $page, $maxItems, $sorting), $maxItems, $page);
+            return $this->query($gridConfig, $this->getSearchQuery($gridConfig));
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
      * Instant search documents for a given locale, query and a max number items
      *
-     * @param string $locale
-     * @param string $search
-     * @param int $maxItems
+     * @param GridConfig $gridConfig
      * @return ResultSet
      */
-    public function instant(string $locale, string $search, int $maxItems): ResultSet
+    public function instant(GridConfig $gridConfig): ResultSet
     {
         try {
-            return $this->query($locale, $this->getInstantQuery($search), $maxItems, 1);
+            return $this->query($gridConfig, $this->getInstantQuery($gridConfig));
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, 1);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
      * Taxon search documents for a given locale, taxon code, max number items and page
      *
-     * @param string $locale
-     * @param string $taxon
-     * @param int $maxItems
-     * @param int $page
-     * @param array $sorting
+     * @param GridConfig $gridConfig
      * @return ResultSet
      */
-    public function taxon(string $locale, string $taxon, int $maxItems, int $page, array $sorting): ResultSet
+    public function taxon(GridConfig $gridConfig): ResultSet
     {
         try {
-            return $this->query($locale, $this->getTaxonQuery($taxon, $page, $maxItems, $sorting), $maxItems, $page);
+            return $this->query($gridConfig, $this->getTaxonQuery($gridConfig));
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
      * Perform search for a given query
      *
-     * @param string $locale
+     * @param GridConfig $gridConfig
      * @param array $query
-     * @param int $maxItems
-     * @param int $page
      * @return ResultSet
      */
-    private function query(string $locale, array $query, int $maxItems, int $page)
+    private function query(GridConfig $gridConfig, array $query)
     {
         try {
             /** @var ElasticallyResultSet $results */
-            $results = $this->getClient()->getIndex($this->getIndexName($locale))->search(
-                $query, $maxItems
+            $results = $this->getClient()->getIndex($this->getIndexName($gridConfig->getLocale()))->search(
+                $query, $gridConfig->getLimit()
             );
         } catch (HttpException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         } catch (ResponseException $exception) {
             $this->logger->critical($exception->getMessage());
-            return new ResultSet($maxItems, $page);
+            return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
 
-        return new ResultSet($maxItems, $page, $results);
+        return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage(), $results, $gridConfig->getTaxon());
     }
 
     /**
      * Retrieve the query to send to Elasticsearch for search
      *
-     * @param string $search
-     * @param int $page
-     * @param int $size
-     * @param array $sorting
-     * @return string
+     * @param GridConfig $gridConfig
+     * @return array
      * @throws ReadFileException
      */
-    private function getSearchQuery(string $search, int $page, int $size, array $sorting): array
+    private function getSearchQuery(GridConfig $gridConfig): array
     {
         $query = $this->searchQueryProvider->getSearchQuery();
 
         // Replace params
-        $query = str_replace('{{QUERY}}', $search, $query);
+        $query = str_replace('{{QUERY}}', $gridConfig->getQuery(), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
         $query = $this->parseQuery($query);
 
+        // Apply filters
+        // Use custom ArrayObject because Elastica make `toArray` on it.
+        $query['post_filter'] = new ArrayObject(FilterHelper::buildFilters($gridConfig->getAppliedFilters()));
+
         // Manage limits
-        $from = ($page - 1) * $size;
+        $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
         $query['from'] = max(0, $from);
-        $query['size'] =  max(1, $size);
+        $query['size'] =  max(1, $gridConfig->getLimit());
 
         // Manage sorting
         $channelCode = $this->channelContext->getChannel()->getCode();
-        foreach ($sorting as $field => $order) {
+        foreach ($gridConfig->getSorting() as $field => $order) {
             $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order);
             break; // only 1
         }
+
+        // Manage filters
+        $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
 
         return $query;
     }
@@ -171,16 +169,16 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for instant search
      *
-     * @param string $search
-     * @return mixed|string
+     * @param GridConfig $gridConfig
+     * @return array
      * @throws ReadFileException
      */
-    private function getInstantQuery(string $search): array
+    private function getInstantQuery(GridConfig $gridConfig): array
     {
         $query = $this->searchQueryProvider->getInstantQuery();
 
         // Replace params
-        $query = str_replace('{{QUERY}}', $search, $query);
+        $query = str_replace('{{QUERY}}', $gridConfig->getQuery(), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
@@ -192,35 +190,39 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for taxon search
      *
-     * @param string $taxon
-     * @param int $page
-     * @param int $size
-     * @param array $sorting
-     * @return mixed|string
+     * @param GridConfig $gridConfig
+     * @return array
      * @throws ReadFileException
      */
-    private function getTaxonQuery(string $taxon, int $page, int $size, array $sorting): array
+    private function getTaxonQuery(GridConfig $gridConfig): array
     {
         $query = $this->searchQueryProvider->getTaxonQuery();
 
         // Replace params
-        $query = str_replace('{{TAXON}}', $taxon, $query);
+        $query = str_replace('{{TAXON}}', $gridConfig->getTaxon()->getCode(), $query);
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
         $query = $this->parseQuery($query);
 
+        // Apply filters
+        // Use custom ArrayObject because Elastica make `toArray` on it.
+        $query['post_filter'] = new ArrayObject(FilterHelper::buildFilters($gridConfig->getAppliedFilters()));
+
         // Manage limits
-        $from = ($page - 1) * $size;
+        $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
         $query['from'] = max(0, $from);
-        $query['size'] =  max(1, $size);
+        $query['size'] =  max(1, $gridConfig->getLimit());
 
         // Manage sorting
         $channelCode = $this->channelContext->getChannel()->getCode();
-        foreach ($sorting as $field => $order) {
-            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $taxon);
+        foreach ($gridConfig->getSorting() as $field => $order) {
+            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $gridConfig->getTaxon()->getCode());
             break; // only 1
         }
+
+        // Manage filters
+        $query['aggs'] = AggregationHelper::buildAggregations($gridConfig->getFilters());
 
         return $query;
     }

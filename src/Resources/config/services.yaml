@@ -40,11 +40,11 @@ services:
           documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
         elastically_bulk_size: 100
 
-  # Add JS for instant search
+  # Add JS for plugin
   monsieurbiz_sylius_search.block_event_listener.layout.javascripts:
     class: Sylius\Bundle\UiBundle\Block\BlockEventListener
     arguments:
-      - '@@MonsieurBizSyliusSearchPlugin/Instant/instant_javascript.html.twig'
+      - '@@MonsieurBizSyliusSearchPlugin/js.html.twig'
     tags:
       - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.javascripts, method: onBlockEvent }
 
@@ -68,9 +68,7 @@ services:
 
   MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider:
     arguments:
-      $searchPath: '%monsieurbiz_sylius_search.search_file%'
-      $instantPath: '%monsieurbiz_sylius_search.instant_file%'
-      $taxonPath: '%monsieurbiz_sylius_search.taxon_file%'
+      $files: '%monsieurbiz_sylius_search.files%'
 
   # Provider to retrieve repositories to index
   MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider:
@@ -78,12 +76,6 @@ services:
       $documentableClasses: '%monsieurbiz_sylius_search.documentable_classes%'
 
 
-  MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:
+  MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig:
     arguments:
-      $taxonLimits: '%monsieurbiz_sylius_search.taxon_limits%'
-      $searchLimits: '%monsieurbiz_sylius_search.search_limits%'
-      $taxonDefaultLimit: '%monsieurbiz_sylius_search.taxon_default_limit%'
-      $searchDefaultLimit: '%monsieurbiz_sylius_search.search_default_limit%'
-      $instantDefaultLimit: '%monsieurbiz_sylius_search.instant_default_limit%'
-      $taxonSorting: '%monsieurbiz_sylius_search.taxon_sorting%'
-      $searchSorting: '%monsieurbiz_sylius_search.search_sorting%'
+      $config: '%monsieurbiz_sylius_search.grid%'

@@ -16,7 +16,18 @@
 
 A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and [Elastically](https://github.com/jolicode/elastically).
 
+## Features
+
+### Search with filters, sort and limits
+
 ![Search results](screenshot_search.jpg)
+
+### Taxon view with filters, sort and limits
+
+![Taxon view](screenshot_taxon.jpg)
+
+
+### Instant search while you're typing
 
 ![Instant search](screenshot_instant.jpg)
 
@@ -27,26 +38,7 @@ Require the plugin :
 
 > If you are using Symfony Flex, the recipe will automatically do the actions below.
 
-Then create the config file in `config/packages/monsieurbiz_search_plugin.yaml` : 
-
-```yaml
-imports:
-    - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
-
-monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
-    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
-    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/taxon.yaml'
-    documentable_classes :
-        - 'App\Entity\Product\Product'
-    taxon_limits: [9, 18, 27]
-    search_limits: [9, 18, 27]
-    taxon_sorting: ['name', 'price', 'created_at']
-    search_sorting: ['name', 'price', 'created_at']
-    taxon_default_limit: 9
-    search_default_limit: 9
-    instant_default_limit: 10
-```
+Then create the config file in `config/packages/monsieurbiz_search_plugin.yaml` with the [default configuration](#configuration).
 
 Import routes in `config/routes.yaml` :
 ```yaml
@@ -94,26 +86,38 @@ For a development infrastructure with docker, you can check the [Monsieur Biz Sy
 The default module configuration is : 
 
 ```yaml
+imports:
+    - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
+
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
-    instant_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
-    taxon_file: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/taxon.yaml'
+    files:
+        search: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
+        instant: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
+        taxon: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/taxon.yaml'
     documentable_classes :
         - 'App\Entity\Product\Product'
-    taxon_limits: [9, 18, 27]
-    search_limits: [9, 18, 27]
-    taxon_sorting: ['name', 'price', 'created_at']
-    search_sorting: ['name', 'price', 'created_at']
-    taxon_default_limit: 9
-    search_default_limit: 9
-    instant_default_limit: 10
+    grid:
+        limits:
+            taxon: [9, 18, 27]
+            search: [9, 18, 27]
+        default_limit:
+            taxon: 9
+            search: 9
+            instant: 10
+        sorting:
+            taxon: ['name', 'price', 'created_at']
+            search: ['name', 'price', 'created_at']
+        filters:
+            attributes: [] # Put the attributes you want to add in filters
+            options: [] # Put the options you want to add in filters
+
 ```
 
 You can customize it in `config/packages/monsieurbiz_sylius_search_plugin.yaml`.
 
-`search_file` is the query used to perform the search.  
-`instant_file` is the query used to perform the instant search.  
-`taxon_file` is the query used to perform the taxon view.
+`monsieur_biz_sylius_search.files.search` is the query used to perform the search.  
+`monsieur_biz_sylius_search.files.instant` is the query used to perform the instant search.  
+`monsieur_biz_sylius_search.files.taxon` is the query used to perform the taxon view.
 
 The `{{QUERY}}` string inside is replaced in PHP by the query typed by the user.
 
@@ -181,9 +185,10 @@ You can customize the search with your custom query files and modifying :
 
 ```yaml
 monsieur_biz_sylius_search:
-    search_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings/queries.yaml'
-    instant_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings/queries.yaml'
-    taxon_file: '%kernel.project_dir%/src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings/queries.yaml'
+    files:
+        search: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
+        instant: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
+        taxon: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/taxon.yaml'
 ```
 
 ## Indexed Documents
@@ -248,7 +253,7 @@ You can override all templates in your theme to :
 - Customize search results display page (`src/MonsieurBizSearchPlugin/Resources/views/Search/`)
 - Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Instant/`)
 - Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Taxon/`)
-- Customize JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/Instant/instant_javascript.html.twig`)
+- Customize JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/js.html.twig`)
 
 ## Jane
 

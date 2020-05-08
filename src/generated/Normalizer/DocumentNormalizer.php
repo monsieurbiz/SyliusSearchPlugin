@@ -81,7 +81,7 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
             $object->setChannel(null);
         }
         if (property_exists($data, 'main_taxon') && $data->{'main_taxon'} !== null) {
-            $object->setMainTaxon($data->{'main_taxon'});
+            $object->setMainTaxon($this->denormalizer->denormalize($data->{'main_taxon'}, 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Taxon', 'json', $context));
         }
         elseif (property_exists($data, 'main_taxon') && $data->{'main_taxon'} === null) {
             $object->setMainTaxon(null);
@@ -89,7 +89,7 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
         if (property_exists($data, 'taxon') && $data->{'taxon'} !== null) {
             $values_1 = array();
             foreach ($data->{'taxon'} as $value_1) {
-                $values_1[] = $value_1;
+                $values_1[] = $this->denormalizer->denormalize($value_1, 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Taxon', 'json', $context);
             }
             $object->setTaxon($values_1);
         }
@@ -178,7 +178,7 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
             $data->{'channel'} = null;
         }
         if (null !== $object->getMainTaxon()) {
-            $data->{'main_taxon'} = $object->getMainTaxon();
+            $data->{'main_taxon'} = $this->normalizer->normalize($object->getMainTaxon(), 'json', $context);
         }
         else {
             $data->{'main_taxon'} = null;
@@ -186,7 +186,7 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
         if (null !== $object->getTaxon()) {
             $values_1 = array();
             foreach ($object->getTaxon() as $value_1) {
-                $values_1[] = $value_1;
+                $values_1[] = $this->normalizer->normalize($value_1, 'json', $context);
             }
             $data->{'taxon'} = $values_1;
         }

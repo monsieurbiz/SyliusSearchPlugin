@@ -34,6 +34,12 @@ class TaxonNormalizer implements DenormalizerInterface, NormalizerInterface, Den
             return new Reference($data->{'$recursiveRef'}, $context['document-origin']);
         }
         $object = new \MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon();
+        if (property_exists($data, 'name') && $data->{'name'} !== null) {
+            $object->setName($data->{'name'});
+        }
+        elseif (property_exists($data, 'name') && $data->{'name'} === null) {
+            $object->setName(null);
+        }
         if (property_exists($data, 'code') && $data->{'code'} !== null) {
             $object->setCode($data->{'code'});
         }
@@ -46,11 +52,29 @@ class TaxonNormalizer implements DenormalizerInterface, NormalizerInterface, Den
         elseif (property_exists($data, 'position') && $data->{'position'} === null) {
             $object->setPosition(null);
         }
+        if (property_exists($data, 'level') && $data->{'level'} !== null) {
+            $object->setLevel($data->{'level'});
+        }
+        elseif (property_exists($data, 'level') && $data->{'level'} === null) {
+            $object->setLevel(null);
+        }
+        if (property_exists($data, 'product_position') && $data->{'product_position'} !== null) {
+            $object->setProductPosition($data->{'product_position'});
+        }
+        elseif (property_exists($data, 'product_position') && $data->{'product_position'} === null) {
+            $object->setProductPosition(null);
+        }
         return $object;
     }
     public function normalize($object, $format = null, array $context = array())
     {
         $data = new \stdClass();
+        if (null !== $object->getName()) {
+            $data->{'name'} = $object->getName();
+        }
+        else {
+            $data->{'name'} = null;
+        }
         if (null !== $object->getCode()) {
             $data->{'code'} = $object->getCode();
         }
@@ -62,6 +86,18 @@ class TaxonNormalizer implements DenormalizerInterface, NormalizerInterface, Den
         }
         else {
             $data->{'position'} = null;
+        }
+        if (null !== $object->getLevel()) {
+            $data->{'level'} = $object->getLevel();
+        }
+        else {
+            $data->{'level'} = null;
+        }
+        if (null !== $object->getProductPosition()) {
+            $data->{'product_position'} = $object->getProductPosition();
+        }
+        else {
+            $data->{'product_position'} = null;
         }
         return $data;
     }

@@ -49,6 +49,9 @@ class GridConfig
     /** @var TaxonInterface|null */
     private $taxon;
 
+    /** @var array */
+    private $appliedFilters;
+
     public function __construct(array $config)
     {
         $this->config = $config;
@@ -86,6 +89,11 @@ class GridConfig
                 if (!in_array($this->limit, $this->limits)) {
                     $this->limit = $this->config['default_limit']['search'] ?? self::FALLBACK_LIMIT;
                 }
+
+                // Set applied filters
+                $this->appliedFilters = $request->get('attribute') ?? [];
+                $priceFilter = $request->get('price') ?? [];
+
                 $this->isInitialized = true;
                 break;
             case self::TAXON_TYPE :
@@ -101,6 +109,10 @@ class GridConfig
                 if (!is_array($this->sorting) || empty($this->sorting)) {
                     $this->sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
                 }
+                
+                // Set applied filters
+                $this->appliedFilters = $request->get('attribute') ?? [];
+                $priceFilter = $request->get('price') ?? [];
 
                 // Set limit
                 $this->limit = max(1, (int) $request->get('limit'));
@@ -204,6 +216,14 @@ class GridConfig
     public function getFilters(): array
     {
         return array_merge($this->getAttributeFilters(), $this->getOptionFilters());
+    }
+
+    /**
+     * @return array
+     */
+    public function getAppliedFilters(): array
+    {
+        return $this->appliedFilters;
     }
 
     /**

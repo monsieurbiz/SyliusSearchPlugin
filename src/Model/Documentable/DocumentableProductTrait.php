@@ -173,13 +173,22 @@ trait DocumentableProductTrait
      */
     protected function addOptionsInDocument(Result $document, string $locale): Result
     {
-        /** @var ProductOptionInterface $option */
-        foreach ($this->getOptions() as $option) {
-            $optionValues = [];
-            foreach ($option->getValues() as $value) {
-                $optionValues[] = $value->getTranslation($locale)->getValue();
+        $options = [];
+        foreach ($this->getVariants() as $variant) {
+            /** @var \App\Entity\Product\ProductVariant $variant */
+            foreach ($variant->getOptionValues() as $val) {
+                if (!isset($options[$val->getOption()->getCode()])) {
+                    $options[$val->getOption()->getCode()] = [
+                        'name' => $val->getOption()->getTranslation($locale)->getName(),
+                        'values' => [],
+                    ];
+                }
+                $options[$val->getOption()->getCode()]['values'][$val->getCode()] = $val->getTranslation($locale)->getValue();
             }
-            $document->addAttribute($option->getCode(), $option->getTranslation($locale)->getName(), $optionValues, $locale, 1);
+        }
+
+        foreach ($options as $optionCode => $option) {
+            $document->addAttribute($optionCode, $option['name'], array_values($option['values']), $locale, 1);
         }
 
         return $document;

@@ -1,3 +1,4 @@
+{% if filter.values|length > 1 %}
 <div class="item">
     {% set appliedAttributes = app.request.query.get('attribute') %}
     {% set currentValues = (appliedAttributes[filter.code] is defined) ? appliedAttributes[filter.code] : [] %}
@@ -24,3 +25,4 @@
         </div>
     </div>
 </div>
+{% endif %}

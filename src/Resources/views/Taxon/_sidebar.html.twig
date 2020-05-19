@@ -1,6 +1,6 @@
-{{ sonata_block_render_event('sylius.shop.product.index.before_vertical_menu', {'taxon': taxon}) }}
+{{ sylius_template_event('sylius.shop.product.index.before_vertical_menu', {'taxon': taxon}) }}
 
 {#{% include '@MonsieurBizSyliusSearchPlugin/Taxon/_tree.html.twig' %}#}
 {% include '@MonsieurBizSyliusSearchPlugin/Taxon/_filters.html.twig' %}
 
-{{ sonata_block_render_event('sylius.shop.product.index.after_vertical_menu', {'taxon': taxon}) }}
+{{ sylius_template_event('sylius.shop.product.index.after_vertical_menu', {'taxon': taxon}) }}

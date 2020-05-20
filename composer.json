@@ -5,8 +5,8 @@
     "description": "A search plugin using Elasticsearch for Sylius.",
     "license": "MIT",
     "require": {
-        "php": "^7.3",
-        "sylius/sylius": "^1.7",
+        "php": "^7.2",
+        "sylius/sylius": "^1.4",
         "jolicode/elastically": "dev-master#d58ac3640577f3ef415bcd2d20d7c968ca8c4ef7 as 1.0.x-dev"
     },
     "require-dev": {

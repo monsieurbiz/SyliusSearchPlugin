@@ -142,9 +142,16 @@ class Search extends AbstractIndex
         // Convert query to array
         $query = $this->parseQuery($query);
 
-        // Apply filters
-        // Use custom ArrayObject because Elastica make `toArray` on it.
-        $query['post_filter'] = new ArrayObject(FilterHelper::buildFilters($gridConfig->getAppliedFilters()));
+        $appliedFilters = FilterHelper::buildFilters($gridConfig->getAppliedFilters());
+        if ($gridConfig->haveToRefreshFilters() && isset($appliedFilters['bool']['filter'])) {
+            // Will retrieve filters after we applied the current ones
+            $query['query']['bool']['filter'] = array_merge(
+                $query['query']['bool']['filter'], $appliedFilters['bool']['filter']
+            );
+        } elseif (!empty($appliedFilters)) {
+            // Will retrieve filters before we applied the current ones
+            $query['post_filter'] = new ArrayObject($appliedFilters);  // Use custom ArrayObject because Elastica make `toArray` on it.
+        }
 
         // Manage limits
         $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
@@ -213,7 +220,7 @@ class Search extends AbstractIndex
             $query['query']['bool']['filter'] = array_merge(
                 $query['query']['bool']['filter'], $appliedFilters['bool']['filter']
             );
-        } else {
+        } elseif (!empty($appliedFilters)) {
             // Will retrieve filters before we applied the current ones
             $query['post_filter'] = new ArrayObject($appliedFilters);  // Use custom ArrayObject because Elastica make `toArray` on it.
         }

@@ -138,7 +138,7 @@ You can decide to load filters before their application or after :
 ```yaml
 monsieur_biz_sylius_search:
     filters:
-            refresh: false # Will refresh the filters depending on applied filters
+        refresh: false # Will refresh the filters depending on applied filters
 ```
 
 For example, if you choose a `L` size and the config is `true`, you will have only filters available for this size.  

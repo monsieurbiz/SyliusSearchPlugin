@@ -215,6 +215,14 @@ class GridConfig
     }
 
     /**
+     * @return bool
+     */
+    public function haveToRefreshFilters(): bool
+    {
+        return $this->config['filters']['refresh'] ?? false;
+    }
+
+    /**
      * @return string[]
      */
     public function getFilters(): array

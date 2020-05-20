@@ -143,7 +143,7 @@ class Search extends AbstractIndex
         $query = $this->parseQuery($query);
 
         $appliedFilters = FilterHelper::buildFilters($gridConfig->getAppliedFilters());
-        if ($gridConfig->haveToRefreshFilters() && isset($appliedFilters['bool']['filter'])) {
+        if ($gridConfig->haveToApplyManuallyFilters() && isset($appliedFilters['bool']['filter'])) {
             // Will retrieve filters after we applied the current ones
             $query['query']['bool']['filter'] = array_merge(
                 $query['query']['bool']['filter'], $appliedFilters['bool']['filter']
@@ -215,7 +215,7 @@ class Search extends AbstractIndex
 
         // Apply filters
         $appliedFilters = FilterHelper::buildFilters($gridConfig->getAppliedFilters());
-        if ($gridConfig->haveToRefreshFilters() && isset($appliedFilters['bool']['filter'])) {
+        if ($gridConfig->haveToApplyManuallyFilters() && isset($appliedFilters['bool']['filter'])) {
             // Will retrieve filters after we applied the current ones
             $query['query']['bool']['filter'] = array_merge(
                 $query['query']['bool']['filter'], $appliedFilters['bool']['filter']

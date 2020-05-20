@@ -110,7 +110,7 @@ monsieur_biz_sylius_search:
         filters:
             attributes: [] # Put the attributes you want to add in filters
             options: [] # Put the options you want to add in filters
-            refresh: false # Will refresh the filters depending on applied filters
+            apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
 
 ```
 
@@ -137,8 +137,9 @@ monsieur_biz_sylius_search:
 You can decide to load filters before their application or after :
 ```yaml
 monsieur_biz_sylius_search:
-    filters:
-        refresh: false # Will refresh the filters depending on applied filters
+    grid:
+        filters:
+            apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
 ```
 
 For example, if you choose a `L` size and the config is `true`, you will have only filters available for this size.  

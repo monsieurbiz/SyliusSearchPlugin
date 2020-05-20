@@ -22,7 +22,16 @@ monsieur_biz_sylius_search:
         filters:
             attributes: [] # Put the attributes you want to add in filters
             options: [] # Put the options you want to add in filters
-            refresh: false # Will refresh the filters depending on applied filters
+            apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
 twig:
     globals:
         monsieur_biz_sylius_search_grid_config: '@MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig'
+
+# Add JS for plugin for Sylius 2.0
+#sylius_ui:
+#    events:
+#        sylius.shop.layout.javascripts:
+#            blocks:
+#                monsieur_biz_sylius_search_js:
+#                    template: "@MonsieurBizSyliusSearchPlugin/js.html.twig"
+#                    priority: 0

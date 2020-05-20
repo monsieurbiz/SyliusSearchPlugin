@@ -1,7 +1,7 @@
 <script type="text/javascript">
     var monsieurbizSearchPlugin = {
         instantEnabled: true,
-        refreshWithButton: {{ monsieur_biz_sylius_search_grid_config.haveToRefreshFilters ? 'true' : 'false' }},
+        refreshWithButton: {{ monsieur_biz_sylius_search_grid_config.haveToApplyManuallyFilters ? 'true' : 'false' }},
         instantUrl: '{{ path('monsieurbiz_sylius_search_instant') | escape('js') }}', // URL for instant search
         searchInputSelector: '.autocomplete-search input[type=text]', // Selector for search input text field
         resultClosestSelector: '.autocomplete-search', // Selector used to display results, take the closest parent of searchInputSelector

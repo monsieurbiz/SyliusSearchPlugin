@@ -9,4 +9,4 @@ monsieur_biz_sylius_search:
         filters:
             attributes: ['cap_brand','cap_collection','cap_material','dress_brand','dress_collection','dress_material','jeans_brand','jeans_collection','jeans_material','t_shirt_brand','t_shirt_collection','t_shirt_material']
             options: ['dress_height','dress_size','jeans_size','t_shirt_size']
-            refresh: false # Will refresh the filters depending on applied filters
+            apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually

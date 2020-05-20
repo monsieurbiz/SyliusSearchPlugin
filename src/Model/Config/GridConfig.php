@@ -217,9 +217,9 @@ class GridConfig
     /**
      * @return bool
      */
-    public function haveToRefreshFilters(): bool
+    public function haveToApplyManuallyFilters(): bool
     {
-        return $this->config['filters']['refresh'] ?? false;
+        return $this->config['filters']['apply_manually'] ?? false;
     }
 
     /**

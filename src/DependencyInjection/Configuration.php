@@ -99,6 +99,7 @@ final class Configuration implements ConfigurationInterface
                                 ->scalarPrototype()->end()
                                 ->isRequired()
                             ->end()
+                            ->booleanNode('refresh')->isRequired()->defaultValue(false)->end()
                         ->end()
                     ->end()
 

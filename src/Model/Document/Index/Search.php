@@ -9,7 +9,6 @@ use Elastica\Exception\ResponseException;
 use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
-use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
 use MonsieurBiz\SyliusSearchPlugin\Helper\AggregationHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\FilterHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SortHelper;
@@ -19,7 +18,6 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
 use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
-use Sylius\Component\Core\Model\TaxonInterface;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -209,8 +207,17 @@ class Search extends AbstractIndex
         $query = $this->parseQuery($query);
 
         // Apply filters
-        // Use custom ArrayObject because Elastica make `toArray` on it.
-        $query['post_filter'] = new ArrayObject(FilterHelper::buildFilters($gridConfig->getAppliedFilters()));
+        $appliedFilters = FilterHelper::buildFilters($gridConfig->getAppliedFilters());
+        if ($gridConfig->haveToRefreshFilters() && isset($appliedFilters['bool']['filter'])) {
+            // Will retrieve filters after we applied the current ones
+            $query['query']['bool']['filter'] = array_merge(
+                $query['query']['bool']['filter'], $appliedFilters['bool']['filter']
+            );
+        } else {
+            // Will retrieve filters before we applied the current ones
+            $query['post_filter'] = new ArrayObject($appliedFilters);  // Use custom ArrayObject because Elastica make `toArray` on it.
+        }
+
 
         // Manage limits
         $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();

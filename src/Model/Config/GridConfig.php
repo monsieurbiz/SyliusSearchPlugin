@@ -92,7 +92,9 @@ class GridConfig
 
                 // Set applied filters
                 $this->appliedFilters = $request->get('attribute') ?? [];
-                $this->appliedFilters['price'] = $request->get('price') ?? [];
+                if ($priceFilter = $request->get('price')) {
+                    $this->appliedFilters['price'] = $priceFilter;
+                }
 
                 $this->isInitialized = true;
                 break;
@@ -112,7 +114,9 @@ class GridConfig
 
                 // Set applied filters
                 $this->appliedFilters = $request->get('attribute') ?? [];
-                $this->appliedFilters['price'] = $request->get('price') ?? [];
+                if ($priceFilter = $request->get('price')) {
+                    $this->appliedFilters['price'] = $priceFilter;
+                }
 
                 // Set limit
                 $this->limit = max(1, (int) $request->get('limit'));

@@ -98,8 +98,9 @@ class SearchController extends AbstractController
         /** @var ResultSet $resultSet */
         $resultSet = $this->documentSearch->search($this->gridConfig);
 
-        // Redirect to document if only one result
-        if ($resultSet->getTotalHits() === 1) {
+        // Redirect to document if only one result and no filter applied
+        $appliedFilters = $this->gridConfig->getAppliedFilters();
+        if ($resultSet->getTotalHits() === 1 && empty($appliedFilters)) {
             /** @var Result $document */
             $document = current($resultSet->getResults());
             try {

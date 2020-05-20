@@ -141,8 +141,14 @@ monsieur_biz_sylius_search:
             refresh: false # Will refresh the filters depending on applied filters
 ```
 
-For example, if you choose a `L` size and the config is `true`, you will have only filters available for this size.
-If it's set to false, you will have all available filters for the products.
+For example, if you choose a `L` size and the config is `true`, you will have only filters available for this size.  
+You will also have a button to apply the desired filters : 
+
+![Submit filters button](submit_filters.png)
+
+
+If it's set to false, you will have all available filters for the products and they will be applied on each change 
+automatically.
 
 ## Documentable objects
 

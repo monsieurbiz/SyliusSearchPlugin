@@ -100,6 +100,7 @@ final class Configuration implements ConfigurationInterface
                                 ->isRequired()
                             ->end()
                             ->booleanNode('apply_manually')->isRequired()->defaultValue(false)->end()
+                            ->booleanNode('use_main_taxon')->isRequired()->defaultValue(false)->end()
                         ->end()
                     ->end()
 

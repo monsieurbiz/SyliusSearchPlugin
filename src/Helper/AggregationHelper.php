@@ -82,6 +82,25 @@ class AggregationHelper
                     ]
                 ]
             ],
+            // Get main taxon info to be able to retrieve the attribute name from code, we also need the level
+            'mainTaxon' => [
+                'nested' => ['path' => 'mainTaxon'],
+                'aggs' => [
+                    'codes' => [
+                        'terms' => ['field' => 'mainTaxon.code', 'size' => self::MAX_AGGREGATED_TAXON_INFO], // Retrieve all taxon info
+                        'aggs' => [
+                            'levels' => [
+                                'terms' => ['field' => 'mainTaxon.level'],
+                                'aggs' => [
+                                    'names' => [
+                                        'terms' => ['field' => 'mainTaxon.name']
+                                    ],
+                                ]
+                            ],
+                        ]
+                    ]
+                ]
+            ],
             // Get attributes info to be able to retrieve the attribute name from code
             'price' => [
                 'nested' => ['path' => 'price'],

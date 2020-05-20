@@ -34,6 +34,9 @@ class ResultSet
     /** @var Filter|null */
     private $taxonFilter;
 
+    /** @var Filter|null */
+    private $mainTaxonFilter;
+
     /** @var Pagerfanta */
     private $pager;
 
@@ -125,6 +128,7 @@ class ResultSet
         $this->sortFilters();
 
         $this->addTaxonFilter($aggregations, $taxon);
+        $this->addMainTaxonFilter($aggregations, $taxon);
 
         $this->addPriceFilter($aggregations);
     }
@@ -167,6 +171,14 @@ class ResultSet
     public function getTaxonFilter(): ?Filter
     {
         return $this->taxonFilter;
+    }
+
+    /**
+     * @return Filter|null
+     */
+    public function getMainTaxonFilter(): ?Filter
+    {
+        return $this->mainTaxonFilter;
     }
 
     /**
@@ -247,6 +259,48 @@ class ResultSet
             // Put taxon filter in first if contains value
             if (count($filter->getValues())) {
                 $this->taxonFilter = $filter;
+            }
+        }
+    }
+
+    /**
+     * Add main taxon filter depending on aggregations
+     *
+     * @param array $aggregations
+     * @param TaxonInterface|null $taxon
+     */
+    protected function addMainTaxonFilter(array $aggregations, ?TaxonInterface $taxon)
+    {
+        $taxonAggregation = $aggregations['mainTaxon'] ?? null;
+        if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
+
+            $filter = new Filter('main_taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
+
+            // Get main taxon code in aggregation
+            $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
+            foreach ($taxonCodeBuckets as $taxonCodeBucket) {
+                if ($taxonCodeBucket['doc_count'] === 0) {
+                    continue;
+                }
+                $taxonCode = $taxonCodeBucket['key'];
+                $taxonName = null;
+
+                // Get main taxon level in aggregation
+                $taxonLevelBuckets = $taxonCodeBucket['levels']['buckets'] ?? [];
+                foreach ($taxonLevelBuckets as $taxonLevelBucket) {
+                    // Get main taxon name in aggregation
+                    $taxonNameBuckets = $taxonLevelBucket['names']['buckets'] ?? [];
+                    foreach ($taxonNameBuckets as $taxonNameBucket) {
+                        $taxonName = $taxonNameBucket['key'];
+                        $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count']);
+                        break 2;
+                    }
+                }
+            }
+
+            // Put taxon filter in first if contains value
+            if (count($filter->getValues())) {
+                $this->mainTaxonFilter = $filter;
             }
         }
     }

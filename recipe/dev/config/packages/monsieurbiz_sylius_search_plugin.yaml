@@ -23,3 +23,6 @@ monsieur_biz_sylius_search:
             attributes: [] # Put the attributes you want to add in filters
             options: [] # Put the options you want to add in filters
             refresh: false # Will refresh the filters depending on applied filters
+twig:
+    globals:
+        monsieur_biz_sylius_search_grid_config: '@MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig'

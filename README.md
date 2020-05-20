@@ -110,6 +110,7 @@ monsieur_biz_sylius_search:
         filters:
             attributes: [] # Put the attributes you want to add in filters
             options: [] # Put the options you want to add in filters
+            refresh: false # Will refresh the filters depending on applied filters
 
 ```
 
@@ -132,6 +133,16 @@ monsieur_biz_sylius_search:
         attributes: [] # Put the attributes you want to add in filters
         options: [] # Put the options you want to add in filters
 ```
+
+You can decide to load filters before their application or after :
+```yaml
+monsieur_biz_sylius_search:
+    filters:
+            refresh: false # Will refresh the filters depending on applied filters
+```
+
+For example, if you choose a `L` size and the config is `true`, you will have only filters available for this size.
+If it's set to false, you will have all available filters for the products.
 
 ## Documentable objects
 

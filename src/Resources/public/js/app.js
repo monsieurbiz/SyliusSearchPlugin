@@ -26,6 +26,15 @@
         },
         filterSearch: function () {
             $(monsieurbizSearchPlugin.priceFilterSelector).prop('autocomplete', 'off');
+
+            // If only a button can submit filters
+            if (monsieurbizSearchPlugin.refreshWithButton) {
+                $(monsieurbizSearchPlugin.filterForm).submit(function(event) {
+                    $(monsieurbizSearchPlugin.loaderSelector).dimmer('show');
+                });
+                return;
+            }
+
             // Init a timeout variable when typing a price
             var priceFilterTimeout = null;
             $(monsieurbizSearchPlugin.priceFilterSelector).keyup(function() {

@@ -35,6 +35,13 @@
             {% if limit is not empty %}
                 <input type="hidden" name="limit" value="{{ limit }}" />
             {% endif %}
+            {% if gridConfig.haveToApplyManuallyFilters() %}
+                <div class="item">
+                    <button type="submit" class="ui primary icon labeled button" style="width: 100%;">
+                        <i class="search icon"></i> {{ 'monsieurbiz_searchplugin.filters.apply_filters' | trans }}
+                    </button>
+                </div>
+            {% endif %}
         </form>
     {% endif %}
 

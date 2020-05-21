@@ -125,7 +125,8 @@ class SearchController extends AbstractController
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
-            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
+            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL),
+            'gridConfig' => $this->gridConfig,
         ]);
     }
 
@@ -150,6 +151,7 @@ class SearchController extends AbstractController
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
+            'gridConfig' => $this->gridConfig,
         ]);
     }
 
@@ -179,7 +181,8 @@ class SearchController extends AbstractController
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
-            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
+            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL),
+            'gridConfig' => $this->gridConfig,
         ]);
     }
 }

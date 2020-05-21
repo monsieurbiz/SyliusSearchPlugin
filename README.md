@@ -110,6 +110,7 @@ monsieur_biz_sylius_search:
         filters:
             attributes: [] # Put the attributes you want to add in filters
             options: [] # Put the options you want to add in filters
+            apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
 
 ```
 
@@ -132,6 +133,23 @@ monsieur_biz_sylius_search:
         attributes: [] # Put the attributes you want to add in filters
         options: [] # Put the options you want to add in filters
 ```
+
+You can decide to load filters before their application or after :
+```yaml
+monsieur_biz_sylius_search:
+    grid:
+        filters:
+            apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
+```
+
+For example, if you choose a `L` size and the config is `true`, you will have only filters available for this size.  
+You will also have a button to apply the desired filters : 
+
+![Submit filters button](submit_filters.png)
+
+
+If it's set to false, you will have all available filters for the products and they will be applied on each change 
+automatically.
 
 ## Documentable objects
 

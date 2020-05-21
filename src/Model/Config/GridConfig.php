@@ -215,6 +215,14 @@ class GridConfig
     }
 
     /**
+     * @return bool
+     */
+    public function haveToApplyManuallyFilters(): bool
+    {
+        return $this->config['filters']['apply_manually'] ?? false;
+    }
+
+    /**
      * @return string[]
      */
     public function getFilters(): array

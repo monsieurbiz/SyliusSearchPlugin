@@ -111,6 +111,7 @@ monsieur_biz_sylius_search:
             attributes: [] # Put the attributes you want to add in filters
             options: [] # Put the options you want to add in filters
             apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
+            use_main_taxon: true # Use main taxon for the taxon filter, else use the taxons
 
 ```
 
@@ -150,6 +151,15 @@ You will also have a button to apply the desired filters :
 
 If it's set to false, you will have all available filters for the products and they will be applied on each change 
 automatically.
+
+
+You can decide to use the `Categories` filter with main taxon or taxons :
+```yaml
+monsieur_biz_sylius_search:
+    grid:
+        filters:
+            use_main_taxon: true # Use main taxon for the taxon filter, else use the taxons
+```
 
 ## Documentable objects
 

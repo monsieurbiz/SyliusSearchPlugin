@@ -6,6 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 
 class FilterHelper
 {
+    const MAIN_TAXON_FILTER = 'main_taxon';
     const TAXON_FILTER = 'taxon';
     const PRICE_FILTER = 'price';
 
@@ -25,6 +26,8 @@ class FilterHelper
         foreach ($appliedFilters as $field => $values) {
             if ($field === self::TAXON_FILTER) {
                 $filters[] = self::buildTaxonFilter($values);
+            } elseif ($field === self::MAIN_TAXON_FILTER) {
+                $filters[] = self::buildMainTaxonFilter($values);
             } elseif ($field === self::PRICE_FILTER) {
                 if (isset($values['min']) && isset($values['max'])) {
                     $filters[] = self::buildPriceFilter((int) $values['min'], (int) $values['max']);
@@ -100,6 +103,32 @@ class FilterHelper
     }
 
     /**
+     * Build filter array for main taxon to add in query
+     *
+     * @param array $values
+     * @return array
+     */
+    public static function buildMainTaxonFilter(array $values): array
+    {
+        $filterValues = [];
+        foreach ($values as $value) {
+            $filterValues[] = self::buildMainTaxonFilterValue($value);
+        }
+
+        return [
+            'nested' => [
+                'path' => 'mainTaxon',
+                'query' => [
+                    'bool' => [
+                        'should' => $filterValues,
+                        'minimum_should_match' => 1
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
      * Build filter array for price to add in query
      *
      * @param int $min
@@ -151,6 +180,21 @@ class FilterHelper
         return [
             'term' => [
                 'taxon.name' => SlugHelper::toLabel($value)
+            ]
+        ];
+    }
+
+    /**
+     * Build filter value array to add in query
+     *
+     * @param string $value
+     * @return array
+     */
+    public static function buildMainTaxonFilterValue(string $value): array
+    {
+        return [
+            'term' => [
+                'mainTaxon.name' => SlugHelper::toLabel($value)
             ]
         ];
     }

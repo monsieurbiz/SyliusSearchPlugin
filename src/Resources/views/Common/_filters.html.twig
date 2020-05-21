@@ -1,17 +1,19 @@
+{% set taxonFilter = gridConfig.useMainTaxonForFilter() ? resultSet.mainTaxonFilter : resultSet.taxonFilter %}
+
 <div class="ui fluid vertical menu mbiz-sylius-search-filters">
     <div class="header item">
         {{ 'monsieurbiz_searchplugin.filters.filter_results' | trans }}
     </div>
 
-    {% if resultSet.filters|length == 0 and resultSet.priceFilter is empty and resultSet.taxonFilter is empty %}
+    {% if resultSet.filters|length == 0 and resultSet.priceFilter is empty and taxonFilter is empty %}
         <div class="item">
             {{ 'monsieurbiz_searchplugin.filters.no_filter'|trans }}
         </div>
     {% else %}
         {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)) %}
         <form name="filters-form" method="get" action="{{ path }}">
-            {% if resultSet.taxonFilter is not empty %}
-                {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': resultSet.taxonFilter} %}
+            {% if taxonFilter is not empty %}
+                {% include '@MonsieurBizSyliusSearchPlugin/Common/_filter.html.twig' with {'filter': taxonFilter} %}
             {% endif %}
 
             {% if resultSet.priceFilter is not empty %}

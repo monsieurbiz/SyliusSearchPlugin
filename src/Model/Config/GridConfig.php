@@ -223,6 +223,14 @@ class GridConfig
     }
 
     /**
+     * @return bool
+     */
+    public function useMainTaxonForFilter(): bool
+    {
+        return $this->config['filters']['use_main_taxon'] ?? false;
+    }
+
+    /**
      * @return string[]
      */
     public function getFilters(): array

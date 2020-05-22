@@ -1,2 +1,4 @@
 imports:
+  - { resource: "twig.yaml" }
+  - { resource: "sylius.yaml" }
   - { resource: "services.yaml" }

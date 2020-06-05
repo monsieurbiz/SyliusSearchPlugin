@@ -109,7 +109,7 @@ class GridConfig
                 $availableSorting = $this->config['sorting']['taxon'] ?? [];
                 $this->sorting = $this->cleanSorting($request->get('sorting'), $availableSorting);
                 if (!is_array($this->sorting) || empty($this->sorting)) {
-                    $this->sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
+                    $this->sorting['position'] = self::SORT_ASC;
                 }
 
                 // Set applied filters

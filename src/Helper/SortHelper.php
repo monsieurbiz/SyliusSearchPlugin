@@ -25,7 +25,7 @@ class SortHelper
             case 'price':
                 return self::buildSort('price.value', $order, 'price', 'price.channel', $channel);
             case 'position':
-                return self::buildSort('taxon.product_position', $order, 'taxon', 'taxon.code', $taxon);
+                return self::buildSort('taxon.productPosition', $order, 'taxon', 'taxon.code', $taxon);
             default:
                 // Dummy value to have null sorting in ES and keep ES results sorting
                 return self::buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', 'dummy');

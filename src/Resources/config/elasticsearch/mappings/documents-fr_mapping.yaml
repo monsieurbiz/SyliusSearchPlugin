@@ -20,7 +20,7 @@ mappings:
           type: integer
         level:
           type: integer
-        product_position:
+        productPosition:
           type: integer
     taxon:
       type: nested
@@ -33,7 +33,7 @@ mappings:
           type: integer
         level:
           type: integer
-        product_position:
+        productPosition:
           type: integer
     attributes:
       type: nested
@@ -63,7 +63,7 @@ mappings:
           type: keyword
         value:
           type: integer
-    original_price:
+    originalPrice:
       type: nested
       properties:
         currency:

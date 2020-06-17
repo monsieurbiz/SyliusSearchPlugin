@@ -37,26 +37,28 @@ class Result extends Document
     /**
      * @param string $code
      * @return Attributes
-     * @throws MissingAttributeException
      */
-    public function getAttribute(string $code): Attributes
+    public function getAttribute(string $code): ?Attributes
     {
         foreach ($this->getAttributes() as $attribute) {
             if ($attribute->getCode() === $code) {
                 return $attribute;
             }
         }
-        throw new MissingAttributeException(sprintf('Attribute not found for code "%s"', $code));
+        return null;
     }
 
     /**
      * @param string $channelCode
      * @param string $currencyCode
-     * @return Price
+     * @return Price|null
      * @throws MissingPriceException
      */
-    public function getPriceByChannelAndCurrency(string $channelCode, string $currencyCode): Price
+    public function getPriceByChannelAndCurrency(string $channelCode, string $currencyCode): ?Price
     {
+        if (null === $this->getPrice()) {
+            return null;
+        }
         foreach ($this->getPrice() as $price) {
             if ($price->getChannel() === $channelCode && $price->getCurrency() === $currencyCode) {
                 return $price;
@@ -68,11 +70,14 @@ class Result extends Document
     /**
      * @param string $channelCode
      * @param string $currencyCode
-     * @return Price
+     * @return Price|null
      * @throws MissingPriceException
      */
-    public function getOriginalPriceByChannelAndCurrency(string $channelCode, string $currencyCode): Price
+    public function getOriginalPriceByChannelAndCurrency(string $channelCode, string $currencyCode): ?Price
     {
+        if (null === $this->getOriginalPrice()) {
+            return null;
+        }
         foreach ($this->getOriginalPrice() as $price) {
             if ($price->getChannel() === $channelCode && $price->getCurrency() === $currencyCode) {
                 return $price;

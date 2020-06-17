@@ -1,15 +1,7 @@
-{% if bundle_exists('SonataCoreBundle') %}
-    {{ sonata_block_render_event('sylius.shop.search.header.before', {'query': query}) }}
-{% else %}
-    {{ sylius_template_event('sylius.shop.search.header.before', {'query': query}) }}
-{% endif %}
+{% include '@MonsieurBizSyliusSearchPlugin/Event/event.html.twig' with {'eventName': 'sylius.shop.search.header.before', 'eventData': {'query': query}} %}
 
 <h1 class="ui monster section dividing header">
     {{ 'monsieurbiz_searchplugin.search.result.search_result'|trans({'%query%': query, '%count%': resultSet.totalHits}) }}
 </h1>
 
-{% if bundle_exists('SonataCoreBundle') %}
-    {{ sonata_block_render_event('sylius.shop.search.header.after', {'query': query}) }}
-{% else %}
-    {{ sylius_template_event('sylius.shop.search.header.after', {'query': query}) }}
-{% endif %}
+{% include '@MonsieurBizSyliusSearchPlugin/Event/event.html.twig' with {'eventName': 'sylius.shop.search.header.after', 'eventData': {'query': query}} %}

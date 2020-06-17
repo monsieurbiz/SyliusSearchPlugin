@@ -1,0 +1,5 @@
+{% if bundle_exists('SonataCoreBundle') %}
+    {% include '@MonsieurBizSyliusSearchPlugin/Event/_sonata.html.twig' with {'eventName': eventName, 'eventData': eventData} %}
+{% else %}
+    {% include '@MonsieurBizSyliusSearchPlugin/Event/_sylius.html.twig' with {'eventName': eventName, 'eventData': eventData} %}
+{% endif %}

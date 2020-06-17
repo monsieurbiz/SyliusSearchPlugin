@@ -1,14 +1,6 @@
-{% if bundle_exists('SonataCoreBundle') %}
-    {{ sonata_block_render_event('sylius.shop.product.index.before_vertical_menu', {'taxon': taxon}) }}
-{% else %}
-    {{ sylius_template_event('sylius.shop.product.index.before_vertical_menu', {'taxon': taxon}) }}
-{% endif %}
+{% include '@MonsieurBizSyliusSearchPlugin/Event/event.html.twig' with {'eventName': 'sylius.shop.product.index.before_vertical_menu', 'eventData': {'taxon': taxon}} %}
 
 {#{% include '@MonsieurBizSyliusSearchPlugin/Taxon/_tree.html.twig' %}#}
 {% include '@MonsieurBizSyliusSearchPlugin/Taxon/_filters.html.twig' %}
 
-{% if bundle_exists('SonataCoreBundle') %}
-    {{ sonata_block_render_event('sylius.shop.product.index.after_vertical_menu', {'taxon': taxon}) }}
-{% else %}
-    {{ sylius_template_event('sylius.shop.product.index.after_vertical_menu', {'taxon': taxon}) }}
-{% endif %}
+{% include '@MonsieurBizSyliusSearchPlugin/Event/event.html.twig' with {'eventName': 'sylius.shop.product.index.after_vertical_menu', 'eventData': {'taxon': taxon}} %}

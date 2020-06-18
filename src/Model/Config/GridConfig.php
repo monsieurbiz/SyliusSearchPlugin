@@ -6,6 +6,9 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Config;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownGridConfigType;
 use Sylius\Component\Core\Model\TaxonInterface;
+use Sylius\Component\Product\Model\ProductAttribute;
+use Sylius\Component\Product\Model\ProductOption;
+use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class GridConfig
@@ -52,9 +55,38 @@ class GridConfig
     /** @var array */
     private $appliedFilters;
 
-    public function __construct(array $config)
+    /**
+     * @var array|null
+     */
+    private $filterableAttributes;
+
+    /**
+     * @var array|null
+     */
+    private $filterableOptions;
+
+    /**
+     * @var RepositoryInterface
+     */
+    private $productAttributeRepository;
+
+    /**
+     * @var RepositoryInterface
+     */
+    private $productOptionRepository;
+
+    /**
+     * GridConfig constructor.
+     *
+     * @param array $config
+     * @param RepositoryInterface $productAttributeRepository
+     * @param RepositoryInterface $productOptionRepository
+     */
+    public function __construct(array $config, RepositoryInterface $productAttributeRepository, RepositoryInterface $productOptionRepository)
     {
         $this->config = $config;
+        $this->productAttributeRepository = $productAttributeRepository;
+        $this->productOptionRepository = $productOptionRepository;
     }
 
     /**
@@ -203,7 +235,17 @@ class GridConfig
      */
     public function getAttributeFilters(): array
     {
-        return $this->config['filters']['attributes'] ?? [];
+        if (null === $this->filterableAttributes) {
+            $attributes = $this->productAttributeRepository->findBy([
+                'filterable' => true,
+            ]);
+            $this->filterableAttributes = [];
+            /** @var ProductAttribute $attribute */
+            foreach ($attributes as $attribute) {
+                $this->filterableAttributes[] = $attribute->getCode();
+            }
+        }
+        return $this->filterableAttributes;
     }
 
     /**
@@ -211,7 +253,17 @@ class GridConfig
      */
     public function getOptionFilters(): array
     {
-        return $this->config['filters']['options'] ?? [];
+        if (null === $this->filterableOptions) {
+            $options = $this->productOptionRepository->findBy([
+                'filterable' => true,
+            ]);
+            $this->filterableOptions = [];
+            /** @var ProductOption $option */
+            foreach ($options as $option) {
+                $this->filterableOptions[] = $option->getCode();
+            }
+        }
+        return $this->filterableOptions;
     }
 
     /**

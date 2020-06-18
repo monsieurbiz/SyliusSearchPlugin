@@ -1,0 +1,26 @@
+{% from '@SyliusAdmin/Macro/translationForm.html.twig' import translationForm %}
+
+{{ form_errors(form) }}
+
+<div class="ui segment">
+    <div class="three fields">
+        {{ form_row(form.code) }}
+        {{ form_row(form.position) }}
+        {{ form_row(form.type) }}
+    </div>
+</div>
+<div class="ui segment">
+    <h4 class="ui dividing header">{{ 'monsieurbiz_searchplugin.admin.product_attribute.form.title'|trans }}</h4>
+    <div class="two fields">
+        {{ form_row(form.filterable) }}
+    </div>
+</div>
+{% if form.configuration is defined %}
+    <div class="ui segment">
+        <h4 class="ui dividing header">{{ 'sylius.ui.configuration'|trans }}</h4>
+        {% for field in form.configuration %}
+            {{ form_row(field) }}
+        {% endfor %}
+    </div>
+{% endif %}
+{{ translationForm(form.translations) }}

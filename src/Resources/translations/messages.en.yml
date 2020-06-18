@@ -1,4 +1,13 @@
 monsieurbiz_searchplugin:
+  admin:
+    product_attribute:
+      form:
+        title: Search
+        filterable: Filterable
+    product_option:
+      form:
+        title: Search
+        filterable: Filterable
   form:
     query: 'Search'
     submit: 'Submit search'

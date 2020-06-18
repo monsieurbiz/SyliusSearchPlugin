@@ -1,4 +1,13 @@
 monsieurbiz_searchplugin:
+  admin:
+    product_attribute:
+      form:
+        title: Recherche
+        filterable: Filtrable
+    product_option:
+      form:
+        title: Recherche
+        filterable: Filtrable
   form:
     query: 'Recherche'
     submit: 'Lancer la recherche'

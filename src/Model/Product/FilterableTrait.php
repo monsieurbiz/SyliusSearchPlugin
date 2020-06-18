@@ -10,9 +10,9 @@ trait FilterableTrait
 {
     /**
      * @var bool
-     * @ORM\Column(name="filterable", type="boolean", nullable=false)
+     * @ORM\Column(name="filterable", type="boolean", nullable=false, options={"default": true})
      */
-    protected $filterable = false;
+    protected $filterable = true;
 
     /**
      * @return bool

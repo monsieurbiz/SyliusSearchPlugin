@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Document;
 
-use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
+use Elastica\ResultSet as ElasticaResultSet;
 use JoliCode\Elastically\Result;
 use MonsieurBiz\SyliusSearchPlugin\Adapter\ResultSetAdapter;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
@@ -44,10 +44,10 @@ class ResultSet
      * SearchResults constructor.
      * @param int $maxItems
      * @param int $page
-     * @param ElasticallyResultSet|null $resultSet
+     * @param ElasticaResultSet|null $resultSet
      * @param TaxonInterface|null $taxon
      */
-    public function __construct(int $maxItems, int $page, ?ElasticallyResultSet $resultSet = null, ?TaxonInterface $taxon = null)
+    public function __construct(int $maxItems, int $page, ?ElasticaResultSet $resultSet = null, ?TaxonInterface $taxon = null)
     {
         $this->maxItems = $maxItems;
         $this->page = $page;
@@ -83,10 +83,10 @@ class ResultSet
     /**
      * Init filters array depending on result aggregations
      *
-     * @param ElasticallyResultSet $resultSet
+     * @param ElasticaResultSet $resultSet
      * @param TaxonInterface|null $taxon
      */
-    private function initFilters(ElasticallyResultSet $resultSet, ?TaxonInterface $taxon = null)
+    private function initFilters(ElasticaResultSet $resultSet, ?TaxonInterface $taxon = null)
     {
         $aggregations = $resultSet->getAggregations();
         // No aggregation so don't perform filters

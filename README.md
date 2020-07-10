@@ -59,10 +59,23 @@ MONSIEURBIZ_SEARCHPLUGIN_ES_PORT=9200
 ###< MonsieurBizSearchPlugin ###
 ```
 
-## Setup
+## Installation
 
-Make your `Product` entity implements [DocumentableInterface](#documentable-objects) and use the `DocumentableProductTrait`.  
-Run the populate [command](#Command).
+1. Install Elasticsearch 💪. See [Infrastructure](#infrastructure) below.
+2. Your `Product` entity needs to implement the [DocumentableInterface](#documentable-objects) interface and use the `\MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait` trait.
+
+2. Your `ProductAttribute` and `ProductOption` entities need to implement the `\MonsieurBiz\SyliusSearchPlugin\Entity\Product\FilterableInterface` interface and use the `\MonsieurBiz\SyliusSearchPlugin\Model\Product\FilterableTrait` trait.
+
+3. You need to run a diff of your doctrine's migrations: `console doctrine:migrations:diff`. Don't forget to run it! (`console doctrine:migrations:migrate`)
+
+4. Copy the templates: (we update the `ProductAttribute` and `ProductOption` forms)
+
+   ```bash
+   mkdir -p templates/bundles/SyliusAdminBundle
+   cp -Rv vendor/monsieurbiz/sylius-search-plugin/src/Resources/SyliusAdminBundle/views/ templates/bundles/SyliusAdminBundle/
+   ```
+
+5. Run the [populate command](#Command).
 
 ## Infrastructure
 
@@ -108,8 +121,6 @@ monsieur_biz_sylius_search:
             taxon: ['name', 'price', 'created_at']
             search: ['name', 'price', 'created_at']
         filters:
-            attributes: [] # Put the attributes you want to add in filters
-            options: [] # Put the options you want to add in filters
             apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
             use_main_taxon: true # Use main taxon for the taxon filter, else use the taxons
 
@@ -126,14 +137,6 @@ The `{{QUERY}}` string inside is replaced in PHP by the query typed by the user.
 `documentable_classes` is an array of entities which can be indexed in Elasticsearch.
 
 You can also change available sortings and limits.
-
-To add filters, you need to add your attributes and options in config : 
- ```yaml
-monsieur_biz_sylius_search:
-    filters:
-        attributes: [] # Put the attributes you want to add in filters
-        options: [] # Put the options you want to add in filters
-```
 
 You can decide to load filters before their application or after :
 ```yaml

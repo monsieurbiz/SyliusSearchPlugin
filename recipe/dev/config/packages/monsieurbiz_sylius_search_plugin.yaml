@@ -20,7 +20,5 @@ monsieur_biz_sylius_search:
             taxon: ['name', 'price', 'created_at']
             search: ['name', 'price', 'created_at']
         filters:
-            attributes: [] # Put the attributes you want to add in filters
-            options: [] # Put the options you want to add in filters
             apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
             use_main_taxon: true # Use main taxon for the taxon filter, else use the taxons

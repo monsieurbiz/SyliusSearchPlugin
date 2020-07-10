@@ -24,6 +24,12 @@ services:
     resource: '../../Controller'
     tags: ['controller.service_arguments']
 
+  # Forms extensions
+  MonsieurBiz\SyliusSearchPlugin\Form\Extension\:
+    resource: '../../Form/Extension'
+    tags:
+      - { name: form.type_extension }
+
   # Client configuration.
   JoliCode\Elastically\Client:
     arguments:

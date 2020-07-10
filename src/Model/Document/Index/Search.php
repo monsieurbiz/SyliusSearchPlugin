@@ -6,7 +6,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Document\Index;
 
 use Elastica\Exception\Connection\HttpException;
 use Elastica\Exception\ResponseException;
-use JoliCode\Elastically\ResultSet as ElasticallyResultSet;
+use Elastica\ResultSet as ElasticaResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
 use MonsieurBiz\SyliusSearchPlugin\Helper\AggregationHelper;
@@ -109,7 +109,7 @@ class Search extends AbstractIndex
     private function query(GridConfig $gridConfig, array $query)
     {
         try {
-            /** @var ElasticallyResultSet $results */
+            /** @var ElasticaResultSet $results */
             $results = $this->getClient()->getIndex($this->getIndexName($gridConfig->getLocale()))->search(
                 $query, $gridConfig->getLimit()
             );

@@ -1,0 +1,72 @@
+mappings:
+    dynamic: false
+    properties:
+        type:
+            type: keyword
+        code:
+            type: keyword
+        enabled:
+            type: boolean
+        channel:
+            type: keyword
+        mainTaxon:
+            type: nested
+            properties:
+                code:
+                    type: keyword
+                name:
+                    type: keyword
+                position:
+                    type: integer
+                level:
+                    type: integer
+                productPosition:
+                    type: integer
+        taxon:
+            type: nested
+            properties:
+                code:
+                    type: keyword
+                name:
+                    type: keyword
+                position:
+                    type: integer
+                level:
+                    type: integer
+                productPosition:
+                    type: integer
+        attributes:
+            type: nested
+            properties:
+                name:
+                    type: text
+                    analyzer: search_standard
+                    fields:
+                        keyword:
+                            type: keyword
+                value:
+                    type: text
+                    analyzer: search_standard
+                    fields:
+                        keyword:
+                            type: keyword
+                code:
+                    type: keyword
+                score:
+                    type: rank_feature
+        price:
+            type: nested
+            properties:
+                currency:
+                    type: keyword
+                channel:
+                    type: keyword
+                value:
+                    type: integer
+        originalPrice:
+            type: nested
+            properties:
+                currency:
+                    type: keyword
+                value:
+                    type: integer

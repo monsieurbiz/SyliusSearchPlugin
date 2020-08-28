@@ -21,7 +21,7 @@ final class ProductOptionTypeExtension extends AbstractTypeExtension
         ;
     }
 
-    public function getExtendedTypes(): array
+    public static function getExtendedTypes(): array
     {
         return [
             ProductOptionType::class,

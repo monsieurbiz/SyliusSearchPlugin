@@ -23,6 +23,12 @@
                     }
                 }, monsieurbizSearchPlugin.keyUpTimeOut);
             });
+
+            // Hide results when user leave the search field
+            $(monsieurbizSearchPlugin.searchInputSelector).focusout(function() {
+                var resultElement = $(this).closest(monsieurbizSearchPlugin.resultClosestSelector).find(monsieurbizSearchPlugin.resultFindSelector);
+                setTimeout(function () {resultElement.hide()}, 100); // Add timeout to keep the click on the result
+            });
         },
         filterSearch: function () {
             $(monsieurbizSearchPlugin.priceFilterSelector).prop('autocomplete', 'off');

@@ -60,7 +60,7 @@ class Indexer extends AbstractIndex
         if (empty($this->locales)) {
             $locales = $this->localeRepository->findAll();
             $this->locales = array_map(
-                function (LocaleInterface $locale) {
+                function(LocaleInterface $locale) {
                     return $locale->getCode();
                 },
                 $locales
@@ -108,7 +108,7 @@ class Indexer extends AbstractIndex
         $this->getIndexer()->refresh($this->getIndexName($locale));
         try {
             $this->getIndexBuilder()->purgeOldIndices($this->getIndexName($locale));
-        } catch(ResponseException $exception) {
+        } catch (ResponseException $exception) {
             throw new ReadOnlyIndexException($exception->getMessage());
         }
     }

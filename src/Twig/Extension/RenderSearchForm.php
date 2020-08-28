@@ -41,6 +41,6 @@ class RenderSearchForm extends AbstractExtension
         return new Markup($this->templatingEngine->render($template, [
             'form' => $this->formFactory->create(SearchType::class)->createView(),
             'query' => urldecode($this->requestStack->getCurrentRequest()->get('query') ?? ''),
-        ]), 'UTF-8' );
+        ]), 'UTF-8');
     }
 }

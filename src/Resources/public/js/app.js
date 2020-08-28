@@ -1,3 +1,4 @@
+/** global: monsieurbizSearchPlugin */
 (function ($) {
     'use strict';
     $.fn.extend({

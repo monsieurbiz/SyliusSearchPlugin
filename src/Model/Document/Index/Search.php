@@ -150,13 +150,13 @@ class Search extends AbstractIndex
             );
         } elseif (!empty($appliedFilters)) {
             // Will retrieve filters before we applied the current ones
-            $query['post_filter'] = new ArrayObject($appliedFilters);  // Use custom ArrayObject because Elastica make `toArray` on it.
+            $query['post_filter'] = new ArrayObject($appliedFilters); // Use custom ArrayObject because Elastica make `toArray` on it.
         }
 
         // Manage limits
         $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
         $query['from'] = max(0, $from);
-        $query['size'] =  max(1, $gridConfig->getLimit());
+        $query['size'] = max(1, $gridConfig->getLimit());
 
         // Manage sorting
         $channelCode = $this->channelContext->getChannel()->getCode();
@@ -222,14 +222,14 @@ class Search extends AbstractIndex
             );
         } elseif (!empty($appliedFilters)) {
             // Will retrieve filters before we applied the current ones
-            $query['post_filter'] = new ArrayObject($appliedFilters);  // Use custom ArrayObject because Elastica make `toArray` on it.
+            $query['post_filter'] = new ArrayObject($appliedFilters); // Use custom ArrayObject because Elastica make `toArray` on it.
         }
 
 
         // Manage limits
         $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
         $query['from'] = max(0, $from);
-        $query['size'] =  max(1, $gridConfig->getLimit());
+        $query['size'] = max(1, $gridConfig->getLimit());
 
         // Manage sorting
         $channelCode = $this->channelContext->getChannel()->getCode();

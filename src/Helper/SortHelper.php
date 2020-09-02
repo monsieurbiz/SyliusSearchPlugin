@@ -17,7 +17,7 @@ class SortHelper
      */
     public static function getSortParamByField(string $field, string $channel, string $order = 'asc', $taxon = ''): array
     {
-        switch($field) {
+        switch ($field) {
             case 'name':
                 return self::buildSort('attributes.value.keyword', $order, 'attributes', 'attributes.code', $field);
             case 'created_at':

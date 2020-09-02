@@ -24,7 +24,7 @@ class CheckMethodExists extends AbstractExtension
         );
     }
 
-    public function bundleExists($bundle){
+    public function bundleExists($bundle) {
         return array_key_exists(
             $bundle,
             $this->container->getParameter('kernel.bundles')

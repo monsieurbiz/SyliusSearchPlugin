@@ -5,16 +5,14 @@ namespace MonsieurBiz\SyliusSearchPlugin\Fixture\Factory;
 
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\FilterableInterface;
 use Sylius\Bundle\CoreBundle\Fixture\Factory\AbstractExampleFactory;
-use Sylius\Bundle\CoreBundle\Fixture\Factory\ExampleFactoryInterface;
 use Sylius\Bundle\CoreBundle\Fixture\OptionsResolver\LazyOption;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
-class FilterableFixtureFactory extends AbstractExampleFactory implements ExampleFactoryInterface
+class FilterableFixtureFactory extends AbstractExampleFactory implements FilterableFixtureFactoryInterface
 {
 
     /**
@@ -32,6 +30,11 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Example
      */
     private $optionsResolver;
 
+    /**
+     * FilterableFixtureFactory constructor.
+     * @param RepositoryInterface $productAttributeRepository
+     * @param RepositoryInterface $productOptionRepository
+     */
     public function __construct(
         RepositoryInterface $productAttributeRepository,
         RepositoryInterface $productOptionRepository

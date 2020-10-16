@@ -30,6 +30,15 @@ services:
     tags:
       - { name: form.type_extension }
 
+  # Fixture
+  MonsieurBiz\SyliusSearchPlugin\Fixture\FilterableFixture:
+    arguments:
+      - "@sylius.manager.product"
+      - '@MonsieurBiz\SyliusSearchPlugin\Fixture\Factory\FilterableFixtureFactory'
+    tags: ['sylius_fixtures.fixture']
+
+  # Fixture Factory
+
   # Client configuration.
   JoliCode\Elastically\Client:
     arguments:

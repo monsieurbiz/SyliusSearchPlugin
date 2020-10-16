@@ -55,14 +55,12 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Example
             ->setAllowedTypes('option', ['null', 'string', ProductOptionInterface::class])
             ->setNormalizer('option', LazyOption::findOneBy($this->productOptionRepository, 'code'))
             // Filterable
-            ->setDefault('filterable', function (Options $options): bool {
-                return true;
-            });
+            ->setDefault('filterable', true);
     }
 
     /**
      * @param array $options
-     * @return void
+     * @return object
      * @throws \Exception
      */
     public function create(array $options = [])
@@ -86,7 +84,7 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Example
         }
 
         /** @var FilterableInterface $object */
-        $object->setFilterable(((bool)$options['filterable']) ?? false);
+        $object->setFilterable(((bool) $options['filterable']) ?? false);
 
         return $object;
     }

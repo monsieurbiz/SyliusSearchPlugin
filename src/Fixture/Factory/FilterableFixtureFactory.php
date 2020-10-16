@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Fixture\Factory;
@@ -11,10 +21,8 @@ use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-
 class FilterableFixtureFactory extends AbstractExampleFactory implements FilterableFixtureFactoryInterface
 {
-
     /**
      * @var RepositoryInterface
      */
@@ -32,6 +40,7 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Filtera
 
     /**
      * FilterableFixtureFactory constructor.
+     *
      * @param RepositoryInterface $productAttributeRepository
      * @param RepositoryInterface $productOptionRepository
      */
@@ -57,13 +66,16 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Filtera
             ->setDefault('option', null)
                 ->setAllowedTypes('option', ['null', 'string', ProductOptionInterface::class])
                 ->setNormalizer('option', LazyOption::findOneBy($this->productOptionRepository, 'code'))
-            ->setDefault('filterable', true);
+            ->setDefault('filterable', true)
+        ;
     }
 
     /**
      * @param array $options
-     * @return object
+     *
      * @throws \Exception
+     *
+     * @return object
      */
     public function create(array $options = [])
     {
@@ -78,11 +90,7 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Filtera
         }
 
         if (!$object instanceof FilterableInterface) {
-            throw new \Exception(sprintf(
-                'Your class "%s" is not an instance of %s',
-                get_class($object),
-                FilterableInterface::class
-            ));
+            throw new \Exception(sprintf('Your class "%s" is not an instance of %s', \get_class($object), FilterableInterface::class));
         }
 
         /** @var FilterableInterface $object */
@@ -90,5 +98,4 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Filtera
 
         return $object;
     }
-
 }

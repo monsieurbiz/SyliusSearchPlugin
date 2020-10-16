@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Tests\MonsieurBiz\SyliusSearchPlugin\Application;
@@ -86,7 +95,7 @@ final class Kernel extends BaseKernel
         Assert::isInstanceOf($container, ContainerBuilder::class);
 
         $locator = new FileLocator($this, $this->getRootDir() . '/Resources');
-        $resolver = new LoaderResolver(array(
+        $resolver = new LoaderResolver([
             new XmlFileLoader($container, $locator),
             new YamlFileLoader($container, $locator),
             new IniFileLoader($container, $locator),
@@ -94,7 +103,7 @@ final class Kernel extends BaseKernel
             new GlobFileLoader($container, $locator),
             new DirectoryLoader($container, $locator),
             new ClosureLoader($container),
-        ));
+        ]);
 
         return new DelegatingLoader($resolver);
     }

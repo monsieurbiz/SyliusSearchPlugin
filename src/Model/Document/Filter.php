@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Document;
@@ -28,6 +37,7 @@ class Filter
 
     /**
      * Filter constructor.
+     *
      * @param string $code
      * @param string $label
      * @param int $count
@@ -67,7 +77,7 @@ class Filter
      * @param $value
      * @param $count
      */
-    public function addValue($value, $count)
+    public function addValue($value, $count): void
     {
         $this->values[] = new FilterValue($value, $count);
     }

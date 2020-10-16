@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Twig\Extension;
@@ -13,23 +22,25 @@ use Twig\TwigFunction;
 
 class RenderDocumentUrl extends AbstractExtension
 {
-
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('search_result_url_param', array($this, 'getUrlParams')),
-        );
+        return [
+            new TwigFunction('search_result_url_param', [$this, 'getUrlParams']),
+        ];
     }
 
     /**
      * @param Result $document
-     * @return UrlParamsProvider
+     *
      * @throws MissingLocaleException
      * @throws NotSupportedTypeException
+     *
+     * @return UrlParamsProvider
      */
-    public function getUrlParams(Result $document): UrlParamsProvider {
+    public function getUrlParams(Result $document): UrlParamsProvider
+    {
         switch ($document->getType()) {
-            case "product" :
+            case 'product':
                 return new UrlParamsProvider('sylius_shop_product_show', ['slug' => $document->getSlug(), '_locale' => $document->getLocale()]);
                 break;
         }

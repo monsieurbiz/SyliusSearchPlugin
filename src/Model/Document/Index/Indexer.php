@@ -92,7 +92,7 @@ class Indexer extends AbstractIndex
 
         $indexName = $this->getIndexName($locale);
         $newIndex = $this->getIndexBuilder()->createIndex($indexName);
-        $response = $this->getIndexBuilder()->markAsLive(
+        $this->getIndexBuilder()->markAsLive(
             $newIndex,
             $indexName
         );
@@ -112,7 +112,7 @@ class Indexer extends AbstractIndex
         $this->getIndexer()->refresh($indexName);
         try {
             $this->getIndexBuilder()->purgeOldIndices($indexName);
-        } catch(ResponseException $exception) {
+        } catch (ResponseException $exception) {
             throw new ReadOnlyIndexException($exception->getMessage());
         }
     }

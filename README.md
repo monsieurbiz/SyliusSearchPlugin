@@ -320,3 +320,33 @@ You can also find YAML used by plugin to perform the search on Elasticsearch :
 - `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/queries/taxon.yaml`
 
 These queries can be customized in another folder if you change the plugin config.
+
+## Fixtures
+
+You can use fixtures to define filterable and non-filterable options and attributes : 
+
+```yaml
+
+sylius_fixtures:
+    suites:
+        default:
+            fixtures:
+                monsieurbiz_sylius_search_filterable:
+                    options:
+                        custom:
+                            cap_collection:
+                                attribute: 'cap_collection'
+                                filterable: false
+
+                            dress_collection:
+                                attribute: 'dress_collection'
+                                filterable: false
+
+                            dress_height:
+                                option: 'dress_height'
+                                filterable: false
+
+                            dress_size:
+                                option: 'dress_size'
+                                filterable: true
+```

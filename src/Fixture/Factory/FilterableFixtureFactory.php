@@ -27,7 +27,9 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Example
      */
     protected $productOptionRepository;
 
-    /** @var OptionsResolver */
+    /**
+     * @var OptionsResolver
+     */
     private $optionsResolver;
 
     public function __construct(
@@ -46,15 +48,12 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Example
     protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            // Attribute
             ->setDefault('attribute', null)
-            ->setAllowedTypes('attribute', ['null', 'string', ProductAttributeInterface::class])
-            ->setNormalizer('attribute', LazyOption::findOneBy($this->productAttributeRepository, 'code'))
-            // Option
+                ->setAllowedTypes('attribute', ['null', 'string', ProductAttributeInterface::class])
+                ->setNormalizer('attribute', LazyOption::findOneBy($this->productAttributeRepository, 'code'))
             ->setDefault('option', null)
-            ->setAllowedTypes('option', ['null', 'string', ProductOptionInterface::class])
-            ->setNormalizer('option', LazyOption::findOneBy($this->productOptionRepository, 'code'))
-            // Filterable
+                ->setAllowedTypes('option', ['null', 'string', ProductOptionInterface::class])
+                ->setNormalizer('option', LazyOption::findOneBy($this->productOptionRepository, 'code'))
             ->setDefault('filterable', true);
     }
 

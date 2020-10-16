@@ -1,13 +1,22 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Twig\Extension;
 
 use MonsieurBiz\SyliusSearchPlugin\Form\Type\SearchType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Templating\EngineInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\Markup;
 use Twig\TwigFunction;
@@ -29,9 +38,9 @@ class RenderSearchForm extends AbstractExtension
 
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('search_form', array($this, 'createForm')),
-        );
+        return [
+            new TwigFunction('search_form', [$this, 'createForm']),
+        ];
     }
 
     public function createForm($template = null)

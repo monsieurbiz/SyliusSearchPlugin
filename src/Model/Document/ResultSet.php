@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Document;
@@ -42,6 +51,7 @@ class ResultSet
 
     /**
      * SearchResults constructor.
+     *
      * @param int $maxItems
      * @param int $page
      * @param ElasticaResultSet|null $resultSet
@@ -53,7 +63,7 @@ class ResultSet
         $this->page = $page;
 
         // Empty result set
-        if ($resultSet === null) {
+        if (null === $resultSet) {
             $this->totalHits = 0;
             $this->results = [];
             $this->filters = [];
@@ -70,9 +80,9 @@ class ResultSet
     }
 
     /**
-     * Init pager with Pager Fanta
+     * Init pager with Pager Fanta.
      */
-    private function initPager()
+    private function initPager(): void
     {
         $adapter = new ResultSetAdapter($this);
         $this->pager = new Pagerfanta($adapter);
@@ -81,12 +91,12 @@ class ResultSet
     }
 
     /**
-     * Init filters array depending on result aggregations
+     * Init filters array depending on result aggregations.
      *
      * @param ElasticaResultSet $resultSet
      * @param TaxonInterface|null $taxon
      */
-    private function initFilters(ElasticaResultSet $resultSet, ?TaxonInterface $taxon = null)
+    private function initFilters(ElasticaResultSet $resultSet, ?TaxonInterface $taxon = null): void
     {
         $aggregations = $resultSet->getAggregations();
         // No aggregation so don't perform filters
@@ -113,7 +123,7 @@ class ResultSet
         $filterAggregations = $aggregations['filters'] ?? [];
         unset($filterAggregations['doc_count']);
         foreach ($filterAggregations as $field => $aggregation) {
-            if ($aggregation['doc_count'] === 0) {
+            if (0 === $aggregation['doc_count']) {
                 continue;
             }
             $filter = new Filter($field, $attributes[$field] ?? $field, $aggregation['doc_count']);
@@ -190,9 +200,9 @@ class ResultSet
     }
 
     /**
-     * Sort filters
+     * Sort filters.
      */
-    protected function sortFilters()
+    protected function sortFilters(): void
     {
         usort($this->filters, function($filter1, $filter2) {
             /** @var Filter $filter1 */
@@ -200,24 +210,23 @@ class ResultSet
 
             // If same count we display the filters with more values before
             if ($filter1->getCount() === $filter2->getCount()) {
-                return count($filter2->getValues()) > count($filter1->getValues());
+                return \count($filter2->getValues()) > \count($filter1->getValues());
             }
 
             return $filter2->getCount() > $filter1->getCount();
-        } );
+        });
     }
 
     /**
-     * Add taxon filter depending on aggregations
+     * Add taxon filter depending on aggregations.
      *
      * @param array $aggregations
      * @param TaxonInterface|null $taxon
      */
-    protected function addTaxonFilter(array $aggregations, ?TaxonInterface $taxon)
+    protected function addTaxonFilter(array $aggregations, ?TaxonInterface $taxon): void
     {
         $taxonAggregation = $aggregations['taxons'] ?? null;
         if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
-
             // Get current taxon level to retrieve only greater levels, in search we will take only the first level
             $currentTaxonLevel = $taxon ? $taxon->getLevel() : 0;
 
@@ -234,7 +243,7 @@ class ResultSet
             // Get taxon code in aggregation
             $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
             foreach ($taxonCodeBuckets as $taxonCodeBucket) {
-                if ($taxonCodeBucket['doc_count'] === 0) {
+                if (0 === $taxonCodeBucket['doc_count']) {
                     continue;
                 }
                 $taxonCode = $taxonCodeBucket['key'];
@@ -257,29 +266,28 @@ class ResultSet
             }
 
             // Put taxon filter in first if contains value
-            if (count($filter->getValues())) {
+            if (\count($filter->getValues())) {
                 $this->taxonFilter = $filter;
             }
         }
     }
 
     /**
-     * Add main taxon filter depending on aggregations
+     * Add main taxon filter depending on aggregations.
      *
      * @param array $aggregations
      * @param TaxonInterface|null $taxon
      */
-    protected function addMainTaxonFilter(array $aggregations, ?TaxonInterface $taxon)
+    protected function addMainTaxonFilter(array $aggregations, ?TaxonInterface $taxon): void
     {
         $taxonAggregation = $aggregations['mainTaxon'] ?? null;
         if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
-
             $filter = new Filter('main_taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
 
             // Get main taxon code in aggregation
             $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
             foreach ($taxonCodeBuckets as $taxonCodeBucket) {
-                if ($taxonCodeBucket['doc_count'] === 0) {
+                if (0 === $taxonCodeBucket['doc_count']) {
                     continue;
                 }
                 $taxonCode = $taxonCodeBucket['key'];
@@ -299,18 +307,18 @@ class ResultSet
             }
 
             // Put taxon filter in first if contains value
-            if (count($filter->getValues())) {
+            if (\count($filter->getValues())) {
                 $this->mainTaxonFilter = $filter;
             }
         }
     }
 
     /**
-     * Add price filter depending on aggregations
+     * Add price filter depending on aggregations.
      *
      * @param array $aggregations
      */
-    protected function addPriceFilter(array $aggregations)
+    protected function addPriceFilter(array $aggregations): void
     {
         $priceAggregation = $aggregations['price'] ?? null;
         if ($priceAggregation && $priceAggregation['doc_count'] > 0) {

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Document\Index;
@@ -9,10 +18,9 @@ use JoliCode\Elastically\IndexBuilder;
 use JoliCode\Elastically\Indexer;
 use MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider;
 
-
 abstract class AbstractIndex
 {
-    const DOCUMENT_INDEX_NAME = 'documents';
+    public const DOCUMENT_INDEX_NAME = 'documents';
 
     /**
      * @var DocumentRepositoryProvider
@@ -24,6 +32,7 @@ abstract class AbstractIndex
 
     /**
      * PopulateCommand constructor.
+     *
      * @param Client $client
      */
     public function __construct(
@@ -33,7 +42,7 @@ abstract class AbstractIndex
     }
 
     /**
-     * Get the client
+     * Get the client.
      *
      * @return Client
      */
@@ -43,9 +52,10 @@ abstract class AbstractIndex
     }
 
     /**
-     * Retrieve the index name
+     * Retrieve the index name.
      *
      * @param string $locale
+     *
      * @return string
      */
     protected function getIndexName(string $locale): string

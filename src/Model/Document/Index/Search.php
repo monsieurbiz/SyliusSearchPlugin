@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Document\Index;
@@ -7,19 +16,18 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Document\Index;
 use Elastica\Exception\Connection\HttpException;
 use Elastica\Exception\ResponseException;
 use Elastica\ResultSet as ElasticaResultSet;
-use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use JoliCode\Elastically\Client;
+use MonsieurBiz\SyliusSearchPlugin\Exception\ReadFileException;
 use MonsieurBiz\SyliusSearchPlugin\Helper\AggregationHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\FilterHelper;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SortHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\ArrayObject;
 use MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
-use Psr\Log\LoggerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
+use Psr\Log\LoggerInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Symfony\Component\Yaml\Yaml;
-
 
 class Search extends AbstractIndex
 {
@@ -34,6 +42,7 @@ class Search extends AbstractIndex
 
     /**
      * PopulateCommand constructor.
+     *
      * @param Client $client
      * @param SearchQueryProvider $searchQueryProvider
      * @param ChannelContextInterface $channelContext
@@ -52,9 +61,10 @@ class Search extends AbstractIndex
     }
 
     /**
-     * Search documents for a given locale, search terms, max number items and page
+     * Search documents for a given locale, search terms, max number items and page.
      *
      * @param GridConfig $gridConfig
+     *
      * @return ResultSet
      */
     public function search(GridConfig $gridConfig): ResultSet
@@ -63,14 +73,16 @@ class Search extends AbstractIndex
             return $this->query($gridConfig, $this->getSearchQuery($gridConfig));
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
+
             return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
-     * Instant search documents for a given locale, query and a max number items
+     * Instant search documents for a given locale, query and a max number items.
      *
      * @param GridConfig $gridConfig
+     *
      * @return ResultSet
      */
     public function instant(GridConfig $gridConfig): ResultSet
@@ -79,14 +91,16 @@ class Search extends AbstractIndex
             return $this->query($gridConfig, $this->getInstantQuery($gridConfig));
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
+
             return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
-     * Taxon search documents for a given locale, taxon code, max number items and page
+     * Taxon search documents for a given locale, taxon code, max number items and page.
      *
      * @param GridConfig $gridConfig
+     *
      * @return ResultSet
      */
     public function taxon(GridConfig $gridConfig): ResultSet
@@ -95,15 +109,17 @@ class Search extends AbstractIndex
             return $this->query($gridConfig, $this->getTaxonQuery($gridConfig));
         } catch (ReadFileException $exception) {
             $this->logger->critical($exception->getMessage());
+
             return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
     }
 
     /**
-     * Perform search for a given query
+     * Perform search for a given query.
      *
      * @param GridConfig $gridConfig
      * @param array $query
+     *
      * @return ResultSet
      */
     private function query(GridConfig $gridConfig, array $query)
@@ -115,9 +131,11 @@ class Search extends AbstractIndex
             );
         } catch (HttpException $exception) {
             $this->logger->critical($exception->getMessage());
+
             return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         } catch (ResponseException $exception) {
             $this->logger->critical($exception->getMessage());
+
             return new ResultSet($gridConfig->getLimit(), $gridConfig->getPage());
         }
 
@@ -125,11 +143,13 @@ class Search extends AbstractIndex
     }
 
     /**
-     * Retrieve the query to send to Elasticsearch for search
+     * Retrieve the query to send to Elasticsearch for search.
      *
      * @param GridConfig $gridConfig
-     * @return array
+     *
      * @throws ReadFileException
+     *
+     * @return array
      */
     private function getSearchQuery(GridConfig $gridConfig): array
     {
@@ -175,11 +195,13 @@ class Search extends AbstractIndex
     }
 
     /**
-     * Retrieve the query to send to Elasticsearch for instant search
+     * Retrieve the query to send to Elasticsearch for instant search.
      *
      * @param GridConfig $gridConfig
-     * @return array
+     *
      * @throws ReadFileException
+     *
+     * @return array
      */
     private function getInstantQuery(GridConfig $gridConfig): array
     {
@@ -190,17 +212,17 @@ class Search extends AbstractIndex
         $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
-        $query = $this->parseQuery($query);
-
-        return $query;
+        return $this->parseQuery($query);
     }
 
     /**
-     * Retrieve the query to send to Elasticsearch for taxon search
+     * Retrieve the query to send to Elasticsearch for taxon search.
      *
      * @param GridConfig $gridConfig
-     * @return array
+     *
      * @throws ReadFileException
+     *
+     * @return array
      */
     private function getTaxonQuery(GridConfig $gridConfig): array
     {
@@ -225,7 +247,6 @@ class Search extends AbstractIndex
             $query['post_filter'] = new ArrayObject($appliedFilters); // Use custom ArrayObject because Elastica make `toArray` on it.
         }
 
-
         // Manage limits
         $from = ($gridConfig->getPage() - 1) * $gridConfig->getLimit();
         $query['from'] = max(0, $from);
@@ -249,6 +270,7 @@ class Search extends AbstractIndex
 
     /**
      * @param string $query
+     *
      * @return array
      */
     private function parseQuery(string $query): array

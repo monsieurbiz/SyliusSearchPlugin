@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Provider;
@@ -15,7 +24,9 @@ class SearchQueryProvider
 
     /**
      * SearchQueryProvider constructor.
+     *
      * @param array $files
+     *
      * @throws MissingConfigFileException
      */
     public function __construct(array $files)
@@ -24,10 +35,11 @@ class SearchQueryProvider
     }
 
     /**
-     * Get search query
+     * Get search query.
+     *
+     * @throws ReadFileException
      *
      * @return string
-     * @throws ReadFileException
      */
     public function getSearchQuery()
     {
@@ -35,10 +47,11 @@ class SearchQueryProvider
     }
 
     /**
-     * Get instant query
+     * Get instant query.
+     *
+     * @throws ReadFileException
      *
      * @return false|string
-     * @throws ReadFileException
      */
     public function getInstantQuery()
     {
@@ -46,10 +59,11 @@ class SearchQueryProvider
     }
 
     /**
-     * Get taxon query
+     * Get taxon query.
+     *
+     * @throws ReadFileException
      *
      * @return false|string
-     * @throws ReadFileException
      */
     public function getTaxonQuery()
     {
@@ -57,18 +71,21 @@ class SearchQueryProvider
     }
 
     /**
-     * Get content from file
+     * Get content from file.
      *
      * @param $path
-     * @return false|string
+     *
      * @throws ReadFileException
+     *
+     * @return false|string
      */
     private function getQuery($path)
     {
         $query = @file_get_contents($path);
-        if ($query === false) {
+        if (false === $query) {
             throw new ReadFileException(sprintf('Error while opening file "%s".', $path));
         }
+
         return $query;
     }
 }

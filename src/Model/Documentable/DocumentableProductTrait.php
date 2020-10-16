@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
@@ -13,7 +22,6 @@ use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductVariant;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Currency\Model\CurrencyInterface;
-use Sylius\Component\Product\Model\ProductOptionInterface;
 
 trait DocumentableProductTrait
 {
@@ -27,6 +35,7 @@ trait DocumentableProductTrait
 
     /**
      * @param string $locale
+     *
      * @return Result
      */
     public function convertToDocument(string $locale): Result
@@ -45,20 +54,19 @@ trait DocumentableProductTrait
         $document = $this->addPricesInDocument($document);
         $document = $this->addTaxonsInDocument($document, $locale);
 
-
         $document->addAttribute('name', 'Name', [$this->getTranslation($locale)->getName()], $locale, 50);
         $document->addAttribute('description', 'Description', [$this->getTranslation($locale)->getDescription()], $locale, 10);
         $document->addAttribute('short_description', 'Short description', [$this->getTranslation($locale)->getShortDescription()], $locale, 10);
         $document->addAttribute('created_at', 'Creation Date', [$this->getCreatedAt()], $locale, 1);
 
         $document = $this->addAttributesInDocument($document, $locale);
-        $document = $this->addOptionsInDocument($document, $locale);
 
-        return $document;
+        return $this->addOptionsInDocument($document, $locale);
     }
 
     /**
      * @param Result $document
+     *
      * @return Result
      */
     protected function addImagesInDocument(Result $document): Result
@@ -73,6 +81,7 @@ trait DocumentableProductTrait
 
     /**
      * @param Result $document
+     *
      * @return Result
      */
     protected function addChannelsInDocument(Result $document): Result
@@ -87,6 +96,7 @@ trait DocumentableProductTrait
 
     /**
      * @param Result $document
+     *
      * @return Result
      */
     protected function addPricesInDocument(Result $document): Result
@@ -113,6 +123,7 @@ trait DocumentableProductTrait
     /**
      * @param Result $document
      * @param string $locale
+     *
      * @return Result
      */
     protected function addTaxonsInDocument(Result $document, string $locale): Result
@@ -146,6 +157,7 @@ trait DocumentableProductTrait
     /**
      * @param Result $document
      * @param string $locale
+     *
      * @return Result
      */
     protected function addAttributesInDocument(Result $document, string $locale): Result
@@ -169,6 +181,7 @@ trait DocumentableProductTrait
     /**
      * @param Result $document
      * @param string $locale
+     *
      * @return Result
      */
     protected function addOptionsInDocument(Result $document, string $locale): Result
@@ -201,11 +214,12 @@ trait DocumentableProductTrait
         $variants = $this->getVariants();
         foreach ($variants as $variant) {
             $channelPrice = $variant->getChannelPricingForChannel($channel);
-            if ($cheapestPrice === null || $channelPrice->getPrice() < $cheapestPrice) {
+            if (null === $cheapestPrice || $channelPrice->getPrice() < $cheapestPrice) {
                 $cheapestPrice = $channelPrice->getPrice();
                 $cheapestVariant = $variant;
             }
         }
+
         return $cheapestVariant;
     }
 }

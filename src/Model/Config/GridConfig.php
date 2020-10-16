@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Config;
@@ -13,14 +22,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class GridConfig
 {
-    const SEARCH_TYPE = 'search';
-    const TAXON_TYPE = 'taxon';
-    const INSTANT_TYPE = 'instant';
+    public const SEARCH_TYPE = 'search';
+    public const TAXON_TYPE = 'taxon';
+    public const INSTANT_TYPE = 'instant';
 
-    const SORT_ASC = 'asc';
-    const SORT_DESC = 'desc';
+    public const SORT_ASC = 'asc';
+    public const SORT_DESC = 'desc';
 
-    const FALLBACK_LIMIT = 10;
+    public const FALLBACK_LIMIT = 10;
 
     /** @var array */
     private $config;
@@ -94,14 +103,14 @@ class GridConfig
      * @param Request $request
      * @param TaxonInterface|null $taxon
      */
-    public function init(string $type, Request $request, ?TaxonInterface $taxon = null)
+    public function init(string $type, Request $request, ?TaxonInterface $taxon = null): void
     {
         if ($this->isInitialized) {
             return;
         }
 
         switch ($type) {
-            case self::SEARCH_TYPE :
+            case self::SEARCH_TYPE:
                 // Set type, locale, page and query
                 $this->type = $type;
                 $this->locale = $request->getLocale();
@@ -111,14 +120,14 @@ class GridConfig
                 // Set sorting
                 $availableSorting = $this->config['sorting']['search'] ?? [];
                 $this->sorting = $this->cleanSorting($request->get('sorting'), $availableSorting);
-                if (!is_array($this->sorting) || empty($this->sorting)) {
+                if (!\is_array($this->sorting) || empty($this->sorting)) {
                     $this->sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
                 }
 
                 // Set limit
                 $this->limit = max(1, (int) $request->get('limit'));
                 $this->limits = $this->config['limits']['search'] ?? [];
-                if (!in_array($this->limit, $this->limits)) {
+                if (!\in_array($this->limit, $this->limits, true)) {
                     $this->limit = $this->config['default_limit']['search'] ?? self::FALLBACK_LIMIT;
                 }
 
@@ -130,7 +139,7 @@ class GridConfig
 
                 $this->isInitialized = true;
                 break;
-            case self::TAXON_TYPE :
+            case self::TAXON_TYPE:
                 // Set type, locale, page and taxon
                 $this->type = $type;
                 $this->locale = $request->getLocale();
@@ -140,7 +149,7 @@ class GridConfig
                 // Set sorting
                 $availableSorting = $this->config['sorting']['taxon'] ?? [];
                 $this->sorting = $this->cleanSorting($request->get('sorting'), $availableSorting);
-                if (!is_array($this->sorting) || empty($this->sorting)) {
+                if (!\is_array($this->sorting) || empty($this->sorting)) {
                     $this->sorting['position'] = self::SORT_ASC;
                 }
 
@@ -153,12 +162,12 @@ class GridConfig
                 // Set limit
                 $this->limit = max(1, (int) $request->get('limit'));
                 $this->limits = $this->config['limits']['taxon'] ?? [];
-                if (!in_array($this->limit, $this->limits)) {
+                if (!\in_array($this->limit, $this->limits, true)) {
                     $this->limit = $this->config['default_limit']['taxon'] ?? self::FALLBACK_LIMIT;
                 }
                 $this->isInitialized = true;
                 break;
-            case self::INSTANT_TYPE :
+            case self::INSTANT_TYPE:
                 // Set type, locale, page and query
                 $this->type = $type;
                 $this->locale = $request->getLocale();
@@ -245,6 +254,7 @@ class GridConfig
                 $this->filterableAttributes[] = $attribute->getCode();
             }
         }
+
         return $this->filterableAttributes;
     }
 
@@ -263,6 +273,7 @@ class GridConfig
                 $this->filterableOptions[] = $option->getCode();
             }
         }
+
         return $this->filterableOptions;
     }
 
@@ -307,23 +318,25 @@ class GridConfig
     }
 
     /**
-     * Be sure given sort in available
+     * Be sure given sort in available.
+     *
      * @param $sorting
      * @param $availableSorting
+     *
      * @return array
      */
     private function cleanSorting(?array $sorting, array $availableSorting): array
     {
-        if (!is_array($sorting)) {
+        if (!\is_array($sorting)) {
             return  [];
         }
 
         foreach ($sorting as $field => $order) {
-            if (!in_array($field, $availableSorting) || !in_array($order, [self::SORT_ASC, self::SORT_DESC])) {
+            if (!\in_array($field, $availableSorting, true) || !\in_array($order, [self::SORT_ASC, self::SORT_DESC], true)) {
                 unset($sorting[$field]);
             }
         }
+
         return $sorting;
     }
 }
-

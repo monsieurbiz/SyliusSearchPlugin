@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
@@ -23,6 +33,7 @@ class PopulateCommand extends Command
 
     /**
      * PopulateCommand constructor.
+     *
      * @param Indexer $documentIndexer
      */
     public function __construct(Indexer $documentIndexer)
@@ -36,7 +47,8 @@ class PopulateCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int|null|void
+     *
+     * @return int|void|null
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

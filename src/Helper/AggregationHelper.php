@@ -1,18 +1,28 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 
 class AggregationHelper
 {
-    const MAX_AGGREGATED_ATTRIBUTES_INFO = 100;
-    const MAX_AGGREGATED_TAXON_INFO = 500;
+    public const MAX_AGGREGATED_ATTRIBUTES_INFO = 100;
+    public const MAX_AGGREGATED_TAXON_INFO = 500;
 
     /**
-     * Build sort array to add in query
+     * Build sort array to add in query.
      *
      * @param string $field
+     *
      * @return array
      */
     public static function buildAggregation(string $field): array
@@ -22,23 +32,24 @@ class AggregationHelper
                 'bool' => [
                     'must' => [
                         [
-                            'term' => ['attributes.code' => $field]
-                        ]
-                    ]
-                ]
+                            'term' => ['attributes.code' => $field],
+                        ],
+                    ],
+                ],
             ],
             'aggs' => [
                 'values' => [
-                    'terms' => ['field' => 'attributes.value.keyword']
-                ]
-            ]
+                    'terms' => ['field' => 'attributes.value.keyword'],
+                ],
+            ],
         ];
     }
 
     /**
-     * Build sort array to add in query
+     * Build sort array to add in query.
      *
      * @param array $filters
+     *
      * @return array
      */
     public static function buildAggregations(array $filters): array
@@ -57,11 +68,11 @@ class AggregationHelper
                         ,
                         'aggs' => [
                             'names' => [
-                                'terms' => ['field' => 'attributes.name.keyword']
+                                'terms' => ['field' => 'attributes.name.keyword'],
                             ],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             // Get taxon info to be able to retrieve the attribute name from code, we also need the level
             'taxons' => [
@@ -74,13 +85,13 @@ class AggregationHelper
                                 'terms' => ['field' => 'taxon.level'],
                                 'aggs' => [
                                     'names' => [
-                                        'terms' => ['field' => 'taxon.name']
+                                        'terms' => ['field' => 'taxon.name'],
                                     ],
-                                ]
+                                ],
                             ],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             // Get main taxon info to be able to retrieve the attribute name from code, we also need the level
             'mainTaxon' => [
@@ -93,29 +104,29 @@ class AggregationHelper
                                 'terms' => ['field' => 'mainTaxon.level'],
                                 'aggs' => [
                                     'names' => [
-                                        'terms' => ['field' => 'mainTaxon.name']
+                                        'terms' => ['field' => 'mainTaxon.name'],
                                     ],
-                                ]
+                                ],
                             ],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             // Get attributes info to be able to retrieve the attribute name from code
             'price' => [
                 'nested' => ['path' => 'price'],
                 'aggs' => [
                     'values' => [
-                        'stats' => ['field' => 'price.value']
-                    ]
-                ]
+                        'stats' => ['field' => 'price.value'],
+                    ],
+                ],
             ],
         ];
 
         if (!empty($attributeAggregations)) {
             $aggregations['filters'] = [
                 'nested' => ['path' => 'attributes'],
-                'aggs' => $attributeAggregations
+                'aggs' => $attributeAggregations,
             ];
         }
 

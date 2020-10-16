@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Document;
 
-use MonsieurBiz\SyliusSearchPlugin\Exception\MissingAttributeException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingParamException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingPriceException;
@@ -18,10 +26,11 @@ use MonsieurBiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
 class Result extends Document
 {
     /**
-     * Document ID in elasticsearch
+     * Document ID in elasticsearch.
+     *
+     * @throws MissingParamException
      *
      * @return string
-     * @throws MissingParamException
      */
     public function getUniqId(): string
     {
@@ -31,11 +40,13 @@ class Result extends Document
         if (!$this->getId()) {
             throw new MissingParamException('Missing "ID" for document');
         }
+
         return sprintf('%s-%d', $this->getType(), $this->getId());
     }
 
     /**
      * @param string $code
+     *
      * @return Attributes
      */
     public function getAttribute(string $code): ?Attributes
@@ -45,14 +56,17 @@ class Result extends Document
                 return $attribute;
             }
         }
+
         return null;
     }
 
     /**
      * @param string $channelCode
      * @param string $currencyCode
-     * @return Price|null
+     *
      * @throws MissingPriceException
+     *
+     * @return Price|null
      */
     public function getPriceByChannelAndCurrency(string $channelCode, string $currencyCode): ?Price
     {
@@ -70,8 +84,10 @@ class Result extends Document
     /**
      * @param string $channelCode
      * @param string $currencyCode
-     * @return Price|null
+     *
      * @throws MissingPriceException
+     *
+     * @return Price|null
      */
     public function getOriginalPriceByChannelAndCurrency(string $channelCode, string $currencyCode): ?Price
     {
@@ -84,12 +100,12 @@ class Result extends Document
             }
         }
         throw new MissingPriceException(sprintf('Original price not found for channel "%s" and currency "%s"', $channelCode, $currencyCode));
-
     }
 
     /**
-     * @return string
      * @throws MissingLocaleException
+     *
+     * @return string
      */
     public function getLocale(): string
     {
@@ -103,13 +119,15 @@ class Result extends Document
     }
 
     /**
-     * @return UrlParamsProvider
      * @throws MissingLocaleException
      * @throws NotSupportedTypeException
+     *
+     * @return UrlParamsProvider
      */
-    public function getUrlParams(): UrlParamsProvider {
+    public function getUrlParams(): UrlParamsProvider
+    {
         switch ($this->getType()) {
-            case "product" :
+            case 'product':
                 return new UrlParamsProvider('sylius_shop_product_show', ['slug' => $this->getSlug(), '_locale' => $this->getLocale()]);
                 break;
         }
@@ -119,6 +137,7 @@ class Result extends Document
 
     /**
      * @param string $channel
+     *
      * @return Result
      */
     public function addChannel(string $channel): self
@@ -134,6 +153,7 @@ class Result extends Document
      * @param int $position
      * @param int $level
      * @param int $productPosition
+     *
      * @return Result
      */
     public function addTaxon(string $code, string $name, int $position, int $level, int $productPosition): self
@@ -149,6 +169,7 @@ class Result extends Document
      * @param string $channel
      * @param string $currency
      * @param int $value
+     *
      * @return Result
      */
     public function addPrice(string $channel, string $currency, int $value): self
@@ -164,6 +185,7 @@ class Result extends Document
      * @param string $channel
      * @param string $currency
      * @param int $value
+     *
      * @return Result
      */
     public function addOriginalPrice(string $channel, string $currency, int $value): self
@@ -181,6 +203,7 @@ class Result extends Document
      * @param array $value
      * @param string $locale
      * @param int $score
+     *
      * @return Result
      */
     public function addAttribute(string $code, string $name, array $value, string $locale, int $score): self

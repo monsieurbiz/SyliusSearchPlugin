@@ -16,3 +16,26 @@ services:
                     documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
                     documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
                 elastically_bulk_size: 100
+
+sylius_fixtures:
+    suites:
+        default:
+            fixtures:
+                monsieurbiz_sylius_search_filterable:
+                    options:
+                        custom:
+                            cap_collection:
+                                attribute: 'cap_collection'
+                                filterable: false
+
+                            dress_collection:
+                                attribute: 'dress_collection'
+                                filterable: false
+
+                            dress_height:
+                                option: 'dress_height'
+                                filterable: false
+
+                            dress_size:
+                                option: 'dress_size'
+                                filterable: true

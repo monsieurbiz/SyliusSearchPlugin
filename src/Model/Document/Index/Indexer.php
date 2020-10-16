@@ -60,7 +60,7 @@ class Indexer extends AbstractIndex
         if (empty($this->locales)) {
             $locales = $this->localeRepository->findAll();
             $this->locales = array_map(
-                function(LocaleInterface $locale) {
+                function (LocaleInterface $locale) {
                     return $locale->getCode();
                 },
                 $locales
@@ -89,9 +89,12 @@ class Indexer extends AbstractIndex
      */
     public function indexAllByLocale(string $locale): void
     {
-        $this->getIndexBuilder()->markAsLive(
-            $this->getIndexBuilder()->createIndex($this->getIndexName($locale)),
-            $this->getIndexName($locale)
+
+        $indexName = $this->getIndexName($locale);
+        $newIndex = $this->getIndexBuilder()->createIndex($indexName);
+        $response = $this->getIndexBuilder()->markAsLive(
+            $newIndex,
+            $indexName
         );
 
         $repositories = $this->documentRepositoryProvider->getRepositories();
@@ -105,10 +108,11 @@ class Indexer extends AbstractIndex
         }
 
         $this->getIndexer()->flush();
-        $this->getIndexer()->refresh($this->getIndexName($locale));
+
+        $this->getIndexer()->refresh($indexName);
         try {
-            $this->getIndexBuilder()->purgeOldIndices($this->getIndexName($locale));
-        } catch (ResponseException $exception) {
+            $this->getIndexBuilder()->purgeOldIndices($indexName);
+        } catch(ResponseException $exception) {
             throw new ReadOnlyIndexException($exception->getMessage());
         }
     }
@@ -137,7 +141,7 @@ class Indexer extends AbstractIndex
     public function indexOneByLocale(Result $document, string $locale): void
     {
         $this->getIndexer()->scheduleIndex(
-            $this->getIndexName($locale),
+            $this->getClient()->getIndex($this->getIndexName($locale)),
             new Document($document->getUniqId(), $document)
         );
     }
@@ -166,7 +170,7 @@ class Indexer extends AbstractIndex
     public function removeOneByLocale(Result $document, string $locale): void
     {
         $this->getIndexer()->scheduleDelete(
-            $this->getIndexName($locale),
+            $this->getClient()->getIndex($this->getIndexName($locale)),
             $document->getUniqId()
         );
     }

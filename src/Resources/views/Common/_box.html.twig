@@ -21,7 +21,7 @@
         <a href="#" class="header sylius-product-name">{{ result.attribute('name').value | join }}</a>
 
         {% if result.price is not empty %}
-            <div class="sylius-product-price">{{ money.format(result.priceByChannelAndCurrency(channel.code, currencyCode).value, currencyCode) }}</div>
+            <div class="sylius-product-price">{{ money.convertAndFormat(result.priceByChannelAndCurrency(channel.code, currencyCode).value, currencyCode) }}</div>
         {% endif %}
     </div>
 </div>

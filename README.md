@@ -53,7 +53,7 @@ Modify `config/bundles.php` to add this line at the end :
     MonsieurBiz\SyliusSearchPlugin\MonsieurBizSyliusSearchPlugin::class => ['all' => true],
 ```
 
-Finally configure plugin in your `.env` file, ina dding this att the end : 
+Finally configure plugin in your `.env` file by adding these lines at the end : 
 ```
 ###> MonsieurBizSearchPlugin ###
 MONSIEURBIZ_SEARCHPLUGIN_ES_HOST=localhost

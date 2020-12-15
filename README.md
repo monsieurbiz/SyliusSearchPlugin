@@ -290,11 +290,16 @@ By default, the form is displayed on `sonata.block.event.sylius.shop.layout.head
 
 ## Front customization
 
-You can override all templates in your theme to : 
-- Customize search results display page (`src/MonsieurBizSearchPlugin/Resources/views/Search/`)
-- Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Instant/`)
-- Customize instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Taxon/`)
-- Customize JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/js.html.twig`)
+You can override all templates in your theme.
+
+The bundle's templates are : 
+- Search results display page (`src/MonsieurBizSearchPlugin/Resources/views/Search/`)
+- Instant search display block (`src/MonsieurBizSearchPlugin/Resources/views/Instant/`)
+- Taxon results display page (`src/MonsieurBizSearchPlugin/Resources/views/Taxon/`)
+- Smaller components (`src/MonsieurBizSearchPlugin/Resources/views/Common/`)
+- JS parameters (`src/MonsieurBizSearchPlugin/Resources/views/js.html.twig`)
+
+Sylius documentation to customize these templates is available [here](https://docs.sylius.com/en/latest/customization/template.html).
 
 ## Jane
 

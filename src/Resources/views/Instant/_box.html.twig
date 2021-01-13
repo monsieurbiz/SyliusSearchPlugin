@@ -1,7 +1,7 @@
 {% import "@SyliusShop/Common/Macro/money.html.twig" as money %}
 
 <div class="ui fluid card">
-    <a href="{{ path(result.urlParams.path, result.urlParams.params) }}" class="blurring dimmable image">
+    <a href="{{ path(search_result_url_param(result).path, search_result_url_param(result).params) }}" class="blurring dimmable image">
         <div class="ui dimmer">
             <div class="content">
                 <div class="center">

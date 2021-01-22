@@ -76,3 +76,13 @@ services:
   MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig:
     arguments:
       $config: '%monsieurbiz_sylius_search.grid%'
+
+  # Helpers
+  MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper: ~
+
+  # Twig extensions
+  MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl:
+    arguments:
+      $helper: '@MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper'
+    tags:
+      - { name: twig.extension }

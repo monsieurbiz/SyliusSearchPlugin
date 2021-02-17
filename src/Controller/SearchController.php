@@ -16,11 +16,11 @@ namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 use MonsieurBiz\SyliusSearchPlugin\Context\TaxonContextInterface;
 use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Search;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
-use MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,6 +52,9 @@ class SearchController extends AbstractController
     /** @var GridConfig */
     private $gridConfig;
 
+    /** @var RenderDocumentUrlHelper */
+    private $renderDocumentUrlHelper;
+
     /**
      * SearchController constructor.
      *
@@ -60,7 +63,8 @@ class SearchController extends AbstractController
      * @param ChannelContextInterface $channelContext
      * @param CurrencyContextInterface $currencyContext
      * @param TaxonContextInterface $taxonContext
-     * @param array $gridConfig
+     * @param GridConfig $gridConfig
+     * @param RenderDocumentUrlHelper $renderDocumentUrlHelper
      */
     public function __construct(
         EngineInterface $templatingEngine,
@@ -68,7 +72,8 @@ class SearchController extends AbstractController
         ChannelContextInterface $channelContext,
         CurrencyContextInterface $currencyContext,
         TaxonContextInterface $taxonContext,
-        GridConfig $gridConfig
+        GridConfig $gridConfig,
+        RenderDocumentUrlHelper $renderDocumentUrlHelper
     ) {
         $this->templatingEngine = $templatingEngine;
         $this->documentSearch = $documentSearch;
@@ -76,6 +81,7 @@ class SearchController extends AbstractController
         $this->currencyContext = $currencyContext;
         $this->taxonContext = $taxonContext;
         $this->gridConfig = $gridConfig;
+        $this->renderDocumentUrlHelper = $renderDocumentUrlHelper;
     }
 
     /**
@@ -117,8 +123,7 @@ class SearchController extends AbstractController
             /** @var Result $document */
             $document = current($resultSet->getResults());
             try {
-                $renderDocumentUrl = new RenderDocumentUrl();
-                $urlParams = $renderDocumentUrl->getUrlParams($document);
+                $urlParams = $this->renderDocumentUrlHelper->getUrlParams($document);
 
                 return new RedirectResponse($this->generateUrl($urlParams->getPath(), $urlParams->getParams()));
             } catch (NotSupportedTypeException $e) {

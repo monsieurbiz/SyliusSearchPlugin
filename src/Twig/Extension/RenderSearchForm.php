@@ -16,21 +16,27 @@ namespace MonsieurBiz\SyliusSearchPlugin\Twig\Extension;
 use MonsieurBiz\SyliusSearchPlugin\Form\Type\SearchType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Markup;
 use Twig\TwigFunction;
 
 class RenderSearchForm extends AbstractExtension
 {
+    /** @var FormFactoryInterface */
     private $formFactory;
 
+    /** @var Environment */
     private $templatingEngine;
 
+    /** @var RequestStack */
     private $requestStack;
 
-    public function __construct(FormFactoryInterface $formFactory, EngineInterface $templatingEngine, RequestStack $requestStack)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        Environment $templatingEngine,
+        RequestStack $requestStack
+    ) {
         $this->formFactory = $formFactory;
         $this->templatingEngine = $templatingEngine;
         $this->requestStack = $requestStack;

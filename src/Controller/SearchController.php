@@ -27,14 +27,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 class SearchController extends AbstractController
 {
     public const SORT_ASC = 'asc';
     public const SORT_DESC = 'desc';
 
-    /** @var EngineInterface */
+    /** @var Environment */
     private $templatingEngine;
 
     /** @var Search */
@@ -55,19 +55,8 @@ class SearchController extends AbstractController
     /** @var RenderDocumentUrlHelper */
     private $renderDocumentUrlHelper;
 
-    /**
-     * SearchController constructor.
-     *
-     * @param EngineInterface $templatingEngine
-     * @param Search $documentSearch
-     * @param ChannelContextInterface $channelContext
-     * @param CurrencyContextInterface $currencyContext
-     * @param TaxonContextInterface $taxonContext
-     * @param GridConfig $gridConfig
-     * @param RenderDocumentUrlHelper $renderDocumentUrlHelper
-     */
     public function __construct(
-        EngineInterface $templatingEngine,
+        Environment $templatingEngine,
         Search $documentSearch,
         ChannelContextInterface $channelContext,
         CurrencyContextInterface $currencyContext,
@@ -138,7 +127,7 @@ class SearchController extends AbstractController
         $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
 
         // Display result list
-        return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
+        return new Response($this->templatingEngine->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'query' => $this->gridConfig->getQuery(),
             'limits' => $this->gridConfig->getLimits(),
             'resultSet' => $resultSet,
@@ -146,7 +135,7 @@ class SearchController extends AbstractController
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
             'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL),
             'gridConfig' => $this->gridConfig,
-        ]);
+        ]));
     }
 
     /**
@@ -166,13 +155,13 @@ class SearchController extends AbstractController
         $resultSet = $this->documentSearch->instant($this->gridConfig);
 
         // Display instant result list
-        return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
+        return new Response($this->templatingEngine->render('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
             'query' => $this->gridConfig->getQuery(),
             'resultSet' => $resultSet,
             'channel' => $this->channelContext->getChannel(),
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
             'gridConfig' => $this->gridConfig,
-        ]);
+        ]));
     }
 
     /**
@@ -196,7 +185,7 @@ class SearchController extends AbstractController
         $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
 
         // Display result list
-        return $this->templatingEngine->renderResponse('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
+        return new Response($this->templatingEngine->render('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
             'taxon' => $this->gridConfig->getTaxon(),
             'limits' => $this->gridConfig->getLimits(),
             'resultSet' => $resultSet,
@@ -204,6 +193,6 @@ class SearchController extends AbstractController
             'currencyCode' => $this->currencyContext->getCurrencyCode(),
             'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL),
             'gridConfig' => $this->gridConfig,
-        ]);
+        ]));
     }
 }

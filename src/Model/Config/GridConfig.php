@@ -120,9 +120,6 @@ class GridConfig
                 // Set sorting
                 $availableSorting = $this->config['sorting']['search'] ?? [];
                 $this->sorting = $this->cleanSorting($request->get('sorting'), $availableSorting);
-                if (!\is_array($this->sorting) || empty($this->sorting)) {
-                    $this->sorting['dummy'] = self::SORT_DESC; // Not existing field to have null in ES so use the score
-                }
 
                 // Set limit
                 $this->limit = max(1, (int) $request->get('limit'));

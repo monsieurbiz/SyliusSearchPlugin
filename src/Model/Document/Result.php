@@ -23,7 +23,7 @@ use MonsieurBiz\SyliusSearchPlugin\generated\Model\Price;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon;
 use MonsieurBiz\SyliusSearchPlugin\Provider\UrlParamsProvider;
 
-class Result extends Document
+class Result extends Document implements ResultInterface
 {
     /**
      * Document ID in elasticsearch.
@@ -156,7 +156,7 @@ class Result extends Document
      *
      * @return Result
      */
-    public function addTaxon(string $code, string $name, int $position, int $level, int $productPosition): self
+    public function addTaxon(string $code, string $name, int $position, int $level, int $productPosition): ResultInterface
     {
         $taxon = new Taxon();
         $taxon->setCode($code)->setPosition($position)->setName($name)->setLevel($level)->setProductPosition($productPosition);
@@ -172,7 +172,7 @@ class Result extends Document
      *
      * @return Result
      */
-    public function addPrice(string $channel, string $currency, int $value): self
+    public function addPrice(string $channel, string $currency, int $value): ResultInterface
     {
         $price = new Price();
         $price->setChannel($channel)->setCurrency($currency)->setValue($value);
@@ -188,7 +188,7 @@ class Result extends Document
      *
      * @return Result
      */
-    public function addOriginalPrice(string $channel, string $currency, int $value): self
+    public function addOriginalPrice(string $channel, string $currency, int $value): ResultInterface
     {
         $price = new Price();
         $price->setChannel($channel)->setCurrency($currency)->setValue($value);
@@ -206,7 +206,7 @@ class Result extends Document
      *
      * @return Result
      */
-    public function addAttribute(string $code, string $name, array $value, string $locale, int $score): self
+    public function addAttribute(string $code, string $name, array $value, string $locale, int $score): ResultInterface
     {
         $attribute = new Attributes();
         $attribute->setCode($code)->setName($name)->setValue($value)->setLocale($locale)->setScore($score);

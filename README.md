@@ -210,6 +210,162 @@ class Product extends BaseProduct implements DocumentableInterface
 
 You can add everything you want !
 
+## Extending the result entity
+
+In case the `MonsieurBiz\SyliusSearchPlugin\Model\Document\Result` Entity does not contain all the data you need there are 2 simple ways to extend it: 
+
+### 1. Adding additional attributes
+
+First, create a new DocumentableProductTrait to extended the `MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait`. The only method you need to overwrite in this case is `convertToDocument`. After calling the baseConvertion you can simply add your own attributes before returning the document.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Module\SearchPlugin\Model\Documentable;
+
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait as BaseTrait;
+
+trait DocumentableProductTrait
+{
+    use BaseTrait {
+        convertToDocument as protected baseConvertion;
+    }
+
+    public function convertToDocument(string $locale): ResultInterface
+    {
+        $document = $this->baseConvertion($locale);
+        
+        /* Adding additional attributes */
+//        $document->addAttribute('my_attribute', 'My attribute', [$this->getMyAttribute()], $locale, 75);
+
+        return $document;
+    }
+}
+```
+
+Then, replace `MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait` in your Product with your new Trait and done!
+
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Entity\Product;
+
+...
+use App\Module\SearchPlugin\Model\Documentable\DocumentableProductTrait;
+
+class Product extends BaseProduct implements DocumentableInterface
+{
+    use DocumentableProductTrait;
+    
+    ...
+}
+```
+
+### 2. Extending the Result entity
+
+Extending the entity very similar and requires only a few additional steps. First, we create our new entity and extend the BaseResult. 
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Module\SearchPlugin\Model\Document;
+
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result as BaseResult;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
+
+class Result extends BaseResult
+{
+    /**
+     * @var string
+     */
+    protected $customProperty;
+
+    /**
+     * @return null|string
+     */
+    public function getCustomProperty()
+    {
+        return $this->customProperty;
+    }
+
+    /**
+     * @param null|string $customString
+     *
+     * @return ResultInterface
+     */
+    public function setCustomerProperty($customString): ResultInterface
+    {
+        $this->customProperty = $customString;
+        return $this;
+    }
+}
+```
+
+Then, create a new Trait. This is the same as in "Adding additional attributes" explained. Except, we also overwrite the createResult method to use our own Result we just created. 
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Module\SearchPlugin\Model\Documentable;
+
+use App\Module\SearchPlugin\Model\Document\Result;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait as BaseTrait;
+
+trait DocumentableProductTrait
+{
+    use BaseTrait {
+        convertToDocument as protected baseConvertion;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createResult(): ResultInterface
+    {
+        return new Result();
+    }
+
+    public function convertToDocument(string $locale): ResultInterface
+    {
+        /** @var Result $document */
+        $document = $this->baseConvertion($locale);
+        
+        /* Setting additonal properties */
+//        $document->setCustomProperty('myCustomValue');
+
+        return $document;
+    }
+}
+```
+
+As a final step, overwrite the `JoliCode\Elastically\Client` config in your `config/services.yaml` to use your new Result entity.
+
+```yaml
+    # MONSIEURBIZ/SYLIUS_SEARCH_PLUGIN
+    JoliCode\Elastically\Client:
+        arguments:
+            $config:
+                host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
+                port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
+                    elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
+                elastically_index_class_mapping:
+                    documents-it_it: \App\Module\SearchPlugin\Model\Result
+                    documents-fr_fr: \App\Module\SearchPlugin\Model\Result
+                    documents-fr: \App\Module\SearchPlugin\Model\Result
+                    documents-en: \App\Module\SearchPlugin\Model\Result
+                    documents-en_us: \App\Module\SearchPlugin\Model\Result
+                elastically_bulk_size: 100
+```
+
 ## Score by attribute
 
 Each document attribute can have a `score`. It means it can be more important than another.  

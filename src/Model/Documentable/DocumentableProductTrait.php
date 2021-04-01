@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon as DocumentTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
+use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Core\Model\Image;
@@ -34,13 +35,21 @@ trait DocumentableProductTrait
     }
 
     /**
+     * @return ResultInterface
+     */
+    public function createResult(): ResultInterface
+    {
+        return new Result();
+    }
+
+    /**
      * @param string $locale
      *
-     * @return Result
+     * @return ResultInterface
      */
-    public function convertToDocument(string $locale): Result
+    public function convertToDocument(string $locale): ResultInterface
     {
-        $document = new Result();
+        $document = $this->createResult();
 
         // Document data
         $document->setType($this->getDocumentType());
@@ -65,11 +74,11 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param Result $document
+     * @param ResultInterface $document
      *
-     * @return Result
+     * @return ResultInterface
      */
-    protected function addImagesInDocument(Result $document): Result
+    protected function addImagesInDocument(ResultInterface $document): ResultInterface
     {
         /** @var Image $image */
         if ($image = $this->getImages()->first()) {
@@ -80,11 +89,11 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param Result $document
+     * @param ResultInterface $document
      *
-     * @return Result
+     * @return ResultInterface
      */
-    protected function addChannelsInDocument(Result $document): Result
+    protected function addChannelsInDocument(ResultInterface $document): ResultInterface
     {
         /** @var Channel $channel */
         foreach ($this->getChannels() as $channel) {
@@ -95,11 +104,11 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param Result $document
+     * @param ResultInterface $document
      *
-     * @return Result
+     * @return ResultInterface
      */
-    protected function addPricesInDocument(Result $document): Result
+    protected function addPricesInDocument(ResultInterface $document): ResultInterface
     {
         /** @var Channel $channel */
         foreach ($this->getChannels() as $channel) {
@@ -121,12 +130,12 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param Result $document
+     * @param ResultInterface $document
      * @param string $locale
      *
-     * @return Result
+     * @return ResultInterface
      */
-    protected function addTaxonsInDocument(Result $document, string $locale): Result
+    protected function addTaxonsInDocument(ResultInterface $document, string $locale): ResultInterface
     {
         /** @var TaxonInterface $mainTaxon */
         if ($mainTaxon = $this->getMainTaxon()) {
@@ -155,12 +164,12 @@ trait DocumentableProductTrait
     }
 
     /**
-     * @param Result $document
+     * @param ResultInterface $document
      * @param string $locale
      *
-     * @return Result
+     * @return ResultInterface
      */
-    protected function addAttributesInDocument(Result $document, string $locale): Result
+    protected function addAttributesInDocument(ResultInterface $document, string $locale): ResultInterface
     {
         /** @var AttributeValueInterface $attribute */
         foreach ($this->getAttributesByLocale($locale, $locale) as $attribute) {
@@ -184,7 +193,7 @@ trait DocumentableProductTrait
      *
      * @return Result
      */
-    protected function addOptionsInDocument(Result $document, string $locale): Result
+    protected function addOptionsInDocument(ResultInterface $document, string $locale): ResultInterface
     {
         $options = [];
         foreach ($this->getVariants() as $variant) {
@@ -207,6 +216,11 @@ trait DocumentableProductTrait
         return $document;
     }
 
+    /**
+     * @param $channel
+     *
+     * @return null
+     */
     private function getCheapestVariantForChannel($channel)
     {
         $cheapestVariant = null;

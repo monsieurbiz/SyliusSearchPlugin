@@ -210,9 +210,9 @@ class Product extends BaseProduct implements DocumentableInterface
 
 You can add everything you want !
 
-## Extending the result entity
+## Adding additional data to results
 
-In case the `MonsieurBiz\SyliusSearchPlugin\Model\Document\Result` Entity does not contain all the data you need there are 2 simple ways to extend it: 
+In case the `MonsieurBiz\SyliusSearchPlugin\Model\Document\Result` entity does not contain all the data you need there are 2 simple ways to saving additional data: 
 
 ### 1. Adding additional attributes
 
@@ -350,6 +350,9 @@ trait DocumentableProductTrait
 As a final step, overwrite the `JoliCode\Elastically\Client` config in your `config/services.yaml` to use your new Result entity.
 
 ```yaml
+services:
+    ...
+    
     # MONSIEURBIZ/SYLIUS_SEARCH_PLUGIN
     JoliCode\Elastically\Client:
         arguments:

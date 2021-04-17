@@ -234,7 +234,7 @@ monsieur_biz_sylius_search:
 
 ## Indexed Documents
 
-Indexed documents are all entities defined in `monsieur_biz_search.documentable_classes` who implements `DocumentableInterface`.
+Indexed documents are all entities defined in `monsieur_biz_search.documentable_classes` which implement `DocumentableInterface`.
 
 ```yaml
 monsieur_biz_sylius_search:

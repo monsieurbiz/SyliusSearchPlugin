@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -23,14 +24,24 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('monsieur_biz_sylius_search');
+        $treeBuilder = new TreeBuilder('monsieurbiz_sylius_search');
         if (method_exists($treeBuilder, 'getRootNode')) {
             $rootNode = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config 4.1 and older
-            $rootNode = $treeBuilder->root('monsieur_biz_sylius_search');
+            $rootNode = $treeBuilder->root('monsieurbiz_sylius_search');
         }
 
+        $this->addSearchConfig($rootNode);
+
+        return $treeBuilder;
+    }
+
+    /**
+     * @param ArrayNodeDefinition $rootNode
+     */
+    private function addSearchConfig(ArrayNodeDefinition $rootNode): void
+    {
         $rootNode
             ->children()
             // Files
@@ -104,8 +115,20 @@ final class Configuration implements ConfigurationInterface
 
                 ->end()
             ->end()
-        ;
 
-        return $treeBuilder;
+            // Elastically
+            ->arrayNode('elastically')
+                ->children()
+                ->scalarNode('host')->isRequired()->end()
+                ->scalarNode('port')->isRequired()->end()
+                ->integerNode('elastically_bulk_size')->isRequired()->end()
+                ->scalarNode('elastically_mappings_directory')->isRequired()->end()
+                ->arrayNode('elastically_index_class_mapping')
+                    ->performNoDeepMerging()
+                    ->scalarPrototype()->end()
+                    ->isRequired()
+                ->end()
+            ->end()
+        ;
     }
 }

@@ -13,8 +13,8 @@
 <h1 align="center">Search</h1>
 
 [![Search Plugin license](https://img.shields.io/github/license/monsieurbiz/SyliusSearchPlugin?public)](https://github.com/monsieurbiz/SyliusSearchPlugin/blob/master/LICENSE.txt)
-[![Build Status](https://img.shields.io/github/workflow/status/monsieurbiz/SyliusSearchPlugin/PHP%20Composer)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions?query=workflow%3A%22PHP+Composer%22)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/monsieurbiz/SyliusSearchPlugin/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/monsieurbiz/SyliusSearchPlugin/?branch=master)
+[![Tests Status](https://img.shields.io/github/workflow/status/monsieurbiz/SyliusSearchPlugin/Tests?logo=github)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions?query=workflow%3ATests)
+[![Security Status](https://img.shields.io/github/workflow/status/monsieurbiz/SyliusSearchPlugin/Security?label=security&logo=github)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions?query=workflow%3ASecurity)
 
 A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and [Elastically](https://github.com/jolicode/elastically).
 
@@ -104,7 +104,7 @@ The default module configuration is :
 imports:
     - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
 
-monsieur_biz_sylius_search:
+monsieurbiz_sylius_search:
     files:
         search: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
         instant: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
@@ -130,9 +130,9 @@ monsieur_biz_sylius_search:
 
 You can customize it in `config/packages/monsieurbiz_sylius_search_plugin.yaml`.
 
-`monsieur_biz_sylius_search.files.search` is the query used to perform the search.  
-`monsieur_biz_sylius_search.files.instant` is the query used to perform the instant search.  
-`monsieur_biz_sylius_search.files.taxon` is the query used to perform the taxon view.
+`monsieurbiz_sylius_search.files.search` is the query used to perform the search.  
+`monsieurbiz_sylius_search.files.instant` is the query used to perform the instant search.  
+`monsieurbiz_sylius_search.files.taxon` is the query used to perform the taxon view.
 
 The `{{QUERY}}` string inside is replaced in PHP by the query typed by the user.
 
@@ -142,7 +142,7 @@ You can also change available sortings and limits.
 
 You can decide to load filters before their application or after :
 ```yaml
-monsieur_biz_sylius_search:
+monsieurbiz_sylius_search:
     grid:
         filters:
             apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
@@ -160,7 +160,7 @@ automatically.
 
 You can decide to use the `Categories` filter with main taxon or taxons :
 ```yaml
-monsieur_biz_sylius_search:
+monsieurbiz_sylius_search:
     grid:
         filters:
             use_main_taxon: true # Use main taxon for the taxon filter, else use the taxons
@@ -225,7 +225,7 @@ $document->addAttribute('description', 'Description', [$this->getTranslation($lo
 You can customize the search with your custom query files and modifying : 
 
 ```yaml
-monsieur_biz_sylius_search:
+monsieurbiz_sylius_search:
     files:
         search: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
         instant: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
@@ -237,7 +237,7 @@ monsieur_biz_sylius_search:
 Indexed documents are all entities defined in `monsieur_biz_search.documentable_classes` which implement `DocumentableInterface`.
 
 ```yaml
-monsieur_biz_sylius_search:
+monsieurbiz_sylius_search:
     documentable_classes :
         - 'App\Entity\Product\Product'
 ```

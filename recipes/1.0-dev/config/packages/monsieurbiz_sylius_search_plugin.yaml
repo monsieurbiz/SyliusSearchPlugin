@@ -1,7 +1,7 @@
 imports:
     - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
 
-monsieur_biz_sylius_search:
+monsieurbiz_sylius_search:
     files:
         search: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/search.yaml'
         instant: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/queries/instant.yaml'
@@ -22,3 +22,14 @@ monsieur_biz_sylius_search:
         filters:
             apply_manually: false # Will refresh the filters depending on applied filters after you apply it manually
             use_main_taxon: true # Use main taxon for the taxon filter, else use the taxons
+    elastically:
+        host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
+        port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
+        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
+        elastically_bulk_size: 100
+        elastically_index_class_mapping:
+          documents-it_it: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
+          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result

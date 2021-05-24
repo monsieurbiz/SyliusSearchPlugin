@@ -51,7 +51,7 @@ class Result extends Document
      */
     public function getAttribute(string $code): ?Attributes
     {
-        foreach ($this->getAttributes() as $attribute) {
+        foreach ($this->getAttributes() ?? [] as $attribute) {
             if ($attribute->getCode() === $code) {
                 return $attribute;
             }
@@ -109,9 +109,9 @@ class Result extends Document
      */
     public function getLocale(): string
     {
-        foreach ($this->getAttributes() as $attribute) {
+        foreach ($this->getAttributes() ?? [] as $attribute) {
             if ($attribute->getLocale()) {
-                return $attribute->getLocale();
+                return (string) $attribute->getLocale();
             }
         }
 
@@ -129,7 +129,6 @@ class Result extends Document
         switch ($this->getType()) {
             case 'product':
                 return new UrlParamsProvider('sylius_shop_product_show', ['slug' => $this->getSlug(), '_locale' => $this->getLocale()]);
-                break;
         }
 
         throw new NotSupportedTypeException(sprintf('Object type "%s" not supported to get URL', $this->getType()));
@@ -142,7 +141,7 @@ class Result extends Document
      */
     public function addChannel(string $channel): self
     {
-        $this->setChannel($this->getChannel() ? array_unique(array_merge($this->getChannel(), [$channel])) : [$channel]);
+        $this->setChannel($this->getChannel() ? array_unique(array_merge($this->getChannel() ?? [], [$channel])) : [$channel]);
 
         return $this;
     }
@@ -160,7 +159,7 @@ class Result extends Document
     {
         $taxon = new Taxon();
         $taxon->setCode($code)->setPosition($position)->setName($name)->setLevel($level)->setProductPosition($productPosition);
-        $this->setTaxon($this->getTaxon() ? array_merge($this->getTaxon(), [$taxon]) : [$taxon]);
+        $this->setTaxon($this->getTaxon() ? array_merge($this->getTaxon() ?? [], [$taxon]) : [$taxon]);
 
         return $this;
     }
@@ -176,7 +175,7 @@ class Result extends Document
     {
         $price = new Price();
         $price->setChannel($channel)->setCurrency($currency)->setValue($value);
-        $this->setPrice($this->getPrice() ? array_merge($this->getPrice(), [$price]) : [$price]);
+        $this->setPrice($this->getPrice() ? array_merge($this->getPrice() ?? [], [$price]) : [$price]);
 
         return $this;
     }
@@ -192,7 +191,7 @@ class Result extends Document
     {
         $price = new Price();
         $price->setChannel($channel)->setCurrency($currency)->setValue($value);
-        $this->setOriginalPrice($this->getOriginalPrice() ? array_merge($this->getOriginalPrice(), [$price]) : [$price]);
+        $this->setOriginalPrice($this->getOriginalPrice() ? array_merge($this->getOriginalPrice() ?? [], [$price]) : [$price]);
 
         return $this;
     }
@@ -210,7 +209,7 @@ class Result extends Document
     {
         $attribute = new Attributes();
         $attribute->setCode($code)->setName($name)->setValue($value)->setLocale($locale)->setScore($score);
-        $this->setAttributes($this->getAttributes() ? array_merge($this->getAttributes(), [$attribute]) : [$attribute]);
+        $this->setAttributes($this->getAttributes() ? array_merge($this->getAttributes() ?? [], [$attribute]) : [$attribute]);
 
         return $this;
     }

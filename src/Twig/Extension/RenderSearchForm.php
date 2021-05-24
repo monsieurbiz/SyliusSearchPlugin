@@ -49,13 +49,14 @@ class RenderSearchForm extends AbstractExtension
         ];
     }
 
-    public function createForm($template = null)
+    public function createForm(string $template = null): Markup
     {
         $template = $template ?? '@MonsieurBizSyliusSearchPlugin/form.html.twig';
+        $query = null !== $this->requestStack->getCurrentRequest() ? $this->requestStack->getCurrentRequest()->get('query') : '';
 
         return new Markup($this->templatingEngine->render($template, [
             'form' => $this->formFactory->create(SearchType::class)->createView(),
-            'query' => urldecode($this->requestStack->getCurrentRequest()->get('query') ?? ''),
+            'query' => $query,
         ]), 'UTF-8');
     }
 }

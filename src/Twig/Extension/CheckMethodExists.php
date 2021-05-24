@@ -19,7 +19,7 @@ use Twig\TwigFunction;
 
 class CheckMethodExists extends AbstractExtension
 {
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -33,11 +33,11 @@ class CheckMethodExists extends AbstractExtension
         ];
     }
 
-    public function bundleExists($bundle)
+    public function bundleExists(string $bundle): bool
     {
         return \array_key_exists(
             $bundle,
-            $this->container->getParameter('kernel.bundles')
+            (array) $this->container->getParameter('kernel.bundles')
         );
     }
 }

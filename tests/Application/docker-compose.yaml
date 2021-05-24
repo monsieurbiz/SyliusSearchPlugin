@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+    database:
+        image: mariadb:10.5.5
+        ports:
+            - 3306
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+          MYSQL_DATABASE: sylius
+        volumes:
+            - database:/var/lib/mysql
+
+    mailer:
+        image: monsieurbiz/mailcatcher
+        ports:
+            - 1025
+            - 1080
+
+    elasticsearch:
+        # image: monsieurbiz/elasticsearch:7.12.1
+        build:
+            context: ./elasticsearch/
+            args:
+              USER_UID: ${USER_UID}
+        environment:
+            - xpack.security.enabled=false
+            - xpack.monitoring.enabled=false
+            - xpack.ml.enabled=false
+            - xpack.graph.enabled=false
+            - xpack.watcher.enabled=false
+            - cluster.name=docker-cluster
+            - bootstrap.memory_lock=true
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - cluster.initial_master_nodes=elasticsearch
+            - node.name=elasticsearch
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - esdata:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+            - 9300:9300
+
+    cerebro:
+        image: lmenezes/cerebro
+        ports:
+        - "9000:9000"
+        links:
+        - elasticsearch
+
+volumes:
+    database: {}
+    esdata: {}

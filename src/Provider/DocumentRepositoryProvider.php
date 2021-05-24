@@ -20,7 +20,7 @@ class DocumentRepositoryProvider
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var string */
+    /** @var array */
     private $documentableClasses;
 
     /**
@@ -35,7 +35,7 @@ class DocumentRepositoryProvider
         $this->documentableClasses = $documentableClasses;
     }
 
-    public function getRepositories()
+    public function getRepositories(): array
     {
         $repositories = [];
         foreach ($this->documentableClasses as $class) {

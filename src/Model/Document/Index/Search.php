@@ -157,7 +157,7 @@ class Search extends AbstractIndex
 
         // Replace params
         $query = str_replace('{{QUERY}}', $gridConfig->getQuery(), $query);
-        $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
+        $query = str_replace('{{CHANNEL}}', (string) $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
         $query = $this->parseQuery($query);
@@ -179,7 +179,7 @@ class Search extends AbstractIndex
         $query['size'] = max(1, $gridConfig->getLimit());
 
         // Manage sorting
-        $channelCode = $this->channelContext->getChannel()->getCode();
+        $channelCode = (string) $this->channelContext->getChannel()->getCode();
         foreach ($gridConfig->getSorting() as $field => $order) {
             $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order);
             break; // only 1
@@ -205,11 +205,11 @@ class Search extends AbstractIndex
      */
     private function getInstantQuery(GridConfig $gridConfig): array
     {
-        $query = $this->searchQueryProvider->getInstantQuery();
+        $query = (string) $this->searchQueryProvider->getInstantQuery();
 
         // Replace params
         $query = str_replace('{{QUERY}}', $gridConfig->getQuery(), $query);
-        $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
+        $query = str_replace('{{CHANNEL}}', (string) $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
         return $this->parseQuery($query);
@@ -226,11 +226,12 @@ class Search extends AbstractIndex
      */
     private function getTaxonQuery(GridConfig $gridConfig): array
     {
-        $query = $this->searchQueryProvider->getTaxonQuery();
+        $query = (string) $this->searchQueryProvider->getTaxonQuery();
+        $taxonCode = null !== $gridConfig->getTaxon() ? (string) $gridConfig->getTaxon()->getCode() : '';
 
         // Replace params
-        $query = str_replace('{{TAXON}}', $gridConfig->getTaxon()->getCode(), $query);
-        $query = str_replace('{{CHANNEL}}', $this->channelContext->getChannel()->getCode(), $query);
+        $query = str_replace('{{TAXON}}', $taxonCode, $query);
+        $query = str_replace('{{CHANNEL}}', (string) $this->channelContext->getChannel()->getCode(), $query);
 
         // Convert query to array
         $query = $this->parseQuery($query);
@@ -253,9 +254,10 @@ class Search extends AbstractIndex
         $query['size'] = max(1, $gridConfig->getLimit());
 
         // Manage sorting
-        $channelCode = $this->channelContext->getChannel()->getCode();
+        $channelCode = (string) $this->channelContext->getChannel()->getCode();
+        $taxonCode = null !== $gridConfig->getTaxon() ? (string) $gridConfig->getTaxon()->getCode() : '';
         foreach ($gridConfig->getSorting() as $field => $order) {
-            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $gridConfig->getTaxon()->getCode());
+            $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $taxonCode);
             break; // only 1
         }
 

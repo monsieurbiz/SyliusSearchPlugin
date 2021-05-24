@@ -1,78 +1,58 @@
 # Testing
 
-Be sure you've run the `composer install` before reading this file.
-With Symfony binary, you should run `symfony composer install`
+## Requirements
+
+You'll need:
+
+- PHP 7.4 minimum.
+- docker, for the database.
+- symfony CLI, to run the local server.
+- composer, to install PHP dependencies.
+- npm and yarn, to install ui dependencies and build the JS/CSS files.
 
 ## Installation
 
-1. To be able to run yarn build correctly, create symlink for `node_modules` :
+```bash
+make install
+```
 
-    ```bash
-    ln -s tests/Application/node_modules node_modules
-    ```
-
-2. From the plugin root directory, run the following commands:
-
-    ```bash
-    $ (cd tests/Application && yarn install)
-    $ (cd tests/Application && yarn build)
-    $ (cd tests/Application && bin/console assets:install public -e test)
-    $ (cd tests/Application && bin/console doctrine:database:drop --force -e test --if-exists)
-    $ (cd tests/Application && bin/console doctrine:database:create -e test)
-    $ (cd tests/Application && bin/console doctrine:schema:create -e test)
-    ```
-
-To be able to setup the plugin's database, remember to configure your database credentials in `tests/Application/.env` 
-and `tests/Application/.env.test`. You can also add custom configuration in `tests/Application/.env.test.local`.
+This will run a Sylius app (the one in `tests/Application/`) with the plugin
+installed and all Sylius' sample data. It uses the symfony binary.
 
 ## Usage
 
-### Running plugin tests
+### List all available commands
 
-  - PHPUnit
+```bash
+make help
+```
 
-    ```bash
-    $ vendor/bin/phpunit
-    ```
+### Running minimum plugin tests
 
-  - PHPSpec
-
-    ```bash
-    $ vendor/bin/phpspec run
-    ```
-    
-  - PHPStan
-  
-    ```bash
-    $ vendor/bin/phpstan analyse src
-    ```
-
-### Opening Sylius with the plugin
-
-- Using `test` environment:
+- PHPUnit
 
     ```bash
-    $ (cd tests/Application && bin/console sylius:fixtures:load -e test)
-    $ (cd tests/Application && bin/console server:run -d public -e test)
+    make test.phpunit
     ```
-    
-- Using `dev` environment:
+
+- PHP CS fixer
 
     ```bash
-    $ (cd tests/Application && bin/console sylius:fixtures:load -e dev)
-    $ (cd tests/Application && bin/console server:run -d public -e dev)
+    make test.phpcs
     ```
 
-### Reindex Elasticsearch
+    > Tip: You can fix your code with `make test.phpcs.fix`!
 
-- Using `test` environment:
+- PHPSpec
 
     ```bash
-    $ (cd tests/Application && bin/console monsieurbiz:search:populate -e test)
+    make test.phpspec
     ```
-    
-- Using `dev` environment:
+
+- PHPStan
 
     ```bash
-    $ (cd tests/Application && bin/console monsieurbiz:search:populate -e dev)
+    make test.phpstan
     ```
+
+> Tip: You can run all tests with `make test.all`!

@@ -25,18 +25,7 @@ services:
   # Client configuration.
   JoliCode\Elastically\Client:
     arguments:
-      $config:
-        host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
-        port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
-        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
-        elastically_index_class_mapping:
-          # @TODO Add it in config
-          documents-it_it: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-        elastically_bulk_size: 100
+      $config: '%monsieurbiz_sylius_search.elastically%'
 
   # Add JS for plugin
   monsieurbiz_sylius_search.block_event_listener.layout.javascripts:

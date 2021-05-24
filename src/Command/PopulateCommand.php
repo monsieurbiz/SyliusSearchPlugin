@@ -48,7 +48,7 @@ class PopulateCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return int|void|null
+     * @return int 0 if everything went fine, or an exit code
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -57,7 +57,11 @@ class PopulateCommand extends Command
             $this->documentIndexer->indexAll();
         } catch (ReadOnlyIndexException $exception) {
             $output->writeln('Cannot purge old index. Please to do it manually if needed.');
+            // it's better to use return Command::FAILURE; in Symfony 5
+            return 1;
         }
         $output->writeln(sprintf('Generated index'));
+        // it's better to use return Command::SUCCESS; in Symfony 5
+        return 0;
     }
 }

@@ -172,7 +172,7 @@ trait DocumentableProductTrait
             } else {
                 $attributeValues[] = $attribute->getValue();
             }
-            $document->addAttribute($attribute->getCode(), $attribute->getName(), $attributeValues, $attribute->getLocaleCode(), 1);
+            $document->addAttribute($attribute->getCode(), $attribute->getName(), $attributeValues, $attribute->getLocaleCode() ?? $locale, 1);
         }
 
         return $document;

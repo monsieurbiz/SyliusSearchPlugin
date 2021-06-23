@@ -85,8 +85,6 @@ class Result extends Document
      * @param string $channelCode
      * @param string $currencyCode
      *
-     * @throws MissingPriceException
-     *
      * @return Price|null
      */
     public function getOriginalPriceByChannelAndCurrency(string $channelCode, string $currencyCode): ?Price
@@ -99,7 +97,8 @@ class Result extends Document
                 return $price;
             }
         }
-        throw new MissingPriceException(sprintf('Original price not found for channel "%s" and currency "%s"', $channelCode, $currencyCode));
+
+        return null;
     }
 
     /**

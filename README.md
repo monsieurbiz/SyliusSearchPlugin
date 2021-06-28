@@ -301,6 +301,27 @@ The bundle's templates are :
 
 Sylius documentation to customize these templates is available [here](https://docs.sylius.com/en/latest/customization/template.html).
 
+## Elasticsearch entity (Document) customization
+
+In order to add a product attribute to the research you have to customize the `\MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait::convertToDocument` method.
+
+E.g. if I want to add a product attribute named `model_code` with a score of 75 I have to do this in my `\App\Entity\Product\Product`:
+
+```php
+    use DocumentableProductTrait {
+        convertToDocument as convertToDocumentTrait;
+    }
+    
+    [...]
+    
+    public function convertToDocument(string $locale): Result
+    {
+        $document = $this->convertToDocumentTrait($locale);
+        $document->addAttribute('model_code', 'Model code', [$this->getModelCode()], $locale, 75);
+        return $document;
+    }
+```
+
 ## Jane
 
 We are using [Jane](https://github.com/janephp/janephp) to create a DTO (Data-transfer object).  

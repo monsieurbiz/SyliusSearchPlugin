@@ -39,7 +39,7 @@ class AggregationHelper
             ],
             'aggs' => [
                 'values' => [
-                    'terms' => ['field' => 'attributes.value.keyword', self::MAX_AGGREGATED_ATTRIBUTES_INFO],
+                    'terms' => ['field' => 'attributes.value.keyword', 'size' => self::MAX_AGGREGATED_ATTRIBUTES_INFO],  // Retrieve all attributes info
                 ],
             ],
         ];

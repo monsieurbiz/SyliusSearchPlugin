@@ -223,7 +223,7 @@ First, create a new DocumentableProductTrait to extended the `MonsieurBiz\Sylius
 
 declare(strict_types=1);
 
-namespace App\Module\SearchPlugin\Model\Documentable;
+namespace App\SearchPlugin\Model\Documentable;
 
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait as BaseTrait;
@@ -256,7 +256,7 @@ declare(strict_types=1);
 namespace App\Entity\Product;
 
 ...
-use App\Module\SearchPlugin\Model\Documentable\DocumentableProductTrait;
+use App\SearchPlugin\Model\Documentable\DocumentableProductTrait;
 
 class Product extends BaseProduct implements DocumentableInterface
 {
@@ -274,7 +274,7 @@ Extending the entity very similar and requires only a few additional steps. Firs
 <?php
 declare(strict_types=1);
 
-namespace App\Module\SearchPlugin\Model\Document;
+namespace App\SearchPlugin\Model\Document;
 
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result as BaseResult;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
@@ -314,9 +314,9 @@ Then, create a new Trait. This is the same as in "Adding additional attributes" 
 
 declare(strict_types=1);
 
-namespace App\Module\SearchPlugin\Model\Documentable;
+namespace App\SearchPlugin\Model\Documentable;
 
-use App\Module\SearchPlugin\Model\Document\Result;
+use App\SearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableProductTrait as BaseTrait;
 
@@ -353,7 +353,7 @@ As a final step, overwrite the `JoliCode\Elastically\Client` config in your `con
 services:
     ...
     
-    # MONSIEURBIZ/SYLIUS_SEARCH_PLUGIN
+    # Change monsieurbiz/sylius-search-plugin services
     JoliCode\Elastically\Client:
         arguments:
             $config:
@@ -361,11 +361,11 @@ services:
                 port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
                     elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
                 elastically_index_class_mapping:
-                    documents-it_it: \App\Module\SearchPlugin\Model\Result
-                    documents-fr_fr: \App\Module\SearchPlugin\Model\Result
-                    documents-fr: \App\Module\SearchPlugin\Model\Result
-                    documents-en: \App\Module\SearchPlugin\Model\Result
-                    documents-en_us: \App\Module\SearchPlugin\Model\Result
+                    documents-it_it: \App\SearchPlugin\Model\Result
+                    documents-fr_fr: \App\SearchPlugin\Model\Result
+                    documents-fr: \App\SearchPlugin\Model\Result
+                    documents-en: \App\SearchPlugin\Model\Result
+                    documents-en_us: \App\SearchPlugin\Model\Result
                 elastically_bulk_size: 100
 ```
 

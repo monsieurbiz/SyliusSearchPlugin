@@ -46,7 +46,6 @@ class FilterableFixture extends AbstractResourceFixture implements FilterableFix
      */
     protected function configureResourceNode(ArrayNodeDefinition $resourceNode): void
     {
-        /** @scrutinizer ignore-call */
         $resourceNode
             ->children()
             ->scalarNode('attribute')->end()

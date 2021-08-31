@@ -35,7 +35,7 @@ A search plugin for Sylius using [Jane](https://github.com/janephp/janephp) and 
 ## Installation
 
 Require the plugin :  
-`composer require monsieurbiz/sylius-search-plugin`
+`composer require monsieurbiz/sylius-search-plugin="^1.0@RC"`
 
 > If you are using Symfony Flex, the recipe will automatically do the actions below.
 

@@ -1,3 +1,6 @@
+parameters:
+  env(MONSIEURBIZ_SEARCHPLUGIN_ES_PREFIX): ''
+
 services:
 
   _defaults:
@@ -37,6 +40,7 @@ services:
           documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
           documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
         elastically_bulk_size: 100
+        elastically_index_prefix: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PREFIX)%'
 
   # Add JS for plugin
   monsieurbiz_sylius_search.block_event_listener.layout.javascripts:

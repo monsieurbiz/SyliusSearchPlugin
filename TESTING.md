@@ -59,8 +59,8 @@ and `tests/Application/.env.test`. You can also add custom configuration in `tes
 - Using `dev` environment:
 
     ```bash
-    $ (cd tests/Application && bin/console sylius:fixtures:load -e dev)
-    $ (cd tests/Application && bin/console server:run -d public -e dev)
+    $ (cd tests/Application && bin/console sylius:fixtures:load -e 1.0-dev)
+    $ (cd tests/Application && bin/console server:run -d public -e 1.0-dev)
     ```
 
 ### Reindex Elasticsearch
@@ -74,5 +74,5 @@ and `tests/Application/.env.test`. You can also add custom configuration in `tes
 - Using `dev` environment:
 
     ```bash
-    $ (cd tests/Application && bin/console monsieurbiz:search:populate -e dev)
+    $ (cd tests/Application && bin/console monsieurbiz:search:populate -e 1.0-dev)
     ```

@@ -5,10 +5,6 @@ services:
     autoconfigure: true
     public: false
 
-  _instanceof:
-    MonsieurBiz\SyliusSearchPlugin\Fixture\FilterableFixtureInterface:
-      tags: ['sylius_fixtures.fixture']
-
   MonsieurBiz\SyliusSearchPlugin\:
     resource: '../../*'
     exclude: '../../{Entity,Migrations,Tests,Kernel.php}'
@@ -21,68 +17,3 @@ services:
     resource: '../../Form/Extension'
     tags:
       - { name: form.type_extension }
-
-  # Client configuration.
-  JoliCode\Elastically\Client:
-    arguments:
-      $config:
-        host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
-        port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
-        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
-        elastically_index_class_mapping:
-          # @TODO Add it in config
-          documents-it_it: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-        elastically_bulk_size: 100
-
-  # Add JS for plugin
-  monsieurbiz_sylius_search.block_event_listener.layout.javascripts:
-    class: Sylius\Bundle\UiBundle\Block\BlockEventListener
-    arguments:
-      - '@@MonsieurBizSyliusSearchPlugin/js.html.twig'
-    tags:
-      - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.javascripts, method: onBlockEvent }
-
-  # Add form search in header
-  monsieurbiz_sylius_search.block_event_listener.layout.header:
-    class: Sylius\Bundle\UiBundle\Block\BlockEventListener
-    arguments:
-      - '@@MonsieurBizSyliusSearchPlugin/Header/form.html.twig'
-    tags:
-      - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.header, method: onBlockEvent }
-
-  # Event when a product is added / modified / deleted
-  monsieurbiz_sylius_search.event_listener.document_listener:
-    class: MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener
-    arguments:
-      - '@MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Indexer'
-    tags:
-      - { name: kernel.event_listener, event: sylius.product.post_create, method: saveDocument }
-      - { name: kernel.event_listener, event: sylius.product.post_update, method: saveDocument }
-      - { name: kernel.event_listener, event: sylius.product.pre_delete, method: deleteDocument }
-
-  MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider:
-    arguments:
-      $files: '%monsieurbiz_sylius_search.files%'
-
-  # Provider to retrieve repositories to index
-  MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider:
-    arguments:
-      $documentableClasses: '%monsieurbiz_sylius_search.documentable_classes%'
-
-  MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig:
-    arguments:
-      $config: '%monsieurbiz_sylius_search.grid%'
-
-  # Helpers
-  MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper: ~
-
-  # Twig extensions
-  MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl:
-    arguments:
-      $helper: '@MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper'
-    tags:
-      - { name: twig.extension }

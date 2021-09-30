@@ -1,5 +1,1 @@
-doctrine_migrations:
-    dir_name: "%kernel.project_dir%/src/Migrations"
-
-    # Namespace is arbitrary but should be different from App\Migrations as migrations classes should NOT be autoloaded
-    namespace: DoctrineMigrations
+../../../../vendor/sylius/sylius/config/packages/doctrine_migrations.yaml

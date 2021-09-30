@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+    database:
+        image: percona:5.7
+        ports:
+            - 3306
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+          MYSQL_DATABASE: sylius
+        volumes:
+            - database:/var/lib/mysql
+    mailer:
+        image: monsieurbiz/mailcatcher
+        ports:
+            - 1025
+            - 1080
+    elasticsearch:
+        build:
+            context: ./docker/elasticsearch/
+        volumes:
+            - esdata:/usr/share/elasticsearch/data:rw
+        environment:
+            - cluster.name=docker-cluster
+            - bootstrap.memory_lock=true
+            - discovery.type=single-node
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+            - "xpack.security.enabled=false"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.15.0
+        environment:
+            - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+            - "XPACK_GRAPH_ENABLED=false"
+            - "XPACK_ML_ENABLED=false"
+            - "XPACK_REPORTING_ENABLED=false"
+            - "XPACK_SECURITY_ENABLED=false"
+            - "XPACK_WATCHER_ENABLED=false"
+        links:
+            - elasticsearch
+        ports:
+            - "5601:5601"
+
+volumes:
+    database: {}
+    esdata: {}

@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 final class MonsieurBizSyliusSearchExtension extends Extension
 {
@@ -26,5 +28,8 @@ final class MonsieurBizSyliusSearchExtension extends Extension
         foreach ($config as $name => $value) {
             $container->setParameter(self::EXTENSION_CONFIG_NAME . '.' . $name, $value);
         }
+
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yaml');
     }
 }

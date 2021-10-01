@@ -8,12 +8,3 @@ services:
   MonsieurBiz\SyliusSearchPlugin\:
     resource: '../../*'
     exclude: '../../{Entity,Migrations,Tests,Kernel.php}'
-
-  MonsieurBiz\SyliusSearchPlugin\Controller\:
-    resource: '../../Controller'
-    tags: ['controller.service_arguments']
-
-  MonsieurBiz\SyliusSearchPlugin\Form\Extension\:
-    resource: '../../Form/Extension'
-    tags:
-      - { name: form.type_extension }

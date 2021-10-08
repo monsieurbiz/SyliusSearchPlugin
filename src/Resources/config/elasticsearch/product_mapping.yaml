@@ -1,0 +1,46 @@
+mappings:
+  dynamic: false
+  properties:
+    code:
+      type: keyword
+    enabled:
+      type: boolean
+    channels:
+      type: nested
+      properties:
+        code:
+          type: keyword
+    images:
+      type: nested
+      properties:
+        path:
+          type: keyword
+    mainTaxon:
+      type: nested
+      properties:
+        code:
+          type: keyword
+        name:
+          type: keyword
+        position:
+          type: integer
+        level:
+          type: integer
+    product_taxon:
+      type: nested
+      properties:
+        taxon:
+          type: nested
+          properties:
+            code:
+              type: keyword
+            name:
+              type: keyword
+            position:
+              type: integer
+            level:
+              type: integer
+        position:
+          type: integer
+    price:
+      type: integer

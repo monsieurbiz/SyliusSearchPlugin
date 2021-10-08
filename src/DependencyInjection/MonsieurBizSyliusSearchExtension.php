@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 final class MonsieurBizSyliusSearchExtension extends Extension
 {
-    public const EXTENSION_CONFIG_NAME = 'monsieurbiz_sylius_search';
+    public const EXTENSION_CONFIG_NAME = 'monsieur_biz_sylius_search';
 
     public function load(array $configs, ContainerBuilder $container): void
     {

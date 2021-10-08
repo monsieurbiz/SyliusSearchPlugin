@@ -6,8 +6,9 @@
     "license": "MIT",
     "require": {
         "php": "^7.4 || ^8.0",
-        "sylius/sylius": "^1.9",
-        "jolicode/elastically": "^1.0.0"
+        "jane-php/automapper-bundle": "^7.1",
+        "jolicode/elastically": "dev-master",
+        "sylius/sylius": "^1.9"
     },
     "require-dev": {
         "behat/behat": "^3.6.1",
@@ -40,12 +41,14 @@
         "symfony/dotenv": "^4.4 || ^5.2",
         "symfony/intl": "^4.4 || ^5.2",
         "symfony/web-profiler-bundle": "^4.4 || ^5.2",
-        "vimeo/psalm": "4.7.1"
+        "vimeo/psalm": "4.7.1",
+        "jane-php/json-schema": "^7.1"
     },
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "MonsieurBiz\\SyliusSearchPlugin\\": "src/",
+            "MonsieurBiz\\SyliusSearchPlugin\\Generated\\": "generated/",
             "Tests\\MonsieurBiz\\SyliusSearchPlugin\\": "tests/"
         }
     },

@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/2019-09/schema#",
+  "definitions": {
+    "Product": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "code": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "main_taxon": {
+          "$ref": "#/definitions/Taxon"
+        },
+        "product_taxons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProductTaxon"
+          }
+        },
+        "description": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "images": {
+          "type": [
+            "null",
+            "array"
+          ],
+          "items": {
+            "$ref": "#/definitions/Image"
+          }
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Channel"
+          }
+        },
+        "price": {
+          "type": "integer"
+        }
+      }
+    },
+    "Image": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "Channel": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "ProductTaxon": {
+      "type": "object",
+      "properties": {
+        "taxon": {
+          "$ref": "#/definitions/Taxon"
+        },
+        "position": {
+          "type": [
+            "null",
+            "integer"
+          ]
+        }
+      }
+    },
+    "Taxon": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "position": {
+          "type": "integer"
+        },
+        "level": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

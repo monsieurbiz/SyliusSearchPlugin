@@ -67,6 +67,7 @@ final class Indexer
      */
     public function indexAll(): void
     {
+        /** @var DocumentableInterface $documentable */
         foreach ($this->documentableRegistry->all() as $documentable) {
             $this->indexDocumentable($documentable);
         }
@@ -74,7 +75,7 @@ final class Indexer
 
     private function indexDocumentable(DocumentableInterface $documentable, ?string $locale = null): void
     {
-        if (null === $locale && $documentable instanceof TranslatableInterface) {
+        if (null === $locale && $documentable->isTranslatable()) {
             foreach ($this->getLocales() as $localeCode) {
                 $this->indexDocumentable($documentable, $localeCode);
             }
@@ -86,15 +87,19 @@ final class Indexer
             Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
         ]);
         $indexBuilder = $factory->buildIndexBuilder();
-        $newIndex = $indexBuilder->createIndex($indexName, ['index_code' => $documentable->getIndexCode(), 'locale' => strtolower($locale)]);
+        $newIndex = $indexBuilder->createIndex($indexName, [
+            'index_code' => $documentable->getIndexCode(),
+            'locale' => $locale ? strtolower($locale) : null,
+        ]);
 
         $indexer = $factory->buildIndexer();
-        $test = $this->entityManager->getRepository(\get_class($documentable))->findAll(); // TODO pagniation
+        $test = $documentable->getDatasource()->getItems($documentable->getSourceClass());
         foreach ($test as $item) {
-            $item->setCurrentLocale($locale); // if TranslatableInterface
+            if (null !== $locale && $item instanceof TranslatableInterface) {
+                $item->setCurrentLocale($locale);
+            }
             $document = new Document((string) $item->getId(), $this->autoMapper->map($item, Product::class));
             $indexer->scheduleIndex($newIndex, $document);
-//            dump($this->autoMapper->map($item, Product::class));die;
         }
         $indexer->flush();
 

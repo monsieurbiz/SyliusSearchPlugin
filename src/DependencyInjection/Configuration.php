@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
+use MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider;
+use MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -25,6 +27,22 @@ final class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('monsieur_biz_sylius_search');
         $rootNode = $treeBuilder->getRootNode();
+        $rootNode
+            ->children()
+                ->arrayNode('documents')
+                    ->useAttributeAsKey('code', false)
+                    ->defaultValue([])
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('source')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('target')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('mapping_provider')->defaultValue(YamlWithLocaleProvider::class)->end()
+                            ->scalarNode('datasource')->defaultValue(RepositoryDatasource::class)->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
 
         return $treeBuilder;
     }

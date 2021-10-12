@@ -11,12 +11,6 @@ services:
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
       $configurationDirectory: '@=service("file_locator").locate("@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch")'
 
-  _instanceof:
-    MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface:
-      tags: [ 'monsieurbiz.search.documentable' ]
-      calls:
-        - [setMappingProvider, ['@monsieurbiz.search.mapper_provider']]
-
   MonsieurBiz\SyliusSearchPlugin\:
     resource: '../../*'
     exclude: '../../{Entity,Migrations,Tests,Kernel.php}'
@@ -58,8 +52,7 @@ services:
       $attributeRepository: '@sylius.repository.product_attribute'
 
   # Define our mapping provider
-  monsieurbiz.search.mapper_provider:
-    class: MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider
+  MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider:
     decorates: JoliCode\Elastically\Mapping\YamlProvider
     arguments:
       $decorated: '@.inner'
@@ -68,7 +61,7 @@ services:
   JoliCode\Elastically\IndexBuilder:
     arguments:
       $client: '@monsieurbiz.search.elasticsearch.client'
-      $mappingProvider: '@monsieurbiz.search.mapper_provider'
+      $mappingProvider: 'MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvide'
 
   monsieurbiz.search.registry.documentable:
     class: Sylius\Component\Registry\ServiceRegistry

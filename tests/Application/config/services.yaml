@@ -5,7 +5,3 @@ parameters:
 
 
 services:
-    App\Entity\Product\Product:
-        tags: [ 'monsieurbiz.search.documentable' ]
-        calls:
-            - [setMappingProvider, ['@monsieurbiz.search.mapper_provider']]

@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 final class MonsieurBizSyliusSearchExtension extends Extension
 {
-    public const EXTENSION_CONFIG_NAME = 'monsieur_biz_sylius_search';
+    public const EXTENSION_CONFIG_NAME = 'monsieurbiz.search.config';
 
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -31,5 +31,13 @@ final class MonsieurBizSyliusSearchExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return str_replace(['monsieur_biz'], ['monsieurbiz'], parent::getAlias());
     }
 }

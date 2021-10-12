@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
 use JoliCode\Elastically\Mapping\MappingProviderInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Datasource\DatasourceInterface;
 
 interface DocumentableInterface
 {
@@ -24,7 +25,13 @@ interface DocumentableInterface
 
     public function getMappingProvider(): MappingProviderInterface;
 
-//    dataSource
-//
-//    className => Product
+    public function getSourceClass(): string;
+
+    public function getTargetClass(): string;
+
+    public function setDatasource(DatasourceInterface $datasource): void;
+
+    public function getDatasource(): DatasourceInterface;
+
+    public function isTranslatable(): bool;
 }

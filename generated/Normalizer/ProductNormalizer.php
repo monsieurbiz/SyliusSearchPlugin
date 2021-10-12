@@ -96,8 +96,12 @@ class ProductNormalizer implements DenormalizerInterface, NormalizerInterface, D
             }
             $object->setChannels($values_2);
         }
-        if (\array_key_exists('price', $data)) {
-            $object->setPrice($data['price']);
+        if (\array_key_exists('attributes', $data)) {
+            $values_3 = array();
+            foreach ($data['attributes'] as $value_5) {
+                $values_3[] = $this->denormalizer->denormalize($value_5, 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductAttribute', 'json', $context);
+            }
+            $object->setAttributes($values_3);
         }
         return $object;
     }
@@ -158,8 +162,12 @@ class ProductNormalizer implements DenormalizerInterface, NormalizerInterface, D
             }
             $data['channels'] = $values_2;
         }
-        if (null !== $object->getPrice()) {
-            $data['price'] = $object->getPrice();
+        if (null !== $object->getAttributes()) {
+            $values_3 = array();
+            foreach ($object->getAttributes() as $value_5) {
+                $values_3[] = $this->normalizer->normalize($value_5, 'json', $context);
+            }
+            $data['attributes'] = $values_3;
         }
         return $data;
     }

@@ -49,9 +49,6 @@
             "$ref": "#/definitions/Channel"
           }
         },
-        "price": {
-          "type": "integer"
-        },
         "attributes": {
           "type": "array",
           "items": {
@@ -117,7 +114,7 @@
           "type": "string"
         },
         "value": {
-          "type": ["null", "string"]
+          "type": ["null", "mixed"]
         }
       }
     }

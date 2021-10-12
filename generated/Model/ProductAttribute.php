@@ -1,66 +1,61 @@
 <?php
 
-/*
- * This file is part of Monsieur Biz' Search plugin for Sylius.
- *
- * (c) Monsieur Biz <sylius@monsieurbiz.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
-declare(strict_types=1);
-
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
 class ProductAttribute
 {
     /**
+     * 
+     *
      * @var string
      */
     protected $name;
     /**
-     * @var string|null
+     * 
+     *
+     * @var null|mixed
      */
     protected $value;
-
     /**
+     * 
+     *
      * @return string
      */
-    public function getName(): string
+    public function getName() : string
     {
         return $this->name;
     }
-
     /**
+     * 
+     *
      * @param string $name
      *
      * @return self
      */
-    public function setName(string $name): self
+    public function setName(string $name) : self
     {
         $this->name = $name;
-
         return $this;
     }
-
     /**
-     * @return string|null
+     * 
+     *
+     * @return null|mixed
      */
-    public function getValue(): ?string
+    public function getValue()
     {
         return $this->value;
     }
-
     /**
-     * @param string|null $value
+     * 
+     *
+     * @param null|mixed $value
      *
      * @return self
      */
-    public function setValue(?string $value): self
+    public function setValue($value) : self
     {
         $this->value = $value;
-
         return $this;
     }
 }

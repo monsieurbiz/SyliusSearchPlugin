@@ -67,9 +67,9 @@ class Product
     /**
      * 
      *
-     * @var int
+     * @var ProductAttribute[]
      */
-    protected $price;
+    protected $attributes;
     /**
      * 
      *
@@ -283,22 +283,22 @@ class Product
     /**
      * 
      *
-     * @return int
+     * @return ProductAttribute[]
      */
-    public function getPrice() : int
+    public function getAttributes() : array
     {
-        return $this->price;
+        return $this->attributes;
     }
     /**
      * 
      *
-     * @param int $price
+     * @param ProductAttribute[] $attributes
      *
      * @return self
      */
-    public function setPrice(int $price) : self
+    public function setAttributes(array $attributes) : self
     {
-        $this->price = $price;
+        $this->attributes = $attributes;
         return $this;
     }
 }

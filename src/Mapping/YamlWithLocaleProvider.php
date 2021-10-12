@@ -15,6 +15,9 @@ namespace MonsieurBiz\SyliusSearchPlugin\Mapping;
 
 use JoliCode\Elastically\Mapping\MappingProviderInterface;
 use JoliCode\Elastically\Mapping\YamlProvider;
+use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
+use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
@@ -23,12 +26,21 @@ class YamlWithLocaleProvider implements MappingProviderInterface
     private YamlProvider $decorated;
     private string $configurationDirectory;
     private Parser $parser;
+    private ProductAttributeRepositoryInterface $attributeRepository;
+    private EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(YamlProvider $decorated, string $configurationDirectory, ?Parser $parser = null)
-    {
+    public function __construct(
+        YamlProvider $decorated,
+        string $configurationDirectory,
+        EventDispatcherInterface $eventDispatcher,
+        ProductAttributeRepositoryInterface $attributeRepository,
+        ?Parser $parser = null
+    ) {
         $this->decorated = $decorated;
         $this->configurationDirectory = $configurationDirectory;
         $this->parser = $parser ?? new Parser();
+        $this->attributeRepository = $attributeRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function provideMapping(string $indexName, array $context = []): ?array
@@ -40,7 +52,13 @@ class YamlWithLocaleProvider implements MappingProviderInterface
             $mapping = $this->appendLocaleAnalyzers($mapping, $locale);
         }
 
-        return $mapping;
+        $mappingProviderEvent = new MappingProviderEvent($context['index_code'] ?? $indexName, new \ArrayObject($mapping));
+        $this->eventDispatcher->dispatch(
+            $mappingProviderEvent,
+            MappingProviderEvent::EVENT_NAME
+        );
+
+        return (array) $mappingProviderEvent->getMapping();
     }
 
     private function appendLocaleAnalyzers(array $mapping, string $locale): array

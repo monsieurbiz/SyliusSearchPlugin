@@ -10,6 +10,10 @@ mappings:
       properties:
         code:
           type: keyword
+    name:
+      type: text
+    description:
+      type: text
     images:
       type: nested
       properties:
@@ -43,4 +47,4 @@ mappings:
         position:
           type: integer
     price:
-      type: integer
+      type: integer # todo - WIP

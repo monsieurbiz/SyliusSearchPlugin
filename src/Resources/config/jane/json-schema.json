@@ -51,6 +51,12 @@
         },
         "price": {
           "type": "integer"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProductAttribute"
+          }
         }
       }
     },
@@ -101,6 +107,17 @@
         },
         "level": {
           "type": "integer"
+        }
+      }
+    },
+    "ProductAttribute": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": ["null", "string"]
         }
       }
     }

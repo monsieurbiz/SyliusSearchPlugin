@@ -1,5 +1,0 @@
-mappings:
-  dynamic: false
-  properties:
-    name:
-      type: keyword

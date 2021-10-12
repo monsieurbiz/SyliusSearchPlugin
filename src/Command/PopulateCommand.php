@@ -36,7 +36,6 @@ class PopulateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $this->indexer->indexAll();
         $output->writeln('ok');
 

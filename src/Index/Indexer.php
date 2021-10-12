@@ -63,7 +63,7 @@ final class Indexer
     }
 
     /**
-     * Index all documentable object
+     * Index all documentable object.
      */
     public function indexAll(): void
     {
@@ -89,11 +89,12 @@ final class Indexer
         $newIndex = $indexBuilder->createIndex($indexName, ['index_code' => $documentable->getIndexCode(), 'locale' => strtolower($locale)]);
 
         $indexer = $factory->buildIndexer();
-        $test = $this->entityManager->getRepository(\get_class($documentable))->findAll();
+        $test = $this->entityManager->getRepository(\get_class($documentable))->findAll(); // TODO pagniation
         foreach ($test as $item) {
             $item->setCurrentLocale($locale); // if TranslatableInterface
-            $indexer->scheduleIndex($newIndex, new Document((string) $item->getId(), $this->autoMapper->map($item, Product::class)));
-            //dump($this->autoMapper->map($item, Product::class));die;
+            $document = new Document((string) $item->getId(), $this->autoMapper->map($item, Product::class));
+            $indexer->scheduleIndex($newIndex, $document);
+//            dump($this->autoMapper->map($item, Product::class));die;
         }
         $indexer->flush();
 

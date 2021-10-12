@@ -18,6 +18,7 @@ $finder = PhpCsFixer\Finder::create()
             'tests/Application/var',
             'tests/Application/bin',
             'tests/Application/config',
+            'generated',
         ]
     )
 ;

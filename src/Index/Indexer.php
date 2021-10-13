@@ -97,8 +97,7 @@ final class Indexer
         ]);
 
         $indexer = $factory->buildIndexer();
-        $test = $documentable->getDatasource()->getItems($documentable->getSourceClass());
-        foreach ($test as $item) {
+        foreach ($documentable->getDatasource()->getItems($documentable->getSourceClass()) as $item) {
             if (null !== $locale && $item instanceof TranslatableInterface) {
                 $item->setCurrentLocale($locale);
             }

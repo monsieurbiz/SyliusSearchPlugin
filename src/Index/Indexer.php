@@ -17,12 +17,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use JoliCode\Elastically\Factory;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Product;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 final class Indexer
 {
@@ -31,17 +31,20 @@ final class Indexer
     private array $locales = [];
     private EntityManagerInterface $entityManager;
     private AutoMapperInterface $autoMapper;
+    private SerializerInterface $serializer;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
         RepositoryInterface $localeRepository,
         EntityManagerInterface $entityManager,
-        AutoMapperInterface $autoMapper
+        AutoMapperInterface $autoMapper,
+        SerializerInterface $serializer
     ) {
         $this->documentableRegistry = $documentableRegistry;
         $this->localeRepository = $localeRepository;
         $this->entityManager = $entityManager;
         $this->autoMapper = $autoMapper;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -85,6 +88,7 @@ final class Indexer
         $indexName = $this->getIndexName($documentable, $locale);
         $factory = new Factory([
             Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
+            Factory::CONFIG_SERIALIZER => $this->serializer,
         ]);
         $indexBuilder = $factory->buildIndexBuilder();
         $newIndex = $indexBuilder->createIndex($indexName, [
@@ -98,8 +102,8 @@ final class Indexer
             if (null !== $locale && $item instanceof TranslatableInterface) {
                 $item->setCurrentLocale($locale);
             }
-            $document = new Document((string) $item->getId(), $this->autoMapper->map($item, Product::class));
-            $indexer->scheduleIndex($newIndex, $document);
+            $dto = $this->autoMapper->map($item, $documentable->getTargetClass());
+            $indexer->scheduleIndex($newIndex, new Document((string) $item->getId(), $dto));
         }
         $indexer->flush();
 

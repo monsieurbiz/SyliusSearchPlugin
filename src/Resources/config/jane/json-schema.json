@@ -1,62 +1,6 @@
 {
   "$schema": "http://json-schema.org/2019-09/schema#",
   "definitions": {
-    "Product": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "code": {
-          "type": "string"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "slug": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "main_taxon": {
-          "$ref": "#/definitions/Taxon"
-        },
-        "product_taxons": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ProductTaxon"
-          }
-        },
-        "description": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "images": {
-          "type": [
-            "null",
-            "array"
-          ],
-          "items": {
-            "$ref": "#/definitions/Image"
-          }
-        },
-        "channels": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Channel"
-          }
-        },
-        "attributes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ProductAttribute"
-          }
-        }
-      }
-    },
     "Image": {
       "type": "object",
       "properties": {

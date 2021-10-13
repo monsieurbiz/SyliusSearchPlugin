@@ -20,6 +20,9 @@ services:
     tags:
       - { name: form.type_extension }
 
+  MonsieurBiz\SyliusSearchPlugin\Generated\:
+    resource: '../../../generated'
+
   JoliCode\Elastically\IndexNameMapper:
     arguments:
       $prefix: null # or a string to prefix index name

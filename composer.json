@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.4 || ^8.0",
+        "jacquesbh/eater": "^2.0",
         "jane-php/automapper-bundle": "^7.1",
         "jolicode/elastically": "dev-master",
         "sylius/sylius": "^1.9"

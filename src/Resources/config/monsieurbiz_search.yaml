@@ -1,7 +1,7 @@
 monsieurbiz_sylius_search:
   documents:
-    product:
+    monsieurbiz_product:
       source: 'Sylius\Component\Core\Model\ProductInterface'
-      target: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\Product'
+      target: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO'
       #mapping_provider: '...' # by default monsieurbiz.search.mapper_provider
       #dataprovider: '...' # by default MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource

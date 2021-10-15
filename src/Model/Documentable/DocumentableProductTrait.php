@@ -225,7 +225,7 @@ trait DocumentableProductTrait
     {
         $cheapestVariant = null;
         $cheapestPrice = null;
-        $variants = $this->getVariants();
+        $variants = $this->getEnabledVariants();
         foreach ($variants as $variant) {
             $channelPrice = $variant->getChannelPricingForChannel($channel);
             if (null === $cheapestPrice || $channelPrice->getPrice() < $cheapestPrice) {

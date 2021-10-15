@@ -7,6 +7,8 @@ mappings:
             type: keyword
         enabled:
             type: boolean
+        inStock:
+            type: boolean
         channel:
             type: keyword
         mainTaxon:

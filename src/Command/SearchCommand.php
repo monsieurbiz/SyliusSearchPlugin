@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
-use Elastica\Query;
-use Elastica\Query\MultiMatch;
-use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Index\Indexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
-use Pagerfanta\Elastica\ElasticaAdapter;
-use Pagerfanta\Pagerfanta;
+use MonsieurBiz\SyliusSearchPlugin\Search\RequestFactory;
+use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Search;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,12 +30,17 @@ class SearchCommand extends Command
     protected static $defaultName = 'monsieurbiz:search:search';
     private Indexer $indexer;
     private SerializerInterface $serializer;
+    private RequestFactory $requestFactory;
+    private Search $search;
 
-    public function __construct(Indexer $indexer, SerializerInterface $serializer, $name = null)
+    public function __construct(
+        Indexer $indexer, SerializerInterface $serializer, RequestFactory $requestFactory, Search $search, $name = null)
     {
         parent::__construct($name);
         $this->indexer = $indexer;
         $this->serializer = $serializer;
+        $this->requestFactory = $requestFactory;
+        $this->search = $search;
     }
 
     protected function configure(): void
@@ -49,33 +52,19 @@ class SearchCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $factory = new Factory([
-            Factory::CONFIG_INDEX_CLASS_MAPPING => [
-                'monsieurbiz_product_fr_fr' => ProductDTO::class,
-            ],
-            Factory::CONFIG_SERIALIZER => $this->serializer,
-        ]);
-
-        $client = $factory->buildClient();
 
         $query = $input->getArgument('query');
+        $request = $this->requestFactory->create(RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
+        $request->setQueryParameters(['query_text' => $query]);
 
-        $searchQuery = new MultiMatch();
-        $searchQuery->setFields([
-            'name^5',
-            'description',
-        ]);
-        $searchQuery->setQuery($query);
-        $searchQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
-
-        $foundPosts =  new Pagerfanta(new ElasticaAdapter($client->getIndex('monsieurbiz_product_fr_fr'), Query::create($searchQuery)));
+        $result = $this->search->query($request);
         $io->title('Search result for: ' . $query);
-        $io->section('Nb results: ' . $foundPosts->getNbResults());
+        $io->section('Nb results: ' . $result->count());
         $documents = [];
-        foreach ($foundPosts as $result) {
+        foreach ($result->getIterator() as $resultItem) {
             /** @var ProductDTO $productDTO */
-            $productDTO = $result->getModel();
-            $documents[] = [$result->getScore(), $productDTO->getId()];
+            $productDTO = $resultItem->getModel();
+            $documents[] = [$resultItem->getScore(), $productDTO->getId()];
         }
         $io->table(['Score', 'Document ID'], $documents);
 

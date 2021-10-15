@@ -28,6 +28,7 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
+use Sylius\Component\Product\Model\ProductAttributeValue;
 
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
@@ -94,9 +95,9 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         });
 
         $metadata->forMember('attributes', function(ProductInterface $product): array {
-            $attributes = [];
-            /** @var \Sylius\Component\Product\Model\ProductAttributeValue $attributeValue */
-            foreach ($product->getAttributes() as $attributeValue) {
+            $currentLocale = $product->getTranslation()->getLocale();
+            /** @var ProductAttributeValue $attributeValue */
+            foreach ($product->getAttributesByLocale($currentLocale, $currentLocale) as $attributeValue) {
                 if (null === $attributeValue->getName() || null === $attributeValue->getValue()) {
                     continue;
                 }
@@ -104,10 +105,9 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
                 if (!$attribute instanceof SearchableInterface || (!$attribute->isSearchable() && !$attribute->isFilterable())) {
                     continue;
                 }
-                $attributeDTO = new ProductAttribute();
-                $attributeDTO->setName($attributeValue->getName());
-                $attributeDTO->setValue($attributeValue->getValue());
-                $attributes[$attributeValue->getCode()] = $attributeDTO; // we can't use the automapper because value has a mixed type
+                $attributeDTO = $this->autoMapper->map($attributeValue, ProductAttribute::class);
+                $attributeDTO->setValue($attributeValue->getValue()); // we can't use the automapper for the value because it has a mixed type
+                $attributes[$attributeValue->getCode()] = $attributeDTO;
             }
 
             return $attributes;

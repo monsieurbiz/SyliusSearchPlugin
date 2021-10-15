@@ -36,6 +36,9 @@ class ProductAttributeNormalizer implements DenormalizerInterface, NormalizerInt
         if (null === $data || false === \is_array($data)) {
             return $object;
         }
+        if (\array_key_exists('code', $data)) {
+            $object->setCode($data['code']);
+        }
         if (\array_key_exists('name', $data)) {
             $object->setName($data['name']);
         }
@@ -56,6 +59,9 @@ class ProductAttributeNormalizer implements DenormalizerInterface, NormalizerInt
     public function normalize($object, $format = null, array $context = array())
     {
         $data = array();
+        if (null !== $object->getCode()) {
+            $data['code'] = $object->getCode();
+        }
         if (null !== $object->getName()) {
             $data['name'] = $object->getName();
         }

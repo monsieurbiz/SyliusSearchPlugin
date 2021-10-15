@@ -9,6 +9,12 @@ class ProductAttribute
      *
      * @var string
      */
+    protected $code;
+    /**
+     * 
+     *
+     * @var string
+     */
     protected $name;
     /**
      * 
@@ -16,6 +22,27 @@ class ProductAttribute
      * @var null|mixed
      */
     protected $value;
+    /**
+     * 
+     *
+     * @return string
+     */
+    public function getCode() : string
+    {
+        return $this->code;
+    }
+    /**
+     * 
+     *
+     * @param string $code
+     *
+     * @return self
+     */
+    public function setCode(string $code) : self
+    {
+        $this->code = $code;
+        return $this;
+    }
     /**
      * 
      *

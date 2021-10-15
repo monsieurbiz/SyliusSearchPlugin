@@ -16,6 +16,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "inStock": {
+          "type": "boolean"
+        },
         "slug": {
           "type": "string"
         },

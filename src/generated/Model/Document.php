@@ -31,6 +31,12 @@ class Document
     /**
      * 
      *
+     * @var bool|null
+     */
+    protected $inStock;
+    /**
+     * 
+     *
      * @var string|null
      */
     protected $slug;
@@ -158,6 +164,27 @@ class Document
     public function setEnabled(?bool $enabled) : self
     {
         $this->enabled = $enabled;
+        return $this;
+    }
+    /**
+     * 
+     *
+     * @return bool|null
+     */
+    public function getInStock() : ?bool
+    {
+        return $this->inStock;
+    }
+    /**
+     * 
+     *
+     * @param bool|null $inStock
+     *
+     * @return self
+     */
+    public function setInStock(?bool $inStock) : self
+    {
+        $this->inStock = $inStock;
         return $this;
     }
     /**

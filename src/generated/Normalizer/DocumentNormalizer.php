@@ -58,6 +58,12 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
         elseif (property_exists($data, 'enabled') && $data->{'enabled'} === null) {
             $object->setEnabled(null);
         }
+        if (property_exists($data, 'inStock') && $data->{'inStock'} !== null) {
+            $object->setInStock($data->{'inStock'});
+        }
+        elseif (property_exists($data, 'inStock') && $data->{'inStock'} === null) {
+            $object->setInStock(null);
+        }
         if (property_exists($data, 'slug') && $data->{'slug'} !== null) {
             $object->setSlug($data->{'slug'});
         }
@@ -154,6 +160,12 @@ class DocumentNormalizer implements DenormalizerInterface, NormalizerInterface, 
         }
         else {
             $data->{'enabled'} = null;
+        }
+        if (null !== $object->getInStock()) {
+            $data->{'inStock'} = $object->getInStock();
+        }
+        else {
+            $data->{'inStock'} = null;
         }
         if (null !== $object->getSlug()) {
             $data->{'slug'} = $object->getSlug();

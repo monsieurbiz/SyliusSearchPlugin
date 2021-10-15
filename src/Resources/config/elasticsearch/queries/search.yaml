@@ -6,6 +6,8 @@ query:
       - term:
           enabled: true
       - term:
+          inStock: true
+      - term:
           channel: "{{CHANNEL}}"
     must:
       - bool:

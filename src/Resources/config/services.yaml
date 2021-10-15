@@ -1,5 +1,6 @@
 parameters:
   monsieurbiz.search.model.documentable.interface: MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface
+  monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface
 
 services:
 
@@ -9,6 +10,7 @@ services:
     public: false
     bind:
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
+      $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
       $configurationDirectory: '@=service("file_locator").locate("@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch")'
 
   MonsieurBiz\SyliusSearchPlugin\:
@@ -70,4 +72,10 @@ services:
     class: Sylius\Component\Registry\ServiceRegistry
     arguments:
       $className: '%monsieurbiz.search.model.documentable.interface%'
+      $context: 'documentable'
+
+  monsieurbiz.search.registry.search_request:
+    class: Sylius\Component\Registry\ServiceRegistry
+    arguments:
+      $className: '%monsieurbiz.search.request.interface%'
       $context: 'documentable'

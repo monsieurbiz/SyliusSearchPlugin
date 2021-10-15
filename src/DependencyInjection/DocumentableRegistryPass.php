@@ -23,6 +23,10 @@ class DocumentableRegistryPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->hasDefinition('monsieurbiz.search.registry.documentable')) {
+            return;
+        }
+
         $registry = $container->getDefinition('monsieurbiz.search.registry.documentable');
         $documentables = $container->getParameter('monsieurbiz.search.config.documents');
         if (!\is_array($documentables)) {

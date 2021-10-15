@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Repository;
 
+use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
 
 interface ProductAttributeRepositoryInterface
 {
     /**
-     * @return ProductAttributeInterface[]
+     * @return ProductAttributeInterface&SearchableInterface[]
      */
     public function findIsSearchableOrFilterable(): array;
 }

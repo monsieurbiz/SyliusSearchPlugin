@@ -19,7 +19,7 @@ mappings:
       properties:
         path:
           type: keyword
-    mainTaxon:
+    main_taxon:
       type: nested
       properties:
         code:
@@ -48,3 +48,4 @@ mappings:
           type: integer
     price:
       type: integer # todo - WIP
+    # attributes mapping is managed dynamically

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin;
 
 use MonsieurBiz\SyliusSearchPlugin\DependencyInjection\DocumentableRegistryPass;
+use MonsieurBiz\SyliusSearchPlugin\DependencyInjection\RegisterSearchRequestPass;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -42,5 +43,6 @@ final class MonsieurBizSyliusSearchPlugin extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new DocumentableRegistryPass());
+        $container->addCompilerPass(new RegisterSearchRequestPass());
     }
 }

@@ -23,6 +23,7 @@ use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductVariant;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Currency\Model\CurrencyInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface;
 
 trait DocumentableProductTrait
 {
@@ -56,6 +57,7 @@ trait DocumentableProductTrait
         $document->setCode($this->getCode());
         $document->setId($this->getId());
         $document->setEnabled($this->isEnabled());
+        $document->setInStock($this->getProductHasVariantInStock());
         $document->setSlug($this->getTranslation($locale)->getSlug());
 
         $document = $this->addImagesInDocument($document);
@@ -235,5 +237,17 @@ trait DocumentableProductTrait
         }
 
         return $cheapestVariant;
+    }
+
+    private function getProductHasVariantInStock()
+    {
+        $variants = $this->getEnabledVariants();
+        /** @var ProductVariantInterface $variant */
+        foreach ($variants as $variant) {
+            if (!$variant->isTracked() || 1 <= ($variant->getOnHand() - $variant->getOnHold())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

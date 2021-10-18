@@ -2,6 +2,7 @@
 
 namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestFactory;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
@@ -23,9 +24,10 @@ class SearchController extends AbstractController
     // TODO add an optional parameter $documentType (nullable => get the default document type)
     public function searchAction(Request $request, string $query): Response
     {
+        $requestConfiguration = new RequestConfiguration($request);
         // TODO create a requestConfiguration (like \Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration without metadata)
         $elasticsearchRequest = $this->requestFactory->create(RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
-        $elasticsearchRequest->setQueryParameters(['query_text' => $query]);
+        $elasticsearchRequest->setConfiguration($requestConfiguration);
 
         $result = $this->search->query($elasticsearchRequest);
 

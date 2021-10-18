@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use Elastica\Query;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 
 interface RequestInterface
 {
@@ -30,5 +31,5 @@ interface RequestInterface
 
     public function supports(string $type, string $documentableCode): bool;
 
-    public function setQueryParameters(array $parameters): void;
+    public function setConfiguration(RequestConfiguration $configuration): void;
 }

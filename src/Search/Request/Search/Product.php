@@ -17,8 +17,10 @@ use Elastica\Aggregation\Nested;
 use Elastica\Aggregation\Terms;
 use Elastica\Query;
 use Elastica\Query\MultiMatch;
+use MonsieurBiz\SyliusSearchPlugin\Helper\SlugHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
@@ -26,7 +28,7 @@ class Product implements RequestInterface
 {
     private DocumentableInterface $documentable;
 
-    private array $queryParameters = [];
+    private RequestConfiguration $configuration;
     private ProductAttributeRepositoryInterface $productAttributeRepository;
 
     public function __construct(
@@ -48,28 +50,28 @@ class Product implements RequestInterface
         return $this->documentable;
     }
 
-    public function setQueryParameters(array $parameters): void
+    public function setConfiguration(RequestConfiguration $configuration): void
     {
-        $this->queryParameters = $parameters;
+        $this->configuration = $configuration;
     }
 
     public function getQuery(): Query
     {
-        if (!\array_key_exists('query_text', $this->queryParameters)) {
+        if ('' === $this->configuration->getQueryText()) {
             throw new \Exception('missing query text'); //todo
         }
 
         $enableFilter = new Query\Terms('enabled', [true]);
         // todo add channel filter
 
-        $searchCode = new Query\Terms('code', [$this->queryParameters['query_text']]);
+        $searchCode = new Query\Terms('code', [$this->configuration->getQueryText()]);
 
         $nameAndDescriptionQuery = new MultiMatch();
         $nameAndDescriptionQuery->setFields([
             'name^5', // todo configuration
             'description', // move to should ? score impact but not include in result
         ]);
-        $nameAndDescriptionQuery->setQuery($this->queryParameters['query_text']);
+        $nameAndDescriptionQuery->setQuery($this->configuration->getQueryText());
         $nameAndDescriptionQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
 
         $searchQuery = new Query\BoolQuery();
@@ -85,6 +87,7 @@ class Product implements RequestInterface
         $bool->addMust($searchQuery);
 
         $esQuery = Query::create($bool);
+        $this->addFilters($esQuery);
         $this->addAggregations($esQuery);
 
         return $esQuery;
@@ -106,7 +109,7 @@ class Product implements RequestInterface
             $attributeValueQuery->setFields([
                 sprintf('attributes.%s.value^%d', $productAttribute->getCode(), $productAttribute->getSearchWeight()),
             ]);
-            $attributeValueQuery->setQuery($this->queryParameters['query_text']);
+            $attributeValueQuery->setQuery($this->configuration->getQueryText());
 
             $attributeQuery = new Query\Nested();
             $attributeQuery->setPath(sprintf('attributes.%s', $productAttribute->getCode()))->setQuery($attributeValueQuery);
@@ -139,5 +142,28 @@ class Product implements RequestInterface
 
             $query->addAggregation($attributesAgg);
         }
+    }
+
+    private function addFilters(Query $query): void
+    {
+        $bool = new Query\BoolQuery();
+        foreach ($this->configuration->getAppliedFilters() as $field => $values) {
+            $attributeValueQuery = new Query\BoolQuery();
+
+            foreach ($values as $value) {
+                $termQuery = new Query\Terms(sprintf('attributes.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
+                $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
+            }
+
+            $attributeQuery = new Query\Nested();
+            $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
+
+            $attributesQuery = new Query\Nested();
+            $attributesQuery->setPath('attributes')->setQuery($attributeQuery);
+
+            $bool->addFilter($attributesQuery);
+        }
+
+        $query->setPostFilter($bool);
     }
 }

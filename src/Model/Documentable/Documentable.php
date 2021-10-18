@@ -22,12 +22,17 @@ class Documentable implements DocumentableInterface
     private string $indexCode;
     private string $sourceClass;
     private string $targetClass;
+    /**
+     * @var array<string, string>
+     */
+    private array $templates;
 
-    public function __construct(string $indexCode, string $sourceClass, string $targetClass)
+    public function __construct(string $indexCode, string $sourceClass, string $targetClass, array $templates)
     {
         $this->indexCode = $indexCode;
         $this->sourceClass = $sourceClass;
         $this->targetClass = $targetClass;
+        $this->templates = $templates;
     }
 
     public function getIndexCode(): string
@@ -50,5 +55,10 @@ class Documentable implements DocumentableInterface
         $interface = (array) (class_implements($this->getSourceClass()) ?? []);
 
         return \in_array(TranslatableInterface::class, $interface, true);
+    }
+
+    public function getTemplate(string $type): ?string
+    {
+        return $this->templates[$type] ?? null;
     }
 }

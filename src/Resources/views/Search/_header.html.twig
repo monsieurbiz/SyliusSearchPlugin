@@ -1,0 +1,5 @@
+{{ sylius_template_event('sylius.shop.search.header.before', _context) }}
+<h1 class="ui monster section dividing header">
+    {{ 'monsieurbiz_searchplugin.search.result.search_result'|trans({'%query%': query, '%count%': result.count}) }}
+</h1>
+{{ sylius_template_event('sylius.shop.search.header.after', _context) }}

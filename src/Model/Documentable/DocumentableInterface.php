@@ -34,4 +34,6 @@ interface DocumentableInterface
     public function getDatasource(): DatasourceInterface;
 
     public function isTranslatable(): bool;
+
+    public function getTemplate(string $type): ?string;
 }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
-use MonsieurBiz\SyliusSearchPlugin\Index\Indexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestFactory;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
@@ -23,22 +22,17 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class SearchCommand extends Command
 {
     protected static $defaultName = 'monsieurbiz:search:search';
-    private Indexer $indexer;
-    private SerializerInterface $serializer;
     private RequestFactory $requestFactory;
     private Search $search;
 
     public function __construct(
-        Indexer $indexer, SerializerInterface $serializer, RequestFactory $requestFactory, Search $search, $name = null)
-    {
+        RequestFactory $requestFactory, Search $search, $name = null
+    ) {
         parent::__construct($name);
-        $this->indexer = $indexer;
-        $this->serializer = $serializer;
         $this->requestFactory = $requestFactory;
         $this->search = $search;
     }

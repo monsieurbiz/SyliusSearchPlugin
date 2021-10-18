@@ -1,0 +1,7 @@
+monsieurbiz_search_search:
+  path: /search/{query}
+  methods: [GET]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:searchAction
+  requirements:
+    query: .+

@@ -16,32 +16,36 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search;
 use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Pagerfanta\Elastica\ElasticaAdapter;
+use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class Search implements SearchInterface
 {
     private SerializerInterface $serializer;
+    private LocaleContextInterface $localeContext;
 
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer, LocaleContextInterface $localeContext)
     {
         $this->serializer = $serializer;
+        $this->localeContext = $localeContext;
     }
 
     public function query(RequestInterface $request): ResponseInterface
     {
+        $indexName = $this->getIndexName($request->getDocumentable(), $this->localeContext->getLocaleCode());
         $factory = new Factory([
             Factory::CONFIG_INDEX_CLASS_MAPPING => [
-                $this->getIndexName($request->getDocumentable(), 'fr_FR') => $request->getDocumentable()->getTargetClass(),
+                $indexName => $request->getDocumentable()->getTargetClass(),
             ],
             Factory::CONFIG_SERIALIZER => $this->serializer,
         ]);
         $client = $factory->buildClient();
 
-        return new Response(new ElasticaAdapter($client->getIndex('monsieurbiz_product_fr_fr'), $request->getQuery()));
+        return new Response(new ElasticaAdapter($client->getIndex($indexName), $request->getQuery()));
     }
 
     private function getIndexName(DocumentableInterface $documentable, ?string $locale = null): string
     {
-        return $documentable->getIndexCode() . strtolower(null !== $locale ? '_' . $locale : '');
+        return $documentable->getIndexCode() . strtolower((null !== $locale && $documentable->isTranslatable()) ? '_' . $locale : '');
     }
 }

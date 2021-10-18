@@ -127,8 +127,12 @@ class Product implements RequestInterface
             $attributeValuesAgg = new Terms('values');
             $attributeValuesAgg->setField(sprintf('attributes.%s.value.keyword', $productAttribute->getCode()));
 
+            $attributeCodesAgg = new Terms('names');
+            $attributeCodesAgg->setField(sprintf('attributes.%s.name', $productAttribute->getCode()));
+            $attributeCodesAgg->addAggregation($attributeValuesAgg);
+
             $attributeAgg = new Nested($productAttribute->getCode(), sprintf('attributes.%s', $productAttribute->getCode()));
-            $attributeAgg->addAggregation($attributeValuesAgg);
+            $attributeAgg->addAggregation($attributeCodesAgg);
 
             $attributesAgg = new Nested('attributes', 'attributes');
             $attributesAgg->addAggregation($attributeAgg);

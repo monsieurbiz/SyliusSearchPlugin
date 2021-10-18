@@ -40,6 +40,7 @@ class DocumentableRegistryPass implements CompilerPassInterface
                     '$indexCode' => $indexCode,
                     '$sourceClass' => $documentableConfiguration['source'],
                     '$targetClass' => $documentableConfiguration['target'],
+                    '$templates' => $documentableConfiguration['templates'],
                 ])
             ;
             $documentableDefinition = $container->setDefinition($documentableServiceId, $documentableDefinition);

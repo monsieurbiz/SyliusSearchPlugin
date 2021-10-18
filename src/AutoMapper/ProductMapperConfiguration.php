@@ -95,8 +95,8 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         });
 
         $metadata->forMember('attributes', function(ProductInterface $product): array {
-            $currentLocale = $product->getTranslation()->getLocale();
-            /** @var ProductAttributeValue $attributeValue */
+            $attributes = [];
+            $currentLocale = $product->getTranslation()->getLocale(); // TODO default locale if it's null?
             foreach ($product->getAttributesByLocale($currentLocale, $currentLocale) as $attributeValue) {
                 if (null === $attributeValue->getName() || null === $attributeValue->getValue()) {
                     continue;
@@ -105,6 +105,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
                 if (!$attribute instanceof SearchableInterface || (!$attribute->isSearchable() && !$attribute->isFilterable())) {
                     continue;
                 }
+                /** @var ProductAttribute $attributeDTO */
                 $attributeDTO = $this->autoMapper->map($attributeValue, ProductAttribute::class);
                 $attributeDTO->setValue($attributeValue->getValue()); // we can't use the automapper for the value because it has a mixed type
                 $attributes[$attributeValue->getCode()] = $attributeDTO;

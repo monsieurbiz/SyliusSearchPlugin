@@ -19,7 +19,7 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 interface ProductAttributeRepositoryInterface
 {
     /**
-     * @return ProductAttributeInterface&SearchableInterface[]
+     * @return ProductAttributeInterface[]&SearchableInterface[]
      */
     public function findIsSearchableOrFilterable(): array;
 }

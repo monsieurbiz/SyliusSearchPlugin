@@ -89,6 +89,7 @@ class Product implements RequestInterface
         $esQuery = Query::create($bool);
         $this->addFilters($esQuery);
         $this->addAggregations($esQuery);
+        dump($esQuery->toArray());
 
         return $esQuery;
     }
@@ -123,6 +124,7 @@ class Product implements RequestInterface
 
     private function addAggregations(Query $query): void
     {
+        $attributesAgg = new Nested('attributes', 'attributes');
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
             if (!$productAttribute->isFilterable()) {
                 continue;
@@ -137,9 +139,9 @@ class Product implements RequestInterface
             $attributeAgg = new Nested($productAttribute->getCode(), sprintf('attributes.%s', $productAttribute->getCode()));
             $attributeAgg->addAggregation($attributeCodesAgg);
 
-            $attributesAgg = new Nested('attributes', 'attributes');
             $attributesAgg->addAggregation($attributeAgg);
-
+        }
+        if (0 < \count($attributesAgg->getAggs())) {
             $query->addAggregation($attributesAgg);
         }
     }

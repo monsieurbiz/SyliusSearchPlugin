@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -47,13 +47,6 @@ class RangeFilter
 
     /**
      * Filter constructor.
-     *
-     * @param string $code
-     * @param string $label
-     * @param string $minLabel
-     * @param string $maxLabel
-     * @param int $min
-     * @param int $max
      */
     public function __construct(string $code, string $label, string $minLabel, string $maxLabel, int $min, int $max)
     {
@@ -65,49 +58,31 @@ class RangeFilter
         $this->max = $max;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return $this->label;
     }
 
-    /**
-     * @return string
-     */
     public function getMinLabel(): string
     {
         return $this->minLabel;
     }
 
-    /**
-     * @return string
-     */
     public function getMaxLabel(): string
     {
         return $this->maxLabel;
     }
 
-    /**
-     * @return int
-     */
     public function getMin(): int
     {
         return $this->min;
     }
 
-    /**
-     * @return int
-     */
     public function getMax(): int
     {
         return $this->max;

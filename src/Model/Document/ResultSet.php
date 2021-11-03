@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -51,11 +51,6 @@ class ResultSet
 
     /**
      * SearchResults constructor.
-     *
-     * @param int $maxItems
-     * @param int $page
-     * @param ElasticaResultSet|null $resultSet
-     * @param TaxonInterface|null $taxon
      */
     public function __construct(int $maxItems, int $page, ?ElasticaResultSet $resultSet = null, ?TaxonInterface $taxon = null)
     {
@@ -92,9 +87,6 @@ class ResultSet
 
     /**
      * Init filters array depending on result aggregations.
-     *
-     * @param ElasticaResultSet $resultSet
-     * @param TaxonInterface|null $taxon
      */
     private function initFilters(ElasticaResultSet $resultSet, ?TaxonInterface $taxon = null): void
     {
@@ -115,6 +107,7 @@ class ResultSet
             foreach ($attributeNameBuckets as $attributeNameBucket) {
                 $attributeName = $attributeNameBucket['key'];
                 $attributes[$attributeCode] = $attributeName;
+
                 break;
             }
         }
@@ -129,7 +122,7 @@ class ResultSet
             $filter = new Filter($field, $attributes[$field] ?? $field, $aggregation['doc_count']);
             $buckets = $aggregation['values']['buckets'] ?? [];
             foreach ($buckets as $bucket) {
-                if (isset($bucket['key']) && isset($bucket['doc_count'])) {
+                if (isset($bucket['key'], $bucket['doc_count'])) {
                     $filter->addValue($bucket['key'], $bucket['doc_count']);
                 }
             }
@@ -159,41 +152,26 @@ class ResultSet
         return $this->filters;
     }
 
-    /**
-     * @return int
-     */
     public function getTotalHits(): int
     {
         return $this->totalHits;
     }
 
-    /**
-     * @return Pagerfanta
-     */
     public function getPager(): Pagerfanta
     {
         return $this->pager;
     }
 
-    /**
-     * @return Filter|null
-     */
     public function getTaxonFilter(): ?Filter
     {
         return $this->taxonFilter;
     }
 
-    /**
-     * @return Filter|null
-     */
     public function getMainTaxonFilter(): ?Filter
     {
         return $this->mainTaxonFilter;
     }
 
-    /**
-     * @return RangeFilter|null
-     */
     public function getPriceFilter(): ?RangeFilter
     {
         return $this->priceFilter;
@@ -204,7 +182,7 @@ class ResultSet
      */
     protected function sortFilters(): void
     {
-        usort($this->filters, function($filter1, $filter2) {
+        usort($this->filters, function ($filter1, $filter2) {
             /** @var Filter $filter1 */
             /** @var Filter $filter2 */
 
@@ -219,9 +197,6 @@ class ResultSet
 
     /**
      * Add taxon filter depending on aggregations.
-     *
-     * @param array $aggregations
-     * @param TaxonInterface|null $taxon
      */
     protected function addTaxonFilter(array $aggregations, ?TaxonInterface $taxon): void
     {
@@ -259,6 +234,7 @@ class ResultSet
                         foreach ($taxonNameBuckets as $taxonNameBucket) {
                             $taxonName = $taxonNameBucket['key'];
                             $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count']);
+
                             break 2;
                         }
                     }
@@ -274,9 +250,6 @@ class ResultSet
 
     /**
      * Add main taxon filter depending on aggregations.
-     *
-     * @param array $aggregations
-     * @param TaxonInterface|null $taxon
      */
     protected function addMainTaxonFilter(array $aggregations, ?TaxonInterface $taxon): void
     {
@@ -301,6 +274,7 @@ class ResultSet
                     foreach ($taxonNameBuckets as $taxonNameBucket) {
                         $taxonName = $taxonNameBucket['key'];
                         $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count']);
+
                         break 2;
                     }
                 }
@@ -315,8 +289,6 @@ class ResultSet
 
     /**
      * Add price filter depending on aggregations.
-     *
-     * @param array $aggregations
      */
     protected function addPriceFilter(array $aggregations): void
     {

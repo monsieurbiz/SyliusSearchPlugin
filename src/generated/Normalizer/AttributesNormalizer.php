@@ -1,30 +1,45 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE.txt
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace MonsieurBiz\SyliusSearchPlugin\generated\Normalizer;
 
 use Jane\JsonSchemaRuntime\Reference;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
 class AttributesNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
+
     use NormalizerAwareTrait;
+
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Attributes';
+        return 'MonsieurBiz\\SyliusSearchPlugin\\generated\\Model\\Attributes' === $type;
     }
+
     public function supportsNormalization($data, $format = null)
     {
         return $data instanceof \MonsieurBiz\SyliusSearchPlugin\generated\Model\Attributes;
     }
-    public function denormalize($data, $class, $format = null, array $context = array())
+
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
-        if (!is_object($data)) {
+        if (!\is_object($data)) {
             return null;
         }
         if (isset($data->{'$ref'})) {
@@ -34,79 +49,72 @@ class AttributesNormalizer implements DenormalizerInterface, NormalizerInterface
             return new Reference($data->{'$recursiveRef'}, $context['document-origin']);
         }
         $object = new \MonsieurBiz\SyliusSearchPlugin\generated\Model\Attributes();
-        if (property_exists($data, 'code') && $data->{'code'} !== null) {
+        if (property_exists($data, 'code') && null !== $data->{'code'}) {
             $object->setCode($data->{'code'});
-        }
-        elseif (property_exists($data, 'code') && $data->{'code'} === null) {
+        } elseif (property_exists($data, 'code') && null === $data->{'code'}) {
             $object->setCode(null);
         }
-        if (property_exists($data, 'name') && $data->{'name'} !== null) {
+        if (property_exists($data, 'name') && null !== $data->{'name'}) {
             $object->setName($data->{'name'});
-        }
-        elseif (property_exists($data, 'name') && $data->{'name'} === null) {
+        } elseif (property_exists($data, 'name') && null === $data->{'name'}) {
             $object->setName(null);
         }
-        if (property_exists($data, 'value') && $data->{'value'} !== null) {
-            $values = array();
+        if (property_exists($data, 'value') && null !== $data->{'value'}) {
+            $values = [];
             foreach ($data->{'value'} as $value) {
                 $values[] = $value;
             }
             $object->setValue($values);
-        }
-        elseif (property_exists($data, 'value') && $data->{'value'} === null) {
+        } elseif (property_exists($data, 'value') && null === $data->{'value'}) {
             $object->setValue(null);
         }
-        if (property_exists($data, 'locale') && $data->{'locale'} !== null) {
+        if (property_exists($data, 'locale') && null !== $data->{'locale'}) {
             $object->setLocale($data->{'locale'});
-        }
-        elseif (property_exists($data, 'locale') && $data->{'locale'} === null) {
+        } elseif (property_exists($data, 'locale') && null === $data->{'locale'}) {
             $object->setLocale(null);
         }
-        if (property_exists($data, 'score') && $data->{'score'} !== null) {
+        if (property_exists($data, 'score') && null !== $data->{'score'}) {
             $object->setScore($data->{'score'});
-        }
-        elseif (property_exists($data, 'score') && $data->{'score'} === null) {
+        } elseif (property_exists($data, 'score') && null === $data->{'score'}) {
             $object->setScore(null);
         }
+
         return $object;
     }
-    public function normalize($object, $format = null, array $context = array())
+
+    public function normalize($object, $format = null, array $context = [])
     {
         $data = new \stdClass();
         if (null !== $object->getCode()) {
             $data->{'code'} = $object->getCode();
-        }
-        else {
+        } else {
             $data->{'code'} = null;
         }
         if (null !== $object->getName()) {
             $data->{'name'} = $object->getName();
-        }
-        else {
+        } else {
             $data->{'name'} = null;
         }
         if (null !== $object->getValue()) {
-            $values = array();
+            $values = [];
             foreach ($object->getValue() as $value) {
                 $values[] = $value;
             }
             $data->{'value'} = $values;
-        }
-        else {
+        } else {
             $data->{'value'} = null;
         }
         if (null !== $object->getLocale()) {
             $data->{'locale'} = $object->getLocale();
-        }
-        else {
+        } else {
             $data->{'locale'} = null;
         }
         if (null !== $object->getScore()) {
             $data->{'score'} = $object->getScore();
-        }
-        else {
+        } else {
             $data->{'score'} = null;
         }
+
         return $data;
     }
 }

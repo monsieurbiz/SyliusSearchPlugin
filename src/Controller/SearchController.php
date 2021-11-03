@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -32,6 +32,7 @@ use Twig\Environment;
 class SearchController extends AbstractController
 {
     public const SORT_ASC = 'asc';
+
     public const SORT_DESC = 'desc';
 
     /** @var Environment */
@@ -76,8 +77,6 @@ class SearchController extends AbstractController
     /**
      * Post search.
      *
-     * @param Request $request
-     *
      * @return RedirectResponse
      */
     public function postAction(Request $request)
@@ -92,10 +91,6 @@ class SearchController extends AbstractController
 
     /**
      * Perform the search action & display results. User can add page, limit or sorting.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function searchAction(Request $request): Response
     {
@@ -111,6 +106,7 @@ class SearchController extends AbstractController
         if (1 === $resultSet->getTotalHits() && empty($appliedFilters)) {
             /** @var Result $document */
             $document = current($resultSet->getResults());
+
             try {
                 $urlParams = $this->renderDocumentUrlHelper->getUrlParams($document);
 
@@ -140,10 +136,6 @@ class SearchController extends AbstractController
 
     /**
      * Perform the instant search action & display results.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function instantAction(Request $request): Response
     {
@@ -166,10 +158,6 @@ class SearchController extends AbstractController
 
     /**
      * Perform the taxon action & display results.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function taxonAction(Request $request): Response
     {

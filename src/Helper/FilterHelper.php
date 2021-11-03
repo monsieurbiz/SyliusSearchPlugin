@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -16,15 +16,13 @@ namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 class FilterHelper
 {
     public const MAIN_TAXON_FILTER = 'main_taxon';
+
     public const TAXON_FILTER = 'taxon';
+
     public const PRICE_FILTER = 'price';
 
     /**
      * Return an array with filters for query.
-     *
-     * @param array $appliedFilters
-     *
-     * @return array
      */
     public static function buildFilters(array $appliedFilters): array
     {
@@ -39,7 +37,7 @@ class FilterHelper
             } elseif (self::MAIN_TAXON_FILTER === $field) {
                 $filters[] = self::buildMainTaxonFilter($values);
             } elseif (self::PRICE_FILTER === $field) {
-                if (isset($values['min']) && isset($values['max'])) {
+                if (isset($values['min'], $values['max'])) {
                     $filters[] = self::buildPriceFilter((int) $values['min'], (int) $values['max']);
                 }
             } else {
@@ -56,11 +54,6 @@ class FilterHelper
 
     /**
      * Build filter array to add in query.
-     *
-     * @param string $field
-     * @param array $values
-     *
-     * @return array
      */
     public static function buildFilter(string $field, array $values): array
     {
@@ -89,10 +82,6 @@ class FilterHelper
 
     /**
      * Build filter array for taxon to add in query.
-     *
-     * @param array $values
-     *
-     * @return array
      */
     public static function buildTaxonFilter(array $values): array
     {
@@ -116,10 +105,6 @@ class FilterHelper
 
     /**
      * Build filter array for main taxon to add in query.
-     *
-     * @param array $values
-     *
-     * @return array
      */
     public static function buildMainTaxonFilter(array $values): array
     {
@@ -143,11 +128,6 @@ class FilterHelper
 
     /**
      * Build filter array for price to add in query.
-     *
-     * @param int $min
-     * @param int $max
-     *
-     * @return array
      */
     public static function buildPriceFilter(int $min, int $max): array
     {
@@ -170,10 +150,6 @@ class FilterHelper
 
     /**
      * Build filter value array to add in query.
-     *
-     * @param string $value
-     *
-     * @return array
      */
     public static function buildFilterValue(string $value): array
     {
@@ -186,10 +162,6 @@ class FilterHelper
 
     /**
      * Build filter value array to add in query.
-     *
-     * @param string $value
-     *
-     * @return array
      */
     public static function buildTaxonFilterValue(string $value): array
     {
@@ -202,10 +174,6 @@ class FilterHelper
 
     /**
      * Build filter value array to add in query.
-     *
-     * @param string $value
-     *
-     * @return array
      */
     public static function buildMainTaxonFilterValue(string $value): array
     {

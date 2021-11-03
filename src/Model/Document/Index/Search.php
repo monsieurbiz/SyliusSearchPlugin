@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -42,11 +42,6 @@ class Search extends AbstractIndex
 
     /**
      * PopulateCommand constructor.
-     *
-     * @param Client $client
-     * @param SearchQueryProvider $searchQueryProvider
-     * @param ChannelContextInterface $channelContext
-     * @param LoggerInterface $logger
      */
     public function __construct(
         Client $client,
@@ -62,10 +57,6 @@ class Search extends AbstractIndex
 
     /**
      * Search documents for a given locale, search terms, max number items and page.
-     *
-     * @param GridConfig $gridConfig
-     *
-     * @return ResultSet
      */
     public function search(GridConfig $gridConfig): ResultSet
     {
@@ -80,10 +71,6 @@ class Search extends AbstractIndex
 
     /**
      * Instant search documents for a given locale, query and a max number items.
-     *
-     * @param GridConfig $gridConfig
-     *
-     * @return ResultSet
      */
     public function instant(GridConfig $gridConfig): ResultSet
     {
@@ -98,10 +85,6 @@ class Search extends AbstractIndex
 
     /**
      * Taxon search documents for a given locale, taxon code, max number items and page.
-     *
-     * @param GridConfig $gridConfig
-     *
-     * @return ResultSet
      */
     public function taxon(GridConfig $gridConfig): ResultSet
     {
@@ -116,9 +99,6 @@ class Search extends AbstractIndex
 
     /**
      * Perform search for a given query.
-     *
-     * @param GridConfig $gridConfig
-     * @param array $query
      *
      * @return ResultSet
      */
@@ -145,11 +125,7 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for search.
      *
-     * @param GridConfig $gridConfig
-     *
      * @throws ReadFileException
-     *
-     * @return array
      */
     private function getSearchQuery(GridConfig $gridConfig): array
     {
@@ -182,6 +158,7 @@ class Search extends AbstractIndex
         $channelCode = $this->channelContext->getChannel()->getCode();
         foreach ($gridConfig->getSorting() as $field => $order) {
             $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order);
+
             break; // only 1
         }
 
@@ -197,11 +174,7 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for instant search.
      *
-     * @param GridConfig $gridConfig
-     *
      * @throws ReadFileException
-     *
-     * @return array
      */
     private function getInstantQuery(GridConfig $gridConfig): array
     {
@@ -218,11 +191,7 @@ class Search extends AbstractIndex
     /**
      * Retrieve the query to send to Elasticsearch for taxon search.
      *
-     * @param GridConfig $gridConfig
-     *
      * @throws ReadFileException
-     *
-     * @return array
      */
     private function getTaxonQuery(GridConfig $gridConfig): array
     {
@@ -256,6 +225,7 @@ class Search extends AbstractIndex
         $channelCode = $this->channelContext->getChannel()->getCode();
         foreach ($gridConfig->getSorting() as $field => $order) {
             $query['sort'][] = SortHelper::getSortParamByField($field, $channelCode, $order, $gridConfig->getTaxon()->getCode());
+
             break; // only 1
         }
 
@@ -268,11 +238,6 @@ class Search extends AbstractIndex
         return $query;
     }
 
-    /**
-     * @param string $query
-     *
-     * @return array
-     */
     private function parseQuery(string $query): array
     {
         return Yaml::parse($query);

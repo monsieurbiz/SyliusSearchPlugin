@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -37,10 +37,6 @@ class Filter
 
     /**
      * Filter constructor.
-     *
-     * @param string $code
-     * @param string $label
-     * @param int $count
      */
     public function __construct(string $code, string $label, int $count)
     {
@@ -49,17 +45,11 @@ class Filter
         $this->count = $count;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return $this->label;
@@ -82,9 +72,6 @@ class Filter
         $this->values[] = new FilterValue($value, $count);
     }
 
-    /**
-     * @return int
-     */
     public function getCount(): int
     {
         return $this->count;

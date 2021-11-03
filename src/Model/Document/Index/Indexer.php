@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -21,8 +21,6 @@ use MonsieurBiz\SyliusSearchPlugin\Exception\ReadOnlyIndexException;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider;
-use MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider;
-use Psr\Log\LoggerInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Webmozart\Assert\Assert;
@@ -42,12 +40,6 @@ class Indexer extends AbstractIndex
 
     /**
      * PopulateCommand constructor.
-     *
-     * @param Client $client
-     * @param DocumentRepositoryProvider $documentRepositoryProvider
-     * @param RepositoryInterface $localeRepository
-     * @param SearchQueryProvider $searchQueryProvider
-     * @param LoggerInterface $logger
      */
     public function __construct(
         Client $client,
@@ -61,15 +53,13 @@ class Indexer extends AbstractIndex
 
     /**
      * Retrieve all available locales.
-     *
-     * @return array
      */
     public function getLocales(): array
     {
         if (empty($this->locales)) {
             $locales = $this->localeRepository->findAll();
             $this->locales = array_map(
-                function(LocaleInterface $locale) {
+                function (LocaleInterface $locale) {
                     return $locale->getCode();
                 },
                 $locales
@@ -93,8 +83,6 @@ class Indexer extends AbstractIndex
 
     /**
      * Index all document for a locale.
-     *
-     * @param string $locale
      *
      * @throws \Exception
      */
@@ -120,6 +108,7 @@ class Indexer extends AbstractIndex
         $this->getIndexer()->flush();
 
         $this->getIndexer()->refresh($indexName);
+
         try {
             $this->getIndexBuilder()->purgeOldIndices($indexName);
         } catch (ResponseException $exception) {
@@ -129,8 +118,6 @@ class Indexer extends AbstractIndex
 
     /**
      * Index a document for all locales.
-     *
-     * @param DocumentableInterface $subject
      *
      * @throws \Exception
      */
@@ -145,9 +132,6 @@ class Indexer extends AbstractIndex
     /**
      * Index a document for one locale.
      *
-     * @param Result $document
-     * @param string $locale
-     *
      * @throws MissingParamException
      */
     public function indexOneByLocale(Result $document, string $locale): void
@@ -161,8 +145,6 @@ class Indexer extends AbstractIndex
     /**
      * Remove a document for all locales.
      *
-     * @param DocumentableInterface $subject
-     *
      * @throws \Exception
      */
     public function removeOne(DocumentableInterface $subject): void
@@ -175,9 +157,6 @@ class Indexer extends AbstractIndex
 
     /**
      * Remove a document for all locales.
-     *
-     * @param Result $document
-     * @param string $locale
      *
      * @throws MissingParamException
      */

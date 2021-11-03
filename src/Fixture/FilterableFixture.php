@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -22,9 +22,6 @@ class FilterableFixture extends AbstractResourceFixture implements FilterableFix
 {
     /**
      * FilterableFixture constructor.
-     *
-     * @param EntityManagerInterface $productManager
-     * @param FilterableFixtureFactoryInterface $exampleFactory
      */
     public function __construct(
         EntityManagerInterface $productManager,
@@ -34,7 +31,7 @@ class FilterableFixture extends AbstractResourceFixture implements FilterableFix
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -42,7 +39,7 @@ class FilterableFixture extends AbstractResourceFixture implements FilterableFix
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function configureResourceNode(ArrayNodeDefinition $resourceNode): void
     {

@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -29,8 +29,6 @@ class Result extends Document implements ResultInterface
      * Document ID in elasticsearch.
      *
      * @throws MissingParamException
-     *
-     * @return string
      */
     public function getUniqId(): string
     {
@@ -45,8 +43,6 @@ class Result extends Document implements ResultInterface
     }
 
     /**
-     * @param string $code
-     *
      * @return Attributes
      */
     public function getAttribute(string $code): ?Attributes
@@ -61,12 +57,7 @@ class Result extends Document implements ResultInterface
     }
 
     /**
-     * @param string $channelCode
-     * @param string $currencyCode
-     *
      * @throws MissingPriceException
-     *
-     * @return Price|null
      */
     public function getPriceByChannelAndCurrency(string $channelCode, string $currencyCode): ?Price
     {
@@ -78,15 +69,10 @@ class Result extends Document implements ResultInterface
                 return $price;
             }
         }
+
         throw new MissingPriceException(sprintf('Price not found for channel "%s" and currency "%s"', $channelCode, $currencyCode));
     }
 
-    /**
-     * @param string $channelCode
-     * @param string $currencyCode
-     *
-     * @return Price|null
-     */
     public function getOriginalPriceByChannelAndCurrency(string $channelCode, string $currencyCode): ?Price
     {
         if (null === $this->getOriginalPrice()) {
@@ -104,8 +90,6 @@ class Result extends Document implements ResultInterface
 
     /**
      * @throws MissingLocaleException
-     *
-     * @return string
      */
     public function getLocale(): string
     {
@@ -121,14 +105,13 @@ class Result extends Document implements ResultInterface
     /**
      * @throws MissingLocaleException
      * @throws NotSupportedTypeException
-     *
-     * @return UrlParamsProvider
      */
     public function getUrlParams(): UrlParamsProvider
     {
         switch ($this->getType()) {
             case 'product':
                 return new UrlParamsProvider('sylius_shop_product_show', ['slug' => $this->getSlug(), '_locale' => $this->getLocale()]);
+
                 break;
         }
 
@@ -136,8 +119,6 @@ class Result extends Document implements ResultInterface
     }
 
     /**
-     * @param string $channel
-     *
      * @return Result
      */
     public function addChannel(string $channel): self
@@ -148,12 +129,6 @@ class Result extends Document implements ResultInterface
     }
 
     /**
-     * @param string $code
-     * @param string $name
-     * @param int $position
-     * @param int $level
-     * @param int $productPosition
-     *
      * @return Result
      */
     public function addTaxon(string $code, string $name, int $position, int $level, int $productPosition): ResultInterface
@@ -166,10 +141,6 @@ class Result extends Document implements ResultInterface
     }
 
     /**
-     * @param string $channel
-     * @param string $currency
-     * @param int $value
-     *
      * @return Result
      */
     public function addPrice(string $channel, string $currency, int $value): ResultInterface
@@ -182,10 +153,6 @@ class Result extends Document implements ResultInterface
     }
 
     /**
-     * @param string $channel
-     * @param string $currency
-     * @param int $value
-     *
      * @return Result
      */
     public function addOriginalPrice(string $channel, string $currency, int $value): ResultInterface
@@ -198,12 +165,6 @@ class Result extends Document implements ResultInterface
     }
 
     /**
-     * @param string $code
-     * @param string $name
-     * @param array $value
-     * @param string $locale
-     * @param int $score
-     *
      * @return Result
      */
     public function addAttribute(string $code, string $name, array $value, string $locale, int $score): ResultInterface

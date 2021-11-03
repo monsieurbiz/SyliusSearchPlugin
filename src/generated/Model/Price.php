@@ -1,88 +1,68 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE.txt
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace MonsieurBiz\SyliusSearchPlugin\generated\Model;
 
 class Price
 {
     /**
-     * 
-     *
      * @var string|null
      */
     protected $channel;
+
     /**
-     * 
-     *
      * @var string|null
      */
     protected $currency;
+
     /**
-     * 
-     *
      * @var int|null
      */
     protected $value;
-    /**
-     * 
-     *
-     * @return string|null
-     */
-    public function getChannel() : ?string
+
+    public function getChannel(): ?string
     {
         return $this->channel;
     }
-    /**
-     * 
-     *
-     * @param string|null $channel
-     *
-     * @return self
-     */
-    public function setChannel(?string $channel) : self
+
+    public function setChannel(?string $channel): self
     {
         $this->channel = $channel;
+
         return $this;
     }
-    /**
-     * 
-     *
-     * @return string|null
-     */
-    public function getCurrency() : ?string
+
+    public function getCurrency(): ?string
     {
         return $this->currency;
     }
-    /**
-     * 
-     *
-     * @param string|null $currency
-     *
-     * @return self
-     */
-    public function setCurrency(?string $currency) : self
+
+    public function setCurrency(?string $currency): self
     {
         $this->currency = $currency;
+
         return $this;
     }
-    /**
-     * 
-     *
-     * @return int|null
-     */
-    public function getValue() : ?int
+
+    public function getValue(): ?int
     {
         return $this->value;
     }
-    /**
-     * 
-     *
-     * @param int|null $value
-     *
-     * @return self
-     */
-    public function setValue(?int $value) : self
+
+    public function setValue(?int $value): self
     {
         $this->value = $value;
+
         return $this;
     }
 }

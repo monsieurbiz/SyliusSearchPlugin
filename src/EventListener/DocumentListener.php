@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -25,8 +25,6 @@ final class DocumentListener
 
     /**
      * DocumentListener constructor.
-     *
-     * @param Indexer $documentIndexer
      */
     public function __construct(Indexer $documentIndexer)
     {
@@ -35,8 +33,6 @@ final class DocumentListener
 
     /**
      * Save document to search index, update if exists.
-     *
-     * @param GenericEvent $event
      *
      * @throws \Exception
      */
@@ -50,8 +46,6 @@ final class DocumentListener
 
     /**
      * Delete document in search index.
-     *
-     * @param GenericEvent $event
      *
      * @throws \Exception
      */

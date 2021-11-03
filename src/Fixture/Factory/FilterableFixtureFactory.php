@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -40,9 +40,6 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Filtera
 
     /**
      * FilterableFixtureFactory constructor.
-     *
-     * @param RepositoryInterface $productAttributeRepository
-     * @param RepositoryInterface $productOptionRepository
      */
     public function __construct(
         RepositoryInterface $productAttributeRepository,
@@ -55,7 +52,7 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Filtera
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function configureOptions(OptionsResolver $resolver): void
     {
@@ -71,8 +68,6 @@ class FilterableFixtureFactory extends AbstractExampleFactory implements Filtera
     }
 
     /**
-     * @param array $options
-     *
      * @throws \Exception
      *
      * @return object

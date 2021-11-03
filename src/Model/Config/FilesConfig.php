@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -36,25 +36,16 @@ class FilesConfig
         $this->taxonPath = $files['taxon'];
     }
 
-    /**
-     * @return string
-     */
     public function getSearchPath(): string
     {
         return $this->searchPath;
     }
 
-    /**
-     * @return string
-     */
     public function getInstantPath(): string
     {
         return $this->instantPath;
     }
 
-    /**
-     * @return string
-     */
     public function getTaxonPath(): string
     {
         return $this->taxonPath;

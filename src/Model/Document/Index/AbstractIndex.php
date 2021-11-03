@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -32,8 +32,6 @@ abstract class AbstractIndex
 
     /**
      * PopulateCommand constructor.
-     *
-     * @param Client $client
      */
     public function __construct(
         Client $client
@@ -43,8 +41,6 @@ abstract class AbstractIndex
 
     /**
      * Get the client.
-     *
-     * @return Client
      */
     protected function getClient(): Client
     {
@@ -53,27 +49,17 @@ abstract class AbstractIndex
 
     /**
      * Retrieve the index name.
-     *
-     * @param string $locale
-     *
-     * @return string
      */
     protected function getIndexName(string $locale): string
     {
         return self::DOCUMENT_INDEX_NAME . '-' . strtolower($locale);
     }
 
-    /**
-     * @return IndexBuilder
-     */
     protected function getIndexBuilder(): IndexBuilder
     {
         return $this->client->getIndexBuilder();
     }
 
-    /**
-     * @return Indexer
-     */
     protected function getIndexer(): Indexer
     {
         return $this->client->getIndexer();

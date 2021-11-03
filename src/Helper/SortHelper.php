@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -18,12 +18,7 @@ class SortHelper
     /**
      * Get query's sort array depending on sorted field.
      *
-     * @param string $field
-     * @param string $channel
-     * @param string $order
      * @param string $taxon
-     *
-     * @return array
      */
     public static function getSortParamByField(string $field, string $channel, string $order = 'asc', $taxon = ''): array
     {
@@ -44,14 +39,6 @@ class SortHelper
 
     /**
      * Build sort array to add in query.
-     *
-     * @param string $field
-     * @param string $order
-     * @param string $nestedPath
-     * @param string $sortFilterField
-     * @param string $sortFilterValue
-     *
-     * @return array
      */
     public static function buildSort(
         string $field,

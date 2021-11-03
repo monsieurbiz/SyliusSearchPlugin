@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -23,10 +23,13 @@ use Symfony\Component\HttpFoundation\Request;
 class GridConfig
 {
     public const SEARCH_TYPE = 'search';
+
     public const TAXON_TYPE = 'taxon';
+
     public const INSTANT_TYPE = 'instant';
 
     public const SORT_ASC = 'asc';
+
     public const SORT_DESC = 'desc';
 
     public const FALLBACK_LIMIT = 10;
@@ -86,10 +89,6 @@ class GridConfig
 
     /**
      * GridConfig constructor.
-     *
-     * @param array $config
-     * @param RepositoryInterface $productAttributeRepository
-     * @param RepositoryInterface $productOptionRepository
      */
     public function __construct(array $config, RepositoryInterface $productAttributeRepository, RepositoryInterface $productOptionRepository)
     {
@@ -98,11 +97,6 @@ class GridConfig
         $this->productOptionRepository = $productOptionRepository;
     }
 
-    /**
-     * @param string $type
-     * @param Request $request
-     * @param TaxonInterface|null $taxon
-     */
     public function init(string $type, Request $request, ?TaxonInterface $taxon = null): void
     {
         if ($this->isInitialized) {
@@ -135,6 +129,7 @@ class GridConfig
                 }
 
                 $this->isInitialized = true;
+
                 break;
             case self::TAXON_TYPE:
                 // Set type, locale, page and taxon
@@ -163,6 +158,7 @@ class GridConfig
                     $this->limit = $this->config['default_limit']['taxon'] ?? self::FALLBACK_LIMIT;
                 }
                 $this->isInitialized = true;
+
                 break;
             case self::INSTANT_TYPE:
                 // Set type, locale, page and query
@@ -174,39 +170,28 @@ class GridConfig
                 // Set limit
                 $this->limit = $this->config['default_limit']['instant'] ?? self::FALLBACK_LIMIT;
                 $this->isInitialized = true;
+
                 break;
             default:
                 throw new UnknownGridConfigType();
         }
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
     public function getLocale(): string
     {
         return $this->locale;
     }
 
-    /**
-     * @return string
-     */
     public function getQuery(): string
     {
         return $this->query;
     }
 
-    /**
-     * @return int
-     */
     public function getPage(): int
     {
         return $this->page;
@@ -220,9 +205,6 @@ class GridConfig
         return $this->limits;
     }
 
-    /**
-     * @return int
-     */
     public function getLimit(): int
     {
         return $this->limit;
@@ -274,17 +256,11 @@ class GridConfig
         return $this->filterableOptions;
     }
 
-    /**
-     * @return bool
-     */
     public function haveToApplyManuallyFilters(): bool
     {
         return $this->config['filters']['apply_manually'] ?? false;
     }
 
-    /**
-     * @return bool
-     */
     public function useMainTaxonForFilter(): bool
     {
         return $this->config['filters']['use_main_taxon'] ?? false;
@@ -298,17 +274,11 @@ class GridConfig
         return array_merge($this->getAttributeFilters(), $this->getOptionFilters());
     }
 
-    /**
-     * @return array
-     */
     public function getAppliedFilters(): array
     {
         return $this->appliedFilters;
     }
 
-    /**
-     * @return TaxonInterface|null
-     */
     public function getTaxon(): ?TaxonInterface
     {
         return $this->taxon;
@@ -319,13 +289,11 @@ class GridConfig
      *
      * @param $sorting
      * @param $availableSorting
-     *
-     * @return array
      */
     private function cleanSorting(?array $sorting, array $availableSorting): array
     {
         if (!\is_array($sorting)) {
-            return  [];
+            return [];
         }
 
         foreach ($sorting as $field => $order) {

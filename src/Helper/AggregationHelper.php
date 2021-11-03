@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -16,14 +16,11 @@ namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 class AggregationHelper
 {
     public const MAX_AGGREGATED_ATTRIBUTES_INFO = 100;
+
     public const MAX_AGGREGATED_TAXON_INFO = 500;
 
     /**
      * Build sort array to add in query.
-     *
-     * @param string $field
-     *
-     * @return array
      */
     public static function buildAggregation(string $field): array
     {
@@ -47,10 +44,6 @@ class AggregationHelper
 
     /**
      * Build sort array to add in query.
-     *
-     * @param array $filters
-     *
-     * @return array
      */
     public static function buildAggregations(array $filters): array
     {

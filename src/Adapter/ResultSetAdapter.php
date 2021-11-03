@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -23,8 +23,6 @@ class ResultSetAdapter implements AdapterInterface
 
     /**
      * Constructor.
-     *
-     * @param ResultSet $resultSet
      */
     public function __construct(ResultSet $resultSet)
     {
@@ -42,7 +40,7 @@ class ResultSetAdapter implements AdapterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getNbResults()
     {
@@ -50,7 +48,7 @@ class ResultSetAdapter implements AdapterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getSlice($offset, $length)
     {

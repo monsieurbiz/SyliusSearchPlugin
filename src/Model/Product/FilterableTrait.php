@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -23,17 +23,11 @@ trait FilterableTrait
      */
     protected $filterable = true;
 
-    /**
-     * @return bool
-     */
     public function isFilterable(): bool
     {
         return $this->filterable;
     }
 
-    /**
-     * @param bool $filterable
-     */
     public function setFilterable(bool $filterable): void
     {
         $this->filterable = $filterable;

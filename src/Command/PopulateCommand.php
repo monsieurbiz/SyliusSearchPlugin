@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -33,8 +33,6 @@ class PopulateCommand extends Command
 
     /**
      * PopulateCommand constructor.
-     *
-     * @param Indexer $documentIndexer
      */
     public function __construct(Indexer $documentIndexer)
     {
@@ -45,14 +43,12 @@ class PopulateCommand extends Command
     /**
      * Populate ES.
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
      * @return int 0 if everything went fine, or an exit code
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln(sprintf('Generating index'));
+        $output->writeln('Generating index');
+
         try {
             $this->documentIndexer->indexAll();
         } catch (ReadOnlyIndexException $exception) {
@@ -60,7 +56,7 @@ class PopulateCommand extends Command
             // it's better to use return Command::FAILURE; in Symfony 5
             return 1;
         }
-        $output->writeln(sprintf('Generated index'));
+        $output->writeln('Generated index');
         // it's better to use return Command::SUCCESS; in Symfony 5
         return 0;
     }

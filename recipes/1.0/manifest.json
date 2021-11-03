@@ -1,6 +1,6 @@
 {
     "bundles": {
-        "MonsieurBiz\\SyliusSearchPlugin\\MonsieurBizSyliusSearchPlugin::class": [
+        "MonsieurBiz\\SyliusSearchPlugin\\MonsieurBizSyliusSearchPlugin": [
             "all"
         ]
     },

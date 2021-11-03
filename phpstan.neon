@@ -14,5 +14,8 @@ parameters:
         - 'src/DependencyInjection/Configuration.php'
         - 'src/DependencyInjection/MonsieurBizSyliusSearchExtension.php'
 
+        # Generated files
+        - 'src/generated/**/*'
+
         # Test dependencies
         - 'tests/Application/**/*'

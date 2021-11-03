@@ -96,6 +96,7 @@ ${APP_DIR}/php.ini: php.ini
 
 apply_dist:
 	cp -Rv dist/* ${APP_DIR}
+	cp -Rv dist/.env.local ${APP_DIR}/.env.local
 
 ###
 ### TESTS

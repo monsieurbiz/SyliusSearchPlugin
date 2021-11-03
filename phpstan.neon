@@ -11,5 +11,4 @@ parameters:
         - 'src/DependencyInjection/MonsieurBizSyliusSearchExtension.php'
 
         # Test dependencies
-        - 'tests/Application/app/**.php'
-        - 'tests/Application/src/**.php'
+        - 'tests/Application/**/*'

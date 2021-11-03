@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Search;
 
+use Elastica\Aggregation;
 use Elastica\Aggregation\Nested;
 use Elastica\Aggregation\Terms;
 use Elastica\Query;
@@ -87,7 +88,8 @@ class Product implements RequestInterface
         $bool->addMust($searchQuery);
 
         $esQuery = Query::create($bool);
-        $this->addFilters($esQuery);
+        $boolFilter = $this->getFilters();
+        $esQuery->setPostFilter($boolFilter);
         $this->addAggregations($esQuery);
         dump($esQuery->toArray());
 
@@ -139,17 +141,25 @@ class Product implements RequestInterface
             $attributeAgg = new Nested($productAttribute->getCode(), sprintf('attributes.%s', $productAttribute->getCode()));
             $attributeAgg->addAggregation($attributeCodesAgg);
 
-            $attributesAgg->addAggregation($attributeAgg);
+            $boolFilter = $this->getFilters($productAttribute->getCode());
+            $filter = new Aggregation\Filter($productAttribute->getCode());
+            $filter->setFilter($boolFilter);
+            $filter->addAggregation($attributeAgg);
+
+            $attributesAgg->addAggregation($filter);
         }
         if (0 < \count($attributesAgg->getAggs())) {
             $query->addAggregation($attributesAgg);
         }
     }
 
-    private function addFilters(Query $query): void
+    private function getFilters($currentAttribute = null): Query\BoolQuery
     {
         $bool = new Query\BoolQuery();
         foreach ($this->configuration->getAppliedFilters() as $field => $values) {
+            if ($currentAttribute == $field) {
+                continue;
+            }
             $attributeValueQuery = new Query\BoolQuery();
 
             foreach ($values as $value) {
@@ -160,12 +170,9 @@ class Product implements RequestInterface
             $attributeQuery = new Query\Nested();
             $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
 
-            $attributesQuery = new Query\Nested();
-            $attributesQuery->setPath('attributes')->setQuery($attributeQuery);
-
-            $bool->addFilter($attributesQuery);
+            $bool->addMust($attributeQuery);
         }
 
-        $query->setPostFilter($bool);
+        return $bool;
     }
 }

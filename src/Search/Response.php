@@ -68,6 +68,9 @@ class Response implements ResponseInterface
         $attributeAggregations = $aggregations['attributes'] ?? [];
         unset($attributeAggregations['doc_count']);
         foreach ($attributeAggregations as $attributeCode => $attributeAggregation) {
+            if (isset($attributeAggregation[$attributeCode])) {
+                $attributeAggregation = $attributeAggregation[$attributeCode];
+            }
             $attributeNameBuckets = $attributeAggregation['names']['buckets'] ?? [];
             foreach ($attributeNameBuckets as $attributeNameBucket) {
                 $attributeValueBuckets = $attributeNameBucket['values']['buckets'] ?? [];

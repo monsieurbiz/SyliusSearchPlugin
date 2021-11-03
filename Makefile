@@ -14,7 +14,7 @@ YARN=yarn
 ### DEVELOPMENT
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
-install: application platform sylius ## Install the plugin
+install: application platform sylius es.reindex ## Install the plugin
 .PHONY: install
 
 up: docker.up server.start ## Up the project (start docker, start symfony server)
@@ -188,6 +188,9 @@ server.start: ## Run the local webserver using Symfony
 
 server.stop: ## Stop the local webserver
 	${SYMFONY} local:server:stop
+
+es.reindex: ## Reindex elasticsearch
+	${CONSOLE} monsieurbiz:search:populate
 
 ###
 ### HELP

@@ -1,6 +1,7 @@
 mappings:
   dynamic: false
   properties:
+    # attributes mapping is managed dynamically
     code:
       type: keyword
     enabled:
@@ -48,4 +49,11 @@ mappings:
           type: integer
     price:
       type: integer # todo - WIP
-    # attributes mapping is managed dynamically
+    variants:
+      type: nested
+      properties:
+        enabled:
+          type: boolean
+        is_in_stock:
+          type: boolean
+        # variant options mapping is managed dynamically

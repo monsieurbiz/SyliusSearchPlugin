@@ -25,18 +25,22 @@ use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Taxon;
 use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
+use MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
-use Sylius\Component\Product\Model\ProductAttributeValue;
+use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
+use Sylius\Component\Inventory\Model\StockableInterface;
 
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
     private AutoMapperInterface $autoMapper;
+    private AvailabilityCheckerInterface $availabilityChecker;
 
-    public function __construct(AutoMapperInterface $autoMapper)
+    public function __construct(AutoMapperInterface $autoMapper, AvailabilityCheckerInterface $availabilityChecker)
     {
         $this->autoMapper = $autoMapper;
+        $this->availabilityChecker = $availabilityChecker;
     }
 
     public function process(MapperGeneratorMetadataInterface $metadata): void
@@ -112,6 +116,33 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             }
 
             return $attributes;
+        });
+
+        $metadata->forMember('variants', function(ProductInterface $product): array {
+            $variants = [];
+            $currentLocale = $product->getTranslation()->getLocale(); // TODO default locale if it's null?
+
+            foreach ($product->getVariants() as $variant) {
+                $isInStock = true;
+                if ($variant instanceof StockableInterface) {
+                    $isInStock = $this->availabilityChecker->isStockAvailable($variant);
+                }
+//                TODO use auto mapper but we want the final class ... $this->autoMapper->map($variant, VariantDTO::class));
+                $variantDTO = [
+                    'enabled' => $variant->isEnabled(),
+                    'is_in_stock' => $isInStock,
+                ];
+                foreach ($variant->getOptionValues() as $optionValue) {
+                    $variantDTO['options'][$optionValue->getOptionCode()] = [
+                        'name' => $optionValue->getName(),
+                        'code' => $optionValue->getCode(),
+                        'value' => $optionValue->getTranslation($currentLocale)->getValue(),
+                    ];
+                }
+                $variants[] = $variantDTO;
+            }
+
+            return $variants;
         });
     }
 

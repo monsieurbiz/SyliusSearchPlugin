@@ -37,6 +37,8 @@ class Filter implements FilterInterface
      */
     private $count;
 
+    private string $type;
+
     /**
      * Filter constructor.
      *
@@ -44,11 +46,12 @@ class Filter implements FilterInterface
      * @param string $label
      * @param int $count
      */
-    public function __construct(string $code, string $label, int $count)
+    public function __construct(string $code, string $label, int $count, string $type)
     {
         $this->code = $code;
         $this->label = $label;
         $this->count = $count;
+        $this->type = $type;
     }
 
     /**
@@ -90,5 +93,21 @@ class Filter implements FilterInterface
     public function getCount(): int
     {
         return $this->count;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
     }
 }

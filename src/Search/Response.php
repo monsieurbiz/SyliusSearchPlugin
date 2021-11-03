@@ -65,25 +65,31 @@ class Response implements ResponseInterface
         }
 
         // Retrieve filters in aggregations
-        $attributeAggregations = $aggregations['attributes'] ?? [];
-        unset($attributeAggregations['doc_count']);
-        foreach ($attributeAggregations as $attributeCode => $attributeAggregation) {
-            if (isset($attributeAggregation[$attributeCode])) {
-                $attributeAggregation = $attributeAggregation[$attributeCode];
+        foreach (['attributes', 'options'] as $aggregationType) {
+            $currentAggregation = $aggregations;
+            if ($aggregationType === 'options') {
+                $currentAggregation = $aggregations['variants']['enabled_variants'] ?? [];
             }
-            $attributeNameBuckets = $attributeAggregation['names']['buckets'] ?? [];
-            foreach ($attributeNameBuckets as $attributeNameBucket) {
-                $attributeValueBuckets = $attributeNameBucket['values']['buckets'] ?? [];
-                $filter = new Filter($attributeCode, $attributeNameBucket['key'], $attributeNameBucket['doc_count']);
-                foreach ($attributeValueBuckets as $attributeValueBucket) {
-                    if (0 === $attributeValueBucket['doc_count']) {
-                        continue;
-                    }
-                    if (isset($attributeValueBucket['key']) && isset($attributeValueBucket['doc_count'])) {
-                        $filter->addValue($attributeValueBucket['key'], $attributeValueBucket['doc_count']);
-                    }
+            $attributeAggregations = $currentAggregation[$aggregationType] ?? [];
+            unset($attributeAggregations['doc_count']);
+            foreach ($attributeAggregations as $attributeCode => $attributeAggregation) {
+                if (isset($attributeAggregation[$attributeCode])) {
+                    $attributeAggregation = $attributeAggregation[$attributeCode];
                 }
-                $this->filters[] = $filter;
+                $attributeNameBuckets = $attributeAggregation['names']['buckets'] ?? [];
+                foreach ($attributeNameBuckets as $attributeNameBucket) {
+                    $attributeValueBuckets = $attributeNameBucket['values']['buckets'] ?? [];
+                    $filter = new Filter($attributeCode, $attributeNameBucket['key'], $attributeNameBucket['doc_count'], $aggregationType);
+                    foreach ($attributeValueBuckets as $attributeValueBucket) {
+                        if (0 === $attributeValueBucket['doc_count']) {
+                            continue;
+                        }
+                        if (isset($attributeValueBucket['key']) && isset($attributeValueBucket['doc_count'])) {
+                            $filter->addValue($attributeValueBucket['key'], $attributeValueBucket['doc_count']);
+                        }
+                    }
+                    $this->filters[] = $filter;
+                }
             }
         }
     }

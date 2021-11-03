@@ -1,4 +1,4 @@
-{% set appliedAttributes = app.request.query.get('attribute') %}
+{% set appliedAttributes = app.request.query.get(filter.type) %}
 {% set currentValues = (appliedAttributes[filter.code] is defined) ? appliedAttributes[filter.code] : [] %}
 {% if filter.values|length or currentValues is not empty %}
     <div class="item">
@@ -12,7 +12,7 @@
                             <input
                                     type="checkbox"
                                     id="{{ 'filter-' ~ filter.code ~ '-value-' ~ value.slug }}"
-                                    name="attribute[{{ filter.code }}][]"
+                                    name="{{ filter.type }}[{{ filter.code }}][]"
                                     value="{{ value.slug }}"
                                     class="hidden"
                                     {% if valueIsApplied %}

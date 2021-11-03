@@ -18,8 +18,13 @@ final class RequestConfiguration
         return $this->request->get('query', '');
     }
 
-    public function getAppliedFilters(): array
+    public function getAppliedFilters($type = null): array
     {
-        return $this->request->get('attribute') ?? [];
+        $appliedFilters = [
+            'attributes' => $this->request->get('attributes', []),
+            'options' => $this->request->get('options', []),
+        ];
+
+        return null !== $type ? ($appliedFilters[$type] ?? []) : $appliedFilters;
     }
 }

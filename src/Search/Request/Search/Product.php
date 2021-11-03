@@ -21,6 +21,7 @@ use Elastica\Query\MultiMatch;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SlugHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
@@ -31,14 +32,17 @@ class Product implements RequestInterface
 
     private RequestConfiguration $configuration;
     private ProductAttributeRepositoryInterface $productAttributeRepository;
+    private ProductOptionRepositoryInterface $productOptionRepository;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
-        ProductAttributeRepositoryInterface $productAttributeRepository
+        ProductAttributeRepositoryInterface $productAttributeRepository,
+        ProductOptionRepositoryInterface $productOptionRepository
     ) {
         //TODO check if exist, return a dummy documentable if not
         $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->productAttributeRepository = $productAttributeRepository;
+        $this->productOptionRepository = $productOptionRepository;
     }
 
     public function getType(): string
@@ -148,15 +152,61 @@ class Product implements RequestInterface
 
             $attributesAgg->addAggregation($filter);
         }
+
+        $enabledFilter = new Query\Term();
+        $enabledFilter->setTerm('variants.enabled', true);
+
+        $isInStockFilter = new Query\Term();
+        $isInStockFilter->setTerm('variants.is_in_stock', true);
+
+        $filterVariants = new Query\BoolQuery();
+        $filterVariants->addFilter($enabledFilter);
+        $filterVariants->addFilter($isInStockFilter);
+
+        $enabledVariants = new Aggregation\Filter('enabled_variants');
+        $enabledVariants->setFilter($filterVariants);
+
+        $variants = new Nested('variants', 'variants');
+        $variants->addAggregation($enabledVariants);
+
+        $optionsAgg = new Nested('options', 'variants.options');
+        foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
+            if (!$productOption->isFilterable()) {
+                continue;
+            }
+            $attributeValuesAgg = new Terms('values');
+            $attributeValuesAgg->setField(sprintf('variants.options.%s.value.keyword', $productOption->getCode()));
+
+            $attributeCodesAgg = new Terms('names');
+            $attributeCodesAgg->setField(sprintf('variants.options.%s.name', $productOption->getCode()));
+            $attributeCodesAgg->addAggregation($attributeValuesAgg);
+
+            $attributeAgg = new Nested($productOption->getCode(), sprintf('variants.options.%s', $productOption->getCode()));
+            $attributeAgg->addAggregation($attributeCodesAgg);
+
+
+            $boolFilter = $this->getFilters($productOption->getCode());
+            $filter = new Aggregation\Filter($productOption->getCode());
+            $filter->setFilter($boolFilter);
+            $filter->addAggregation($attributeAgg);
+
+            $optionsAgg->addAggregation($filter);
+        }
+
         if (0 < \count($attributesAgg->getAggs())) {
             $query->addAggregation($attributesAgg);
+        }
+
+        if (0 < \count($optionsAgg->getAggs())) {
+            $enabledVariants->addAggregation($optionsAgg);
+            $query->addAggregation($variants);
         }
     }
 
     private function getFilters($currentAttribute = null): Query\BoolQuery
     {
         $bool = new Query\BoolQuery();
-        foreach ($this->configuration->getAppliedFilters() as $field => $values) {
+        foreach ($this->configuration->getAppliedFilters('attributes') as $field => $values) {
             if ($currentAttribute == $field) {
                 continue;
             }
@@ -171,6 +221,40 @@ class Product implements RequestInterface
             $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
 
             $bool->addMust($attributeQuery);
+        }
+
+
+
+        foreach ($this->configuration->getAppliedFilters('options') as $field => $values) {
+            if ($currentAttribute == $field) {
+                continue;
+            }
+            $enabledVariantsFilter = new Query\Term();
+            $enabledVariantsFilter->setTerm('variants.enabled', true);
+
+            $isInStockVariantsFilter = new Query\Term();
+            $isInStockVariantsFilter->setTerm('variants.is_in_stock', true);
+
+            $variantsQuery = new Query\BoolQuery();
+            $variantsQuery->addMust($enabledVariantsFilter);
+            $variantsQuery->addMust($isInStockVariantsFilter);
+
+            $attributeValueQuery = new Query\BoolQuery();
+
+            foreach ($values as $value) {
+                $termQuery = new Query\Terms(sprintf('variants.options.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
+                $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
+            }
+
+            $attributeQuery = new Query\Nested();
+            $attributeQuery->setPath(sprintf('variants.options.%s', $field))->setQuery($attributeValueQuery);
+
+            $variantsQuery->addMust($attributeQuery);
+
+            $variantsFilter = new Query\Nested();
+            $variantsFilter->setPath('variants')
+                ->setQuery($variantsQuery);
+            $bool->addMust($variantsFilter);
         }
 
         return $bool;

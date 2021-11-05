@@ -153,22 +153,6 @@ class Product implements RequestInterface
             $attributesAgg->addAggregation($filter);
         }
 
-        $enabledFilter = new Query\Term();
-        $enabledFilter->setTerm('variants.enabled', true);
-
-        $isInStockFilter = new Query\Term();
-        $isInStockFilter->setTerm('variants.is_in_stock', true);
-
-        $filterVariants = new Query\BoolQuery();
-        $filterVariants->addFilter($enabledFilter);
-        $filterVariants->addFilter($isInStockFilter);
-
-        $enabledVariants = new Aggregation\Filter('enabled_variants');
-        $enabledVariants->setFilter($filterVariants);
-
-        $variants = new Nested('variants', 'variants');
-        $variants->addAggregation($enabledVariants);
-
         $optionsAgg = new Nested('options', 'variants.options');
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
             if (!$productOption->isFilterable()) {
@@ -184,13 +168,7 @@ class Product implements RequestInterface
             $attributeAgg = new Nested($productOption->getCode(), sprintf('variants.options.%s', $productOption->getCode()));
             $attributeAgg->addAggregation($attributeCodesAgg);
 
-
-            $boolFilter = $this->getFilters($productOption->getCode());
-            $filter = new Aggregation\Filter($productOption->getCode());
-            $filter->setFilter($boolFilter);
-            $filter->addAggregation($attributeAgg);
-
-            $optionsAgg->addAggregation($filter);
+            $optionsAgg->addAggregation($attributeAgg);
         }
 
         if (0 < \count($attributesAgg->getAggs())) {
@@ -198,8 +176,7 @@ class Product implements RequestInterface
         }
 
         if (0 < \count($optionsAgg->getAggs())) {
-            $enabledVariants->addAggregation($optionsAgg);
-            $query->addAggregation($variants);
+            $query->addAggregation($optionsAgg);
         }
     }
 
@@ -214,7 +191,7 @@ class Product implements RequestInterface
 
             foreach ($values as $value) {
                 $termQuery = new Query\Terms(sprintf('attributes.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
-                $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
+                $attributeValueQuery->addShould($termQuery); // src/Search/Request/Search/Product.php configure the "and" or "or"
             }
 
             $attributeQuery = new Query\Nested();
@@ -229,15 +206,6 @@ class Product implements RequestInterface
             if ($currentAttribute == $field) {
                 continue;
             }
-            $enabledVariantsFilter = new Query\Term();
-            $enabledVariantsFilter->setTerm('variants.enabled', true);
-
-            $isInStockVariantsFilter = new Query\Term();
-            $isInStockVariantsFilter->setTerm('variants.is_in_stock', true);
-
-            $variantsQuery = new Query\BoolQuery();
-            $variantsQuery->addMust($enabledVariantsFilter);
-            $variantsQuery->addMust($isInStockVariantsFilter);
 
             $attributeValueQuery = new Query\BoolQuery();
 
@@ -249,12 +217,7 @@ class Product implements RequestInterface
             $attributeQuery = new Query\Nested();
             $attributeQuery->setPath(sprintf('variants.options.%s', $field))->setQuery($attributeValueQuery);
 
-            $variantsQuery->addMust($attributeQuery);
-
-            $variantsFilter = new Query\Nested();
-            $variantsFilter->setPath('variants')
-                ->setQuery($variantsQuery);
-            $bool->addMust($variantsFilter);
+            $bool->addMust($attributeQuery);
         }
 
         return $bool;

@@ -122,10 +122,13 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             $variants = [];
             $currentLocale = $product->getTranslation()->getLocale(); // TODO default locale if it's null?
 
-            foreach ($product->getVariants() as $variant) {
+            foreach ($product->getEnabledVariants() as $variant) {
                 $isInStock = true;
                 if ($variant instanceof StockableInterface) {
                     $isInStock = $this->availabilityChecker->isStockAvailable($variant);
+                }
+                if (!$isInStock) {
+                    continue;
                 }
 //                TODO use auto mapper but we want the final class ... $this->autoMapper->map($variant, VariantDTO::class));
                 $variantDTO = [

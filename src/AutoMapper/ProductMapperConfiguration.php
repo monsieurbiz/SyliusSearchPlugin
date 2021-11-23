@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper;
 
-use App\Entity\Product\Product;
 use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
@@ -29,18 +28,16 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
-use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
-use Sylius\Component\Inventory\Model\StockableInterface;
 
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
+    private Configuration $configuration;
     private AutoMapperInterface $autoMapper;
-    private AvailabilityCheckerInterface $availabilityChecker;
 
-    public function __construct(AutoMapperInterface $autoMapper, AvailabilityCheckerInterface $availabilityChecker)
+    public function __construct(Configuration $configuration, AutoMapperInterface $autoMapper)
     {
+        $this->configuration = $configuration;
         $this->autoMapper = $autoMapper;
-        $this->availabilityChecker = $availabilityChecker;
     }
 
     public function process(MapperGeneratorMetadataInterface $metadata): void
@@ -76,7 +73,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         $metadata->forMember('images', function(ProductInterface $product): array {
             $images = [];
             foreach ($product->getImages() as $image) {
-                $images[] = $this->autoMapper->map($image, Image::class);
+                $images[] = $this->autoMapper->map($image, Image::class); // rename the target class to DTO
             }
 
             return $images;
@@ -111,6 +108,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
                 }
                 /** @var ProductAttribute $attributeDTO */
                 $attributeDTO = $this->autoMapper->map($attributeValue, ProductAttribute::class);
+                // todo the getValue depends on the type ...
                 $attributeDTO->setValue($attributeValue->getValue()); // we can't use the automapper for the value because it has a mixed type
                 $attributes[$attributeValue->getCode()] = $attributeDTO;
             }
@@ -120,29 +118,8 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
         $metadata->forMember('variants', function(ProductInterface $product): array {
             $variants = [];
-            $currentLocale = $product->getTranslation()->getLocale(); // TODO default locale if it's null?
-
             foreach ($product->getEnabledVariants() as $variant) {
-                $isInStock = true;
-                if ($variant instanceof StockableInterface) {
-                    $isInStock = $this->availabilityChecker->isStockAvailable($variant);
-                }
-                if (!$isInStock) {
-                    continue;
-                }
-//                TODO use auto mapper but we want the final class ... $this->autoMapper->map($variant, VariantDTO::class));
-                $variantDTO = [
-                    'enabled' => $variant->isEnabled(),
-                    'is_in_stock' => $isInStock,
-                ];
-                foreach ($variant->getOptionValues() as $optionValue) {
-                    $variantDTO['options'][$optionValue->getOptionCode()] = [
-                        'name' => $optionValue->getName(),
-                        'code' => $optionValue->getCode(),
-                        'value' => $optionValue->getTranslation($currentLocale)->getValue(),
-                    ];
-                }
-                $variants[] = $variantDTO;
+                $variants[] = $this->autoMapper->map($variant, VariantDTO::class);
             }
 
             return $variants;
@@ -151,7 +128,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
     public function getSource(): string
     {
-        return Product::class;
+        return $this->configuration->getSourceClass('product');
     }
 
     public function getTarget(): string

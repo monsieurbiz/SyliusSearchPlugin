@@ -47,6 +47,11 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('automapper_classes')
+                    ->useAttributeAsKey('code', false)
+                    ->defaultValue([])
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
 

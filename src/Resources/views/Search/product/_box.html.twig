@@ -21,8 +21,9 @@
     <div class="content">
         <a href="{{ path('sylius_shop_product_show', {'slug': item.slug, '_locale': sylius.localeCode}) }}" class="header sylius-product-name">{{ item.name }}</a>
 
-        {#        {% if item.price is not empty %}#}
-        {#            <div class="sylius-product-price">{{ money.convertAndFormat(result.priceByChannelAndCurrency(channel.code, currencyCode).value) }}</div>#}
-        {#        {% endif %}#}
+        {% if item.prices is not empty %}
+            {% set pricing = item.prices|filter(price => price.channel_code == sylius.channel.code)|first %}
+            <div class="sylius-product-price">{{ money.convertAndFormat(pricing.price) }}</div>
+        {% endif %}
     </div>
 </div>

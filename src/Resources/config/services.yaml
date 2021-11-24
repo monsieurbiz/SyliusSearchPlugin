@@ -9,6 +9,7 @@ services:
     autoconfigure: true
     public: false
     bind:
+      $localeProvider: '@sylius.translation_locale_provider'
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
       $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
       $configurationDirectory: '@=service("file_locator").locate("@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch")'
@@ -66,7 +67,7 @@ services:
   JoliCode\Elastically\IndexBuilder:
     arguments:
       $client: '@monsieurbiz.search.elasticsearch.client'
-      $mappingProvider: 'MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvide'
+      $mappingProvider: '@MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider'
 
   monsieurbiz.search.registry.documentable:
     class: Sylius\Component\Registry\ServiceRegistry
@@ -79,3 +80,11 @@ services:
     arguments:
       $className: '%monsieurbiz.search.request.interface%'
       $context: 'documentable'
+
+  # Define product attribute value readers
+  MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueConfiguration:
+    arguments:
+      $productAttributeValueReaders: {
+        default: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\DefaultReader',
+        select: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\SelectReader'
+      }

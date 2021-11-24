@@ -10,3 +10,4 @@ monsieurbiz_sylius_search:
   automapper_classes:
     product: '%sylius.model.product.class%'
     product_variant: '%sylius.model.product_variant.class%'
+    product_attribute_value: '%sylius.model.product_attribute_value.class%'

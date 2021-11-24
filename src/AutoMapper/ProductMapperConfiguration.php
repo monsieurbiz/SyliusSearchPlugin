@@ -106,11 +106,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
                 if (!$attribute instanceof SearchableInterface || (!$attribute->isSearchable() && !$attribute->isFilterable())) {
                     continue;
                 }
-                /** @var ProductAttribute $attributeDTO */
-                $attributeDTO = $this->autoMapper->map($attributeValue, ProductAttribute::class);
-                // todo the getValue depends on the type ...
-                $attributeDTO->setValue($attributeValue->getValue()); // we can't use the automapper for the value because it has a mixed type
-                $attributes[$attributeValue->getCode()] = $attributeDTO;
+                $attributes[$attributeValue->getCode()] = $this->autoMapper->map($attributeValue, ProductAttribute::class);
             }
 
             return $attributes;

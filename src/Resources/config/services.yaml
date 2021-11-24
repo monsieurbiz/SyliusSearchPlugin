@@ -86,5 +86,6 @@ services:
     arguments:
       $productAttributeValueReaders: {
         default: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\DefaultReader',
-        select: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\SelectReader'
+        select: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\SelectReader',
+        date: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\DateReader'
       }

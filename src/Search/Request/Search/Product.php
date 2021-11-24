@@ -131,6 +131,9 @@ class Product implements RequestInterface
     private function addAggregations(Query $query): void
     {
         $attributesAgg = new Nested('attributes', 'attributes');
+        $filtredAttributesAgg = new Aggregation\Filter('attributes');
+        $filtredAttributesAgg->setFilter($this->getFilters(null, ['options']));
+        $filtredAttributesAgg->addAggregation($attributesAgg);
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
             if (!$productAttribute->isFilterable()) {
                 continue;
@@ -145,7 +148,7 @@ class Product implements RequestInterface
             $attributeAgg = new Nested($productAttribute->getCode(), sprintf('attributes.%s', $productAttribute->getCode()));
             $attributeAgg->addAggregation($attributeCodesAgg);
 
-            $boolFilter = $this->getFilters($productAttribute->getCode());
+            $boolFilter = $this->getFilters($productAttribute->getCode(), ['attributes']);
             $filter = new Aggregation\Filter($productAttribute->getCode());
             $filter->setFilter($boolFilter);
             $filter->addAggregation($attributeAgg);
@@ -154,6 +157,9 @@ class Product implements RequestInterface
         }
 
         $optionsAgg = new Nested('options', 'variants.options');
+        $filtredOptionsAgg = new Aggregation\Filter('options');
+        $filtredOptionsAgg->setFilter($this->getFilters(null, ['attributes']));
+        $filtredOptionsAgg->addAggregation($optionsAgg);
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
             if (!$productOption->isFilterable()) {
                 continue;
@@ -168,56 +174,63 @@ class Product implements RequestInterface
             $attributeAgg = new Nested($productOption->getCode(), sprintf('variants.options.%s', $productOption->getCode()));
             $attributeAgg->addAggregation($attributeCodesAgg);
 
-            $optionsAgg->addAggregation($attributeAgg);
+            $boolFilter = $this->getFilters($productOption->getCode(), ['options']);
+            $filter = new Aggregation\Filter($productOption->getCode());
+            $filter->setFilter($boolFilter);
+            $filter->addAggregation($attributeAgg);
+
+            $optionsAgg->addAggregation($filter);
         }
 
         if (0 < \count($attributesAgg->getAggs())) {
-            $query->addAggregation($attributesAgg);
+            $query->addAggregation($filtredAttributesAgg);
         }
 
         if (0 < \count($optionsAgg->getAggs())) {
-            $query->addAggregation($optionsAgg);
+            $query->addAggregation($filtredOptionsAgg);
         }
     }
 
-    private function getFilters($currentAttribute = null): Query\BoolQuery
+    private function getFilters($currentAttribute = null, array $filtreTypes = ['attributes', 'options']): Query\BoolQuery
     {
         $bool = new Query\BoolQuery();
-        foreach ($this->configuration->getAppliedFilters('attributes') as $field => $values) {
-            if ($currentAttribute == $field) {
-                continue;
+        if (\in_array('attributes', $filtreTypes, true)) {
+            foreach ($this->configuration->getAppliedFilters('attributes') as $field => $values) {
+                if ($currentAttribute == $field) {
+                    continue;
+                }
+                $attributeValueQuery = new Query\BoolQuery();
+
+                foreach ($values as $value) {
+                    $termQuery = new Query\Terms(sprintf('attributes.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
+                    $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
+                }
+
+                $attributeQuery = new Query\Nested();
+                $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
+
+                $bool->addMust($attributeQuery);
             }
-            $attributeValueQuery = new Query\BoolQuery();
-
-            foreach ($values as $value) {
-                $termQuery = new Query\Terms(sprintf('attributes.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
-                $attributeValueQuery->addShould($termQuery); // src/Search/Request/Search/Product.php configure the "and" or "or"
-            }
-
-            $attributeQuery = new Query\Nested();
-            $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
-
-            $bool->addMust($attributeQuery);
         }
 
+        if (\in_array('options', $filtreTypes, true)) {
+            foreach ($this->configuration->getAppliedFilters('options') as $field => $values) {
+                if ($currentAttribute == $field) {
+                    continue;
+                }
 
+                $attributeValueQuery = new Query\BoolQuery();
 
-        foreach ($this->configuration->getAppliedFilters('options') as $field => $values) {
-            if ($currentAttribute == $field) {
-                continue;
+                foreach ($values as $value) {
+                    $termQuery = new Query\Terms(sprintf('variants.options.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
+                    $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
+                }
+
+                $attributeQuery = new Query\Nested();
+                $attributeQuery->setPath(sprintf('variants.options.%s', $field))->setQuery($attributeValueQuery);
+
+                $bool->addMust($attributeQuery);
             }
-
-            $attributeValueQuery = new Query\BoolQuery();
-
-            foreach ($values as $value) {
-                $termQuery = new Query\Terms(sprintf('variants.options.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
-                $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
-            }
-
-            $attributeQuery = new Query\Nested();
-            $attributeQuery->setPath(sprintf('variants.options.%s', $field))->setQuery($attributeValueQuery);
-
-            $bool->addMust($attributeQuery);
         }
 
         return $bool;

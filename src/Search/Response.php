@@ -67,6 +67,7 @@ class Response implements ResponseInterface
         // Retrieve filters in aggregations
         foreach (['attributes', 'options'] as $aggregationType) {
             $attributeAggregations = $aggregations[$aggregationType] ?? [];
+            $attributeAggregations = $attributeAggregations[$aggregationType] ?? $attributeAggregations;
             unset($attributeAggregations['doc_count']);
             foreach ($attributeAggregations as $attributeCode => $attributeAggregation) {
                 if (isset($attributeAggregation[$attributeCode])) {

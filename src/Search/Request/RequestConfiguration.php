@@ -32,6 +32,7 @@ final class RequestConfiguration
     public function getAppliedFilters($type = null): array
     {
         $appliedFilters = [
+            'taxon' => $this->request->get('taxon', []),
             'attributes' => $this->request->get('attributes', []),
             'options' => $this->request->get('options', []),
         ];

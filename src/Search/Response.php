@@ -64,6 +64,39 @@ class Response implements ResponseInterface
             return;
         }
 
+        // todo main taxon
+        $taxonAggregation = $aggregations['main_taxon'] ?? null;
+        if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
+            $filter = new Filter('main_taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count'], 'taxon');
+
+            // Get main taxon code in aggregation
+            $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
+            foreach ($taxonCodeBuckets as $taxonCodeBucket) {
+                if (0 === $taxonCodeBucket['doc_count']) {
+                    continue;
+                }
+                $taxonCode = $taxonCodeBucket['key'];
+                $taxonName = null;
+
+                // Get main taxon level in aggregation
+                $taxonLevelBuckets = $taxonCodeBucket['levels']['buckets'] ?? [];
+                foreach ($taxonLevelBuckets as $taxonLevelBucket) {
+                    // Get main taxon name in aggregation
+                    $taxonNameBuckets = $taxonLevelBucket['names']['buckets'] ?? [];
+                    foreach ($taxonNameBuckets as $taxonNameBucket) {
+                        $taxonName = $taxonNameBucket['key'];
+                        $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count']);
+                        break 2;
+                    }
+                }
+            }
+
+            // Put taxon filter in first if contains value
+            if (0 !== \count($filter->getValues())) {
+                $this->filters[] = $filter;
+            }
+        }
+
         // Retrieve filters in aggregations
         foreach (['attributes', 'options'] as $aggregationType) {
             $attributeAggregations = $aggregations[$aggregationType] ?? [];

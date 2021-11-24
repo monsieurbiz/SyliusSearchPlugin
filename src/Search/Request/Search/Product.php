@@ -95,6 +95,7 @@ class Product implements RequestInterface
         $boolFilter = $this->getFilters();
         $esQuery->setPostFilter($boolFilter);
         $this->addAggregations($esQuery);
+        $esQuery->addAggregation($this->getMainTaxonAggregation());
         dump($esQuery->toArray());
 
         return $esQuery;
@@ -132,7 +133,7 @@ class Product implements RequestInterface
     {
         $attributesAgg = new Nested('attributes', 'attributes');
         $filtredAttributesAgg = new Aggregation\Filter('attributes');
-        $filtredAttributesAgg->setFilter($this->getFilters(null, ['options']));
+        $filtredAttributesAgg->setFilter($this->getFilters(null, ['options', 'taxon']));
         $filtredAttributesAgg->addAggregation($attributesAgg);
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
             if (!$productAttribute->isFilterable()) {
@@ -158,7 +159,7 @@ class Product implements RequestInterface
 
         $optionsAgg = new Nested('options', 'variants.options');
         $filtredOptionsAgg = new Aggregation\Filter('options');
-        $filtredOptionsAgg->setFilter($this->getFilters(null, ['attributes']));
+        $filtredOptionsAgg->setFilter($this->getFilters(null, ['attributes', 'taxon']));
         $filtredOptionsAgg->addAggregation($optionsAgg);
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
             if (!$productOption->isFilterable()) {
@@ -191,9 +192,58 @@ class Product implements RequestInterface
         }
     }
 
-    private function getFilters($currentAttribute = null, array $filtreTypes = ['attributes', 'options']): Query\BoolQuery
+    private function getMainTaxonAggregation(): Aggregation\AbstractAggregation
+    {
+        $qb = new \Elastica\QueryBuilder();
+
+        return $qb->aggregation()
+            ->nested('main_taxon', 'main_taxon')
+            ->addAggregation(
+                $qb->aggregation()
+                    ->terms('codes')
+                    ->setField('main_taxon.code')
+                    ->addAggregation(
+                        $qb->aggregation()
+                            ->terms('levels')
+                            ->setField('main_taxon.level')
+                            ->addAggregation(
+                                $qb->aggregation()
+                                    ->terms('names')
+                                    ->setField('main_taxon.name')
+                            )
+                    )
+            )
+        ;
+    }
+
+    private function getFilters($currentAttribute = null, array $filtreTypes = ['attributes', 'options', 'taxon']): Query\BoolQuery
     {
         $bool = new Query\BoolQuery();
+
+        //todo
+        if (\in_array('taxon', $filtreTypes, true)) {
+            $qb = new \Elastica\QueryBuilder();
+            foreach ($this->configuration->getAppliedFilters('taxon') as $field => $values) {
+                $mainTaxonQuery = $qb->query()
+                    ->bool();
+                foreach ($values as $value) {
+                    $mainTaxonQuery->addShould(
+                        $qb->query()
+                            ->term()
+                            ->setTerm(sprintf('%s.name', $field), SlugHelper::toLabel($value))
+                    );
+                }
+                $bool->addMust(
+                    $qb->query()
+                        ->nested()
+                        ->setPath($field)
+                        ->setQuery(
+                            $mainTaxonQuery
+                        )
+                );
+            }
+        }
+
         if (\in_array('attributes', $filtreTypes, true)) {
             foreach ($this->configuration->getAppliedFilters('attributes') as $field => $values) {
                 if ($currentAttribute == $field) {

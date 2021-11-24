@@ -20,6 +20,7 @@ use Jane\Component\AutoMapper\MapperMetadata;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image;
+use MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Taxon;
@@ -28,16 +29,24 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface;
+use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
     private Configuration $configuration;
     private AutoMapperInterface $autoMapper;
+    private ProductVariantResolverInterface $productVariantResolver;
 
-    public function __construct(Configuration $configuration, AutoMapperInterface $autoMapper)
-    {
+    public function __construct(
+        Configuration $configuration,
+        AutoMapperInterface $autoMapper,
+        ProductVariantResolverInterface $productVariantResolver
+    ) {
         $this->configuration = $configuration;
         $this->autoMapper = $autoMapper;
+        // todo change the resolver from the configuration
+        $this->productVariantResolver = $productVariantResolver;
     }
 
     public function process(MapperGeneratorMetadataInterface $metadata): void
@@ -119,6 +128,17 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             }
 
             return $variants;
+        });
+
+        $metadata->forMember('prices', function(ProductInterface $product): array {
+            $prices = [];
+            /** @var ProductVariantInterface $variant */
+            $variant = $this->productVariantResolver->getVariant($product);
+            foreach ($variant->getChannelPricings() as $channelPricing) {
+                $prices[] = $this->autoMapper->map($channelPricing, PricingDTO::class);
+            }
+
+            return $prices;
         });
     }
 

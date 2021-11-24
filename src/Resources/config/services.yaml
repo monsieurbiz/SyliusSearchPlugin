@@ -10,6 +10,7 @@ services:
     public: false
     bind:
       $localeProvider: '@sylius.translation_locale_provider'
+      $productVariantResolver: '@sylius.product_variant_resolver.default'
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
       $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
       $configurationDirectory: '@=service("file_locator").locate("@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch")'

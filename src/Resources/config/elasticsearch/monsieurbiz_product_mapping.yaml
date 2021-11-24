@@ -47,8 +47,17 @@ mappings:
               type: integer
         position:
           type: integer
-    price:
-      type: integer # todo - WIP
+    prices:
+      type: nested
+      properties:
+        channel_code:
+          type: keyword
+        price:
+          type: integer
+        original_price:
+          type: integer
+        is_price_reduced:
+          type: boolean
     variants:
       type: nested
       properties:

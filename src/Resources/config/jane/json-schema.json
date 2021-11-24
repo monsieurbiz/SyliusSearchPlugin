@@ -64,6 +64,23 @@
           "type": ["null", "mixed"]
         }
       }
+    },
+    "PricingDTO": {
+      "type": "object",
+      "properties": {
+        "channel_code": {
+          "type": "string"
+        },
+        "price": {
+          "type": ["null", "integer"]
+        },
+        "original_price": {
+          "type": ["null", "integer"]
+        },
+        "price_reduced": {
+          "type": ["boolean"]
+        }
+      }
     }
   }
 }

@@ -13,6 +13,11 @@ mappings:
           type: keyword
     name:
       type: text
+      fields:
+        keyword:
+          type: keyword
+    created_at:
+      type: date
     description:
       type: text
     images:

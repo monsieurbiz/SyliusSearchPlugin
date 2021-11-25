@@ -79,6 +79,10 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $product->getDescription();
         });
 
+        $metadata->forMember('created_at', function(ProductInterface $product) {
+            return $product->getCreatedAt();
+        });
+
         $metadata->forMember('images', function(ProductInterface $product): array {
             $images = [];
             foreach ($product->getImages() as $image) {

@@ -24,6 +24,7 @@ use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterfac
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
+use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
 class Product implements RequestInterface
@@ -33,16 +34,19 @@ class Product implements RequestInterface
     private RequestConfiguration $configuration;
     private ProductAttributeRepositoryInterface $productAttributeRepository;
     private ProductOptionRepositoryInterface $productOptionRepository;
+    private ChannelContextInterface $channelContext;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
         ProductAttributeRepositoryInterface $productAttributeRepository,
-        ProductOptionRepositoryInterface $productOptionRepository
+        ProductOptionRepositoryInterface $productOptionRepository,
+        ChannelContextInterface $channelContext
     ) {
         //TODO check if exist, return a dummy documentable if not
         $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
+        $this->channelContext = $channelContext;
     }
 
     public function getType(): string
@@ -96,6 +100,16 @@ class Product implements RequestInterface
         $esQuery->setPostFilter($boolFilter);
         $this->addAggregations($esQuery);
         $esQuery->addAggregation($this->getMainTaxonAggregation());
+
+        // Manage sorting
+//        $channelCode = $this->channelContext->getChannel()->getCode();
+        foreach ($this->configuration->getSorting() as $field => $order) {
+            $sort = $this->getSort($field, $order);
+            if (0 !== \count($sort)) {
+                $esQuery->addSort($this->getSort($field, $order));
+            }
+        }
+
         dump($esQuery->toArray());
 
         return $esQuery;
@@ -225,7 +239,8 @@ class Product implements RequestInterface
             $qb = new \Elastica\QueryBuilder();
             foreach ($this->configuration->getAppliedFilters('taxon') as $field => $values) {
                 $mainTaxonQuery = $qb->query()
-                    ->bool();
+                    ->bool()
+                ;
                 foreach ($values as $value) {
                     $mainTaxonQuery->addShould(
                         $qb->query()
@@ -284,5 +299,51 @@ class Product implements RequestInterface
         }
 
         return $bool;
+    }
+
+    // todo find solution to get more extendable
+    private function getSort(string $field, string $order)
+    {
+        $fieldName = $field;
+        if ('name' == $field) {
+            $fieldName = $field . '.keyword';
+        }
+
+        switch ($field) {
+            case 'name':
+            case 'created_at':
+                return $this->buildSort($fieldName, $order);
+            case 'price':
+                return self::buildSort(
+                    'prices.price',
+                    $order,
+                    'prices',
+                    'prices.channel_code', $this->channelContext->getChannel()->getCode()
+                );
+            case 'position':
+            default:
+                // Dummy value to have null sorting in ES and keep ES results sorting
+                return $this->buildSort('_score', 'desc');
+        }
+    }
+
+    private function buildSort(
+        string $field,
+        string $order,
+        ?string $nestedPath = null,
+        ?string $sortFilterField = null,
+        ?string $sortFilterValue = null
+    ): array {
+        $sort = [$field => ['order' => $order]];
+        if (null !== $nestedPath) {
+            $sort[$field]['nested_path'] = $nestedPath;
+            $sort[$field]['nested_filter'] = [
+                'term' => [
+                    $sortFilterField => $sortFilterValue,
+                ],
+            ];
+        }
+
+        return $sort;
     }
 }

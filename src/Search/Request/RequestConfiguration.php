@@ -39,4 +39,9 @@ final class RequestConfiguration
 
         return null !== $type ? ($appliedFilters[$type] ?? []) : $appliedFilters;
     }
+
+    public function getSorting(): array
+    {
+        return $this->request->get('sorting', []);
+    }
 }

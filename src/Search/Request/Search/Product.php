@@ -86,6 +86,7 @@ class Product implements RequestInterface
         ]);
         $nameAndDescriptionQuery->setQuery($this->configuration->getQueryText());
         $nameAndDescriptionQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
+        $nameAndDescriptionQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
 
         $searchQuery = new Query\BoolQuery();
         $searchQuery
@@ -107,7 +108,6 @@ class Product implements RequestInterface
         $esQuery->addAggregation($this->getMainTaxonAggregation());
 
         // Manage sorting
-//        $channelCode = $this->channelContext->getChannel()->getCode();
         foreach ($this->configuration->getSorting() as $field => $order) {
             $sort = $this->getSort($field, $order);
             if (0 !== \count($sort)) {
@@ -137,6 +137,7 @@ class Product implements RequestInterface
                 sprintf('attributes.%s.value^%d', $productAttribute->getCode(), $productAttribute->getSearchWeight()),
             ]);
             $attributeValueQuery->setQuery($this->configuration->getQueryText());
+            $attributeValueQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
 
             $attributeQuery = new Query\Nested();
             $attributeQuery->setPath(sprintf('attributes.%s', $productAttribute->getCode()))->setQuery($attributeValueQuery);

@@ -44,4 +44,9 @@ final class RequestConfiguration
     {
         return $this->request->get('sorting', []);
     }
+
+    public function getPage(): int
+    {
+        return (int) $this->request->get('page', 1);
+    }
 }

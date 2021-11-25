@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
+
 interface SearchInterface
 {
-    public function query(RequestInterface $request): ResponseInterface;
+    public function query(RequestConfiguration $requestConfiguration, RequestInterface $request): ResponseInterface;
 }

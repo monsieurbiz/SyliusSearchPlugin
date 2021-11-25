@@ -15,17 +15,20 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use Elastica\ResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use Pagerfanta\Adapter\AdapterInterface;
 use Pagerfanta\Pagerfanta;
 
 class Response implements ResponseInterface
 {
+    private RequestConfiguration $requestConfiguration;
     private AdapterInterface $adapter;
     private ?Pagerfanta $paginator = null;
     private array $filters = [];
 
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(RequestConfiguration $requestConfiguration, AdapterInterface $adapter)
     {
+        $this->requestConfiguration = $requestConfiguration;
         $this->adapter = $adapter;
         $this->buildFilters();
     }
@@ -45,10 +48,12 @@ class Response implements ResponseInterface
         return $this->filters;
     }
 
-    private function getPaginator(): Pagerfanta
+    public function getPaginator(): Pagerfanta
     {
         if (null === $this->paginator) {
             $this->paginator = new Pagerfanta($this->adapter);
+            $this->paginator->setCurrentPage($this->requestConfiguration->getPage());
+            $this->paginator->setMaxPerPage(10); // @todo
         }
 
         return $this->paginator;

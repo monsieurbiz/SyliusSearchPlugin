@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use Pagerfanta\Elastica\ElasticaAdapter;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -30,7 +31,7 @@ class Search implements SearchInterface
         $this->localeContext = $localeContext;
     }
 
-    public function query(RequestInterface $request): ResponseInterface
+    public function query(RequestConfiguration $requestConfiguration, RequestInterface $request): ResponseInterface
     {
         $indexName = $this->getIndexName($request->getDocumentable(), $this->localeContext->getLocaleCode());
         $factory = new Factory([
@@ -41,7 +42,7 @@ class Search implements SearchInterface
         ]);
         $client = $factory->buildClient();
 
-        return new Response(new ElasticaAdapter($client->getIndex($indexName), $request->getQuery()));
+        return new Response($requestConfiguration, new ElasticaAdapter($client->getIndex($indexName), $request->getQuery()));
     }
 
     private function getIndexName(DocumentableInterface $documentable, ?string $locale = null): string

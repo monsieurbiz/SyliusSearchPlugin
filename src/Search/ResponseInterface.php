@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterInterface;
+use Pagerfanta\Pagerfanta;
 
 interface ResponseInterface extends \IteratorAggregate, \Countable
 {
@@ -21,4 +22,6 @@ interface ResponseInterface extends \IteratorAggregate, \Countable
      * @return FilterInterface[]
      */
     public function getFilters(): array;
+
+    public function getPaginator(): Pagerfanta;
 }

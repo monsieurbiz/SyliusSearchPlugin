@@ -40,7 +40,7 @@ class SearchController extends AbstractController
         $elasticsearchRequest = $this->requestFactory->create(RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
         $elasticsearchRequest->setConfiguration($requestConfiguration);
 
-        $result = $this->search->query($elasticsearchRequest);
+        $result = $this->search->query($requestConfiguration, $elasticsearchRequest);
 
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'documentable' => $elasticsearchRequest->getDocumentable(),

@@ -49,4 +49,22 @@ final class RequestConfiguration
     {
         return (int) $this->request->get('page', 1);
     }
+
+    public function getLimit(): int
+    {
+        $limit = (int)  $this->request->get('limit');
+        $availableLimits = $this->getAvailableLimits();
+
+        if (!\in_array($limit, $availableLimits, true)) {
+            $limit = reset($availableLimits);
+        }
+
+        return $limit;
+    }
+
+    public function getAvailableLimits(): array
+    {
+        // TODO define this in config (by query type?)
+        return [9, 18, 27];
+    }
 }

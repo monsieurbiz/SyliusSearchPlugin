@@ -46,6 +46,7 @@ class SearchController extends AbstractController
             'documentable' => $elasticsearchRequest->getDocumentable(),
             'query' => $query,
             'result' => $result,
+            'limits' => $requestConfiguration->getAvailableLimits(),
         ]);
     }
 }

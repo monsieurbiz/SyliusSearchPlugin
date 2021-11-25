@@ -71,7 +71,11 @@ class Product implements RequestInterface
         }
 
         $enableFilter = new Query\Terms('enabled', [true]);
-        // todo add channel filter
+        $currentChannelFilter = new Query\Term();
+        $currentChannelFilter->setTerm('channels.code', $this->channelContext->getChannel()->getCode());
+        $channelFilter = new Query\Nested();
+        $channelFilter->setPath('channels');
+        $channelFilter->setQuery($currentChannelFilter);
 
         $searchCode = new Query\Terms('code', [$this->configuration->getQueryText()]);
 
@@ -93,6 +97,7 @@ class Product implements RequestInterface
 
         $bool = new Query\BoolQuery();
         $bool->addFilter($enableFilter);
+        $bool->addFilter($channelFilter);
         $bool->addMust($searchQuery);
 
         $esQuery = Query::create($bool);

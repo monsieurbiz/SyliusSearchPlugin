@@ -303,19 +303,23 @@ class Product implements RequestInterface
         }
 
         //todo
-        if (\in_array('price', $filtreTypes, true) && 0 !== count($this->configuration->getAppliedFilters('price'))) {
+        $priceValue = $this->configuration->getAppliedFilters('price');
+        if (\in_array('price', $filtreTypes, true) && 0 !== \count($priceValue)) {
             $qb = new \Elastica\QueryBuilder();
 
             // channel filter
             $channelPriceFilter = $qb->query()
                 ->term(['prices.channel_code' => $this->channelContext->getChannel()->getCode()])
             ;
-            $priceValue = $this->configuration->getAppliedFilters('price');
+            $conditions = [];
+            if (\array_key_exists('min', $priceValue)) {
+                $conditions['gte'] = $priceValue['min'] * 100;
+            }
+            if (\array_key_exists('max', $priceValue)) {
+                $conditions['lte'] = $priceValue['max'] * 100;
+            }
             $priceQuery = $qb->query()
-                ->range('prices.price', [
-                    'gte' => $priceValue['min'] * 100,
-                    'lte' => $priceValue['max'] * 100,
-                ])
+                ->range('prices.price', $conditions)
             ;
             $bool->addMust(
                 $qb->query()

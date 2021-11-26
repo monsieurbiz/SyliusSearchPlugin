@@ -1,7 +1,7 @@
 <div class="item">
-    {% set currentValue = app.request.query.get(filter.code) %}
-    {% set minValue = (currentValue['min'] is defined) ? currentValue['min'] : filter.min %}
-    {% set maxValue = (currentValue['max'] is defined) ? currentValue['max'] : filter.max %}
+    {% set currentValue = requestConfiguration.appliedFilters(filter.code) %}
+    {% set minValue = (currentValue['min'] is defined) ? currentValue['min'] : '' %}
+    {% set maxValue = (currentValue['max'] is defined) ? currentValue['max'] : '' %}
 
     <div class="filter-item" id="{{ 'filter-' ~ filter.code }}">
         <div class="ui teal ribbon label">{{ filter.label | trans }}</div>
@@ -11,7 +11,7 @@
                 <label for="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" style="margin-bottom: 5px;display: block;">{{ filter.minLabel | trans }}</label>
                 <div class="ui labeled input">
                     <div class="ui label">{{ currencySymbol }}</div>
-                    <input type="number" id="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" name="{{ filter.code ~ '[min]'}}" value="{{ minValue }}">
+                    <input type="number" id="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" name="{{ filter.code ~ '[min]'}}" value="{{ minValue }}" placeholder="{{ filter.min }}">
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
                 <label for="{{ 'filter-' ~ filter.code ~ '-' ~ 'max'}}" style="margin-bottom: 5px;display: block;">{{ filter.maxLabel | trans }}</label>
                 <div class="ui labeled input">
                     <div class="ui label">{{ currencySymbol }}</div>
-                    <input type="number" id="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" name="{{ filter.code ~ '[max]'}}" value="{{ maxValue }}">
+                    <input type="number" id="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" name="{{ filter.code ~ '[max]'}}" value="{{ maxValue }}" placeholder="{{ filter.max }}">
                 </div>
             </div>
         </div>

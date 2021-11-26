@@ -44,6 +44,7 @@ class SearchController extends AbstractController
 
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'documentable' => $result->getDocumentable(),
+            'requestConfiguration' => $requestConfiguration,
             'query' => $query,
             'result' => $result,
             'limits' => $requestConfiguration->getAvailableLimits(),

@@ -288,7 +288,7 @@ class Product implements RequestInterface
                     $mainTaxonQuery->addShould(
                         $qb->query()
                             ->term()
-                            ->setTerm(sprintf('%s.name', $field), SlugHelper::toLabel($value))
+                            ->setTerm(sprintf('%s.code', $field), SlugHelper::toLabel($value))
                     );
                 }
                 $bool->addMust(

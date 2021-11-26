@@ -99,7 +99,7 @@ class Response implements ResponseInterface
                     $taxonNameBuckets = $taxonLevelBucket['names']['buckets'] ?? [];
                     foreach ($taxonNameBuckets as $taxonNameBucket) {
                         $taxonName = $taxonNameBucket['key'];
-                        $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count']);
+                        $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count'], $taxonCode);
                         break 2;
                     }
                 }

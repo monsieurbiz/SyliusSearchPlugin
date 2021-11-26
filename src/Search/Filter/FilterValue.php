@@ -32,15 +32,18 @@ class FilterValue
      */
     private $count;
 
+    private string $value;
+
     /**
      * Filter constructor.
      *
      * @param string $label
      * @param int $count
      */
-    public function __construct(string $label, int $count)
+    public function __construct(string $label, int $count, string $value = null)
     {
-        $this->slug = SlugHelper::toSlug($label);
+        $this->value = $value ?? $label;
+        $this->slug = SlugHelper::toSlug($this->value);
         $this->label = $label;
         $this->count = $count;
     }
@@ -67,5 +70,10 @@ class FilterValue
     public function getCount(): int
     {
         return $this->count;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
     }
 }

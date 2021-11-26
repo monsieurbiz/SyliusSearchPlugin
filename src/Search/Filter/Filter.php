@@ -78,13 +78,9 @@ class Filter implements FilterInterface
         return $this->values;
     }
 
-    /**
-     * @param $value
-     * @param $count
-     */
-    public function addValue($value, $count): void
+    public function addValue(string $label, int $count, ?string $value = null): void
     {
-        $this->values[] = new FilterValue($value, $count);
+        $this->values[] = new FilterValue($label, $count, $value);
     }
 
     /**

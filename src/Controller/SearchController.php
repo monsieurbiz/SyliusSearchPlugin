@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
-use MonsieurBiz\SyliusSearchPlugin\Search\RequestFactory;
-use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
@@ -26,14 +25,12 @@ use Symfony\Component\Intl\Currencies;
 
 class SearchController extends AbstractController
 {
-    private RequestFactory $requestFactory;
     private Search $search;
     private CurrencyContextInterface $currencyContext;
     private LocaleContextInterface $localeContext;
 
-    public function __construct(RequestFactory $requestFactory, Search $search, CurrencyContextInterface $currencyContext, LocaleContextInterface $localeContext)
+    public function __construct(Search $search, CurrencyContextInterface $currencyContext, LocaleContextInterface $localeContext)
     {
-        $this->requestFactory = $requestFactory;
         $this->search = $search;
         $this->currencyContext = $currencyContext;
         $this->localeContext = $localeContext;
@@ -42,15 +39,11 @@ class SearchController extends AbstractController
     // TODO add an optional parameter $documentType (nullable => get the default document type)
     public function searchAction(Request $request, string $query): Response
     {
-        $requestConfiguration = new RequestConfiguration($request);
-        // TODO create a requestConfiguration (like \Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration without metadata)
-        $elasticsearchRequest = $this->requestFactory->create(RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
-        $elasticsearchRequest->setConfiguration($requestConfiguration);
-
-        $result = $this->search->query($requestConfiguration, $elasticsearchRequest);
+        $requestConfiguration = new RequestConfiguration($request, RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
+        $result = $this->search->search($requestConfiguration);
 
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
-            'documentable' => $elasticsearchRequest->getDocumentable(),
+            'documentable' => $result->getDocumentable(),
             'query' => $query,
             'result' => $result,
             'limits' => $requestConfiguration->getAvailableLimits(),

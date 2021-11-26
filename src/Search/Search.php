@@ -15,7 +15,9 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestHandler;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use Pagerfanta\Elastica\ElasticaAdapter;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -24,15 +26,19 @@ class Search implements SearchInterface
 {
     private SerializerInterface $serializer;
     private LocaleContextInterface $localeContext;
+    private RequestHandler $requestHandler;
 
-    public function __construct(SerializerInterface $serializer, LocaleContextInterface $localeContext)
+    public function __construct(SerializerInterface $serializer, LocaleContextInterface $localeContext, RequestHandler $requestHandler)
     {
         $this->serializer = $serializer;
         $this->localeContext = $localeContext;
+        $this->requestHandler = $requestHandler;
     }
 
-    public function query(RequestConfiguration $requestConfiguration, RequestInterface $request): ResponseInterface
+    public function search(RequestConfiguration $requestConfiguration): ResponseInterface
     {
+        $request = $this->requestHandler->getRequest($requestConfiguration);
+
         $indexName = $this->getIndexName($request->getDocumentable(), $this->localeContext->getLocaleCode());
         $factory = new Factory([
             Factory::CONFIG_INDEX_CLASS_MAPPING => [
@@ -42,7 +48,11 @@ class Search implements SearchInterface
         ]);
         $client = $factory->buildClient();
 
-        return new Response($requestConfiguration, new ElasticaAdapter($client->getIndex($indexName), $request->getQuery()));
+        return new Response(
+            $requestConfiguration,
+            new ElasticaAdapter($client->getIndex($indexName), $request->getQuery()),
+            $request->getDocumentable()
+        );
     }
 
     private function getIndexName(DocumentableInterface $documentable, ?string $locale = null): string

@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Search;
+namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
+use Elastica\Query;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
-class RequestFactory
+class RequestHandler
 {
     private ServiceRegistryInterface $searchRequestsRegistry;
 
@@ -24,11 +25,13 @@ class RequestFactory
         $this->searchRequestsRegistry = $searchRequestsRegistry;
     }
 
-    public function create(string $type, string $documentType): RequestInterface
+    public function getRequest(RequestConfiguration $requestConfiguration): RequestInterface
     {
         /** @var RequestInterface $request */
         foreach ($this->searchRequestsRegistry->all() as $request) {
-            if ($request->supports($type, $documentType)) {
+            if ($request->supports($requestConfiguration->getType(), $requestConfiguration->getDocumentType())) {
+                $request->setConfiguration($requestConfiguration);
+
                 return $request;
             }
         }

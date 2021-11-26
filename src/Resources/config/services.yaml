@@ -1,6 +1,6 @@
 parameters:
   monsieurbiz.search.model.documentable.interface: MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface
-  monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface
+  monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface
 
 services:
 

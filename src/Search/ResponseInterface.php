@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterInterface;
 use Pagerfanta\Pagerfanta;
 
@@ -24,4 +25,6 @@ interface ResponseInterface extends \IteratorAggregate, \Countable
     public function getFilters(): array;
 
     public function getPaginator(): Pagerfanta;
+
+    public function getDocumentable(): DocumentableInterface;
 }

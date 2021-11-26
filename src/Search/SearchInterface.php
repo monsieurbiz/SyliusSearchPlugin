@@ -17,5 +17,5 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 
 interface SearchInterface
 {
-    public function query(RequestConfiguration $requestConfiguration, RequestInterface $request): ResponseInterface;
+    public function search(RequestConfiguration $requestConfiguration): ResponseInterface;
 }

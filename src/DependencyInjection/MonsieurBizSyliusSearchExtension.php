@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
-use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Search;
+namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
 use Elastica\Query;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;

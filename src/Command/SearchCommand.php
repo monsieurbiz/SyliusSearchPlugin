@@ -15,8 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
 use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
-use MonsieurBiz\SyliusSearchPlugin\Search\RequestFactory;
-use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,18 +29,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class SearchCommand extends Command
 {
     protected static $defaultName = 'monsieurbiz:search:search';
-    private RequestFactory $requestFactory;
     private Search $search;
     private RequestStack $requestStack;
 
     public function __construct(
-        RequestFactory $requestFactory,
         Search $search,
         RequestStack $requestStack,
         $name = null
     ) {
         parent::__construct($name);
-        $this->requestFactory = $requestFactory;
         $this->search = $search;
         $this->requestStack = $requestStack;
     }
@@ -58,15 +54,11 @@ class SearchCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $query = $input->getArgument('query');
-
         $request = new Request(['query' => $query, '_channel_code' => $input->getOption('channel')]);
         $this->requestStack->push($request);
+        $requestConfiguration = new RequestConfiguration($request, RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
 
-        $requestConfiguration = new RequestConfiguration($request);
-        $elasticsearchRequest = $this->requestFactory->create(RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
-        $elasticsearchRequest->setConfiguration($requestConfiguration);
-
-        $result = $this->search->query($requestConfiguration, $elasticsearchRequest);
+        $result = $this->search->search($requestConfiguration);
         $io->title('Search result for: ' . $query);
         $io->section('Nb results: ' . $result->count());
         $documents = [];

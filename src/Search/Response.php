@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use Elastica\ResultSet;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\RangeFilter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
@@ -24,13 +25,15 @@ class Response implements ResponseInterface
 {
     private RequestConfiguration $requestConfiguration;
     private AdapterInterface $adapter;
+    private DocumentableInterface $documentable;
     private ?Pagerfanta $paginator = null;
     private array $filters = [];
 
-    public function __construct(RequestConfiguration $requestConfiguration, AdapterInterface $adapter)
+    public function __construct(RequestConfiguration $requestConfiguration, AdapterInterface $adapter, DocumentableInterface $documentable)
     {
         $this->requestConfiguration = $requestConfiguration;
         $this->adapter = $adapter;
+        $this->documentable = $documentable;
         $this->buildFilters();
     }
 
@@ -58,6 +61,11 @@ class Response implements ResponseInterface
         }
 
         return $this->paginator;
+    }
+
+    public function getDocumentable(): DocumentableInterface
+    {
+        return $this->documentable;
     }
 
     private function buildFilters(): void

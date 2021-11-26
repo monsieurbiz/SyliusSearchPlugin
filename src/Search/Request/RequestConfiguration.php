@@ -18,10 +18,14 @@ use Symfony\Component\HttpFoundation\Request;
 final class RequestConfiguration
 {
     private Request $request;
+    private string $type;
+    private string $documentType;
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, string $type, string $documentType)
     {
         $this->request = $request;
+        $this->type = $type;
+        $this->documentType = $documentType;
     }
 
     public function getQueryText(): string
@@ -33,7 +37,7 @@ final class RequestConfiguration
     {
         $appliedFilters = [
             'taxon' => $this->request->get('taxon', []),
-            'price' =>$this->request->get('price', null),
+            'price' =>$this->request->get('price', []),
             'attributes' => $this->request->get('attributes', []),
             'options' => $this->request->get('options', []),
         ];
@@ -67,5 +71,15 @@ final class RequestConfiguration
     {
         // TODO define this in config (by query type?)
         return [9, 18, 27];
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getDocumentType(): string
+    {
+        return $this->documentType;
     }
 }

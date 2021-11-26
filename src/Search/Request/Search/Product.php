@@ -154,7 +154,7 @@ class Product implements RequestInterface
     {
         $attributesAgg = new Nested('attributes', 'attributes');
         $filtredAttributesAgg = new Aggregation\Filter('attributes');
-        $filtredAttributesAgg->setFilter($this->getFilters(null, ['options', 'taxon']));
+        $filtredAttributesAgg->setFilter($this->getFilters(null, ['options', 'taxon', 'price']));
         $filtredAttributesAgg->addAggregation($attributesAgg);
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
             if (!$productAttribute->isFilterable()) {
@@ -180,7 +180,7 @@ class Product implements RequestInterface
 
         $optionsAgg = new Nested('options', 'variants.options');
         $filtredOptionsAgg = new Aggregation\Filter('options');
-        $filtredOptionsAgg->setFilter($this->getFilters(null, ['attributes', 'taxon']));
+        $filtredOptionsAgg->setFilter($this->getFilters(null, ['attributes', 'taxon', 'price']));
         $filtredOptionsAgg->addAggregation($optionsAgg);
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
             if (!$productOption->isFilterable()) {
@@ -217,20 +217,27 @@ class Product implements RequestInterface
     {
         $qb = new \Elastica\QueryBuilder();
 
+        $otherFilters = $this->getFilters(null, ['attributes', 'options', 'price']);
+
         return $qb->aggregation()
-            ->nested('main_taxon', 'main_taxon')
+            ->filter('main_taxon')
+            ->setFilter($otherFilters)
             ->addAggregation(
                 $qb->aggregation()
-                    ->terms('codes')
-                    ->setField('main_taxon.code')
+                    ->nested('main_taxon', 'main_taxon')
                     ->addAggregation(
                         $qb->aggregation()
-                            ->terms('levels')
-                            ->setField('main_taxon.level')
+                            ->terms('codes')
+                            ->setField('main_taxon.code')
                             ->addAggregation(
                                 $qb->aggregation()
-                                    ->terms('names')
-                                    ->setField('main_taxon.name')
+                                    ->terms('levels')
+                                    ->setField('main_taxon.level')
+                                    ->addAggregation(
+                                        $qb->aggregation()
+                                            ->terms('names')
+                                            ->setField('main_taxon.name')
+                                    )
                             )
                     )
             )
@@ -241,19 +248,26 @@ class Product implements RequestInterface
     {
         $qb = new \Elastica\QueryBuilder();
 
+        $otherFilters = $this->getFilters(null, ['attributes', 'options', 'taxon']);
+
         return $qb->aggregation()
-            ->nested('prices', 'prices')
+            ->filter('prices')
+            ->setFilter($otherFilters)
             ->addAggregation(
                 $qb->aggregation()
-                    ->filter('prices')
-                    ->setFilter(
-                        $qb->query()->term()
-                            ->setTerm('prices.channel_code', $this->channelContext->getChannel()->getCode())
-                    )
+                    ->nested('prices', 'prices')
                     ->addAggregation(
                         $qb->aggregation()
-                            ->stats('prices_stats')
-                            ->setField('prices.price')
+                            ->filter('prices')
+                            ->setFilter(
+                                $qb->query()->term()
+                                    ->setTerm('prices.channel_code', $this->channelContext->getChannel()->getCode())
+                            )
+                            ->addAggregation(
+                                $qb->aggregation()
+                                    ->stats('prices_stats')
+                                    ->setField('prices.price')
+                            )
                     )
             )
         ;

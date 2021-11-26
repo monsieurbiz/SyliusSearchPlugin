@@ -79,7 +79,7 @@ class Response implements ResponseInterface
         }
 
         // todo main taxon
-        $taxonAggregation = $aggregations['main_taxon'] ?? null;
+        $taxonAggregation = $aggregations['main_taxon']['main_taxon'] ?? null;
         if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
             $filter = new Filter('main_taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count'], 'taxon');
 
@@ -112,7 +112,7 @@ class Response implements ResponseInterface
         }
 
         // todo price
-        $priceAggregation = $aggregations['prices']['prices'] ?? null;
+        $priceAggregation = $aggregations['prices']['prices']['prices'] ?? null;
         if ($priceAggregation && $priceAggregation['doc_count'] > 0) {
             $this->filters[] = new RangeFilter(
                 'price',

@@ -17,19 +17,26 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestFactory;
 use MonsieurBiz\SyliusSearchPlugin\Search\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
+use Sylius\Component\Currency\Context\CurrencyContextInterface;
+use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Intl\Currencies;
 
 class SearchController extends AbstractController
 {
     private RequestFactory $requestFactory;
     private Search $search;
+    private CurrencyContextInterface $currencyContext;
+    private LocaleContextInterface $localeContext;
 
-    public function __construct(RequestFactory $requestFactory, Search $search)
+    public function __construct(RequestFactory $requestFactory, Search $search, CurrencyContextInterface $currencyContext, LocaleContextInterface $localeContext)
     {
         $this->requestFactory = $requestFactory;
         $this->search = $search;
+        $this->currencyContext = $currencyContext;
+        $this->localeContext = $localeContext;
     }
 
     // TODO add an optional parameter $documentType (nullable => get the default document type)
@@ -47,6 +54,7 @@ class SearchController extends AbstractController
             'query' => $query,
             'result' => $result,
             'limits' => $requestConfiguration->getAvailableLimits(),
+            'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
         ]);
     }
 }

@@ -1,0 +1,27 @@
+<div class="item">
+    {% set currentValue = app.request.query.get(filter.code) %}
+    {% set minValue = (currentValue['min'] is defined) ? currentValue['min'] : filter.min %}
+    {% set maxValue = (currentValue['max'] is defined) ? currentValue['max'] : filter.max %}
+
+    <div class="filter-item" id="{{ 'filter-' ~ filter.code }}">
+        <div class="ui teal ribbon label">{{ filter.label | trans }}</div>
+        <div class="filter-values" style="width: 100%">
+
+            <div class="filter-value" style="margin-top: 10px;">
+                <label for="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" style="margin-bottom: 5px;display: block;">{{ filter.minLabel | trans }}</label>
+                <div class="ui labeled input">
+                    <div class="ui label">{{ currencySymbol }}</div>
+                    <input type="number" id="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" name="{{ filter.code ~ '[min]'}}" value="{{ minValue }}">
+                </div>
+            </div>
+
+            <div class="filter-value" style="margin-top: 10px;">
+                <label for="{{ 'filter-' ~ filter.code ~ '-' ~ 'max'}}" style="margin-bottom: 5px;display: block;">{{ filter.maxLabel | trans }}</label>
+                <div class="ui labeled input">
+                    <div class="ui label">{{ currencySymbol }}</div>
+                    <input type="number" id="{{ 'filter-' ~ filter.code ~ '-' ~ 'min'}}" name="{{ filter.code ~ '[max]'}}" value="{{ maxValue }}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

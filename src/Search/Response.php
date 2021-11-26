@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use Elastica\ResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
+use MonsieurBiz\SyliusSearchPlugin\Search\Filter\RangeFilter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use Pagerfanta\Adapter\AdapterInterface;
 use Pagerfanta\Pagerfanta;
@@ -100,6 +101,19 @@ class Response implements ResponseInterface
             if (0 !== \count($filter->getValues())) {
                 $this->filters[] = $filter;
             }
+        }
+
+        // todo price
+        $priceAggregation = $aggregations['prices']['prices'] ?? null;
+        if ($priceAggregation && $priceAggregation['doc_count'] > 0) {
+            $this->filters[] = new RangeFilter(
+                'price',
+                'monsieurbiz_searchplugin.filters.price_filter',
+                'monsieurbiz_searchplugin.filters.price_min',
+                'monsieurbiz_searchplugin.filters.price_max',
+                (int) floor(($priceAggregation['prices_stats']['min'] ?? 0) / 100),
+                (int) ceil(($priceAggregation['prices_stats']['max'] ?? 0) / 100)
+            );
         }
 
         // Retrieve filters in aggregations

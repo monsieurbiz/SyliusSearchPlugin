@@ -106,6 +106,7 @@ class Product implements RequestInterface
         $esQuery->setPostFilter($boolFilter);
         $this->addAggregations($esQuery);
         $esQuery->addAggregation($this->getMainTaxonAggregation());
+        $esQuery->addAggregation($this->getPriceAggregation());
 
         // Manage sorting
         foreach ($this->configuration->getSorting() as $field => $order) {
@@ -115,7 +116,7 @@ class Product implements RequestInterface
             }
         }
 
-        dump($esQuery->toArray());
+        dump(json_encode($esQuery->toArray(), 1));
 
         return $esQuery;
     }
@@ -236,7 +237,29 @@ class Product implements RequestInterface
         ;
     }
 
-    private function getFilters($currentAttribute = null, array $filtreTypes = ['attributes', 'options', 'taxon']): Query\BoolQuery
+    private function getPriceAggregation(): Aggregation\AbstractAggregation
+    {
+        $qb = new \Elastica\QueryBuilder();
+
+        return $qb->aggregation()
+            ->nested('prices', 'prices')
+            ->addAggregation(
+                $qb->aggregation()
+                    ->filter('prices')
+                    ->setFilter(
+                        $qb->query()->term()
+                            ->setTerm('prices.channel_code', $this->channelContext->getChannel()->getCode())
+                    )
+                    ->addAggregation(
+                        $qb->aggregation()
+                            ->stats('prices_stats')
+                            ->setField('prices.price')
+                    )
+            )
+        ;
+    }
+
+    private function getFilters($currentAttribute = null, array $filtreTypes = ['attributes', 'options', 'taxon', 'price']): Query\BoolQuery
     {
         $bool = new Query\BoolQuery();
 
@@ -263,6 +286,33 @@ class Product implements RequestInterface
                         )
                 );
             }
+        }
+
+        //todo
+        if (\in_array('price', $filtreTypes, true) && 0 !== count($this->configuration->getAppliedFilters('price'))) {
+            $qb = new \Elastica\QueryBuilder();
+
+            // channel filter
+            $channelPriceFilter = $qb->query()
+                ->term(['prices.channel_code' => $this->channelContext->getChannel()->getCode()])
+            ;
+            $priceValue = $this->configuration->getAppliedFilters('price');
+            $priceQuery = $qb->query()
+                ->range('prices.price', [
+                    'gte' => $priceValue['min'] * 100,
+                    'lte' => $priceValue['max'] * 100,
+                ])
+            ;
+            $bool->addMust(
+                $qb->query()
+                    ->nested()
+                    ->setPath('prices')
+                    ->setQuery(
+                        $qb->query()->bool()
+                            ->addMust($channelPriceFilter)
+                            ->addMust($priceQuery)
+                    )
+            );
         }
 
         if (\in_array('attributes', $filtreTypes, true)) {

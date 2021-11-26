@@ -33,6 +33,7 @@ final class RequestConfiguration
     {
         $appliedFilters = [
             'taxon' => $this->request->get('taxon', []),
+            'price' =>$this->request->get('price', null),
             'attributes' => $this->request->get('attributes', []),
             'options' => $this->request->get('options', []),
         ];

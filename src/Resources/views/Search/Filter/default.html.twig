@@ -1,0 +1,28 @@
+{% set appliedAttributes = app.request.query.get(filter.type) %}
+{% set currentValues = (appliedAttributes[filter.code] is defined) ? appliedAttributes[filter.code] : [] %}
+{% if filter.values|length or currentValues is not empty %}
+    <div class="item">
+        <div class="filter-item" id="{{ 'filter-' ~ filter.code }}" >
+            <div class="ui teal ribbon label">{{ filter.label | trans }}</div>
+            <div class="filter-values" style="width: 100%">
+                {% for value in filter.values %}
+                    {% set valueIsApplied = (value.slug in currentValues) %}
+                    <div class="filter-value" style="margin-top: 10px;">
+                        <div class="ui toggle checkbox">
+                            <input
+                                    type="checkbox"
+                                    id="{{ 'filter-' ~ filter.code ~ '-value-' ~ value.slug }}"
+                                    name="{{ filter.type }}[{{ filter.code }}][]"
+                                    value="{{ value.slug }}"
+                                    class="hidden"
+                                    {% if valueIsApplied %}
+                                        checked="checked"
+                                    {% endif %}
+                            >
+                            <label for="{{ 'filter-' ~ filter.code ~ '-value-' ~ value.slug }}">{{ value.label }} <span class="count">({{ value.count }})</span></label></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}

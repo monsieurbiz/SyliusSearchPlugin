@@ -5,3 +5,9 @@ monsieurbiz_search_search:
     _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:searchAction
   requirements:
     query: .+
+
+monsieurbiz_search_post:
+  path: /search
+  methods: [POST]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:postAction

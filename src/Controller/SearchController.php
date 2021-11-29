@@ -19,6 +19,7 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Search;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Intl\Currencies;
@@ -50,5 +51,24 @@ class SearchController extends AbstractController
             'limits' => $requestConfiguration->getAvailableLimits(),
             'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
         ]);
+    }
+
+    /**
+     * Post search.
+     *
+     * @param Request $request
+     *
+     * @return RedirectResponse
+     */
+    public function postAction(Request $request)
+    {
+        $query = $request->request->get('monsieurbiz_searchplugin_search')['query'] ?? '';
+
+        return $this->redirect(
+            $this->generateUrl(
+                'monsieurbiz_search_search',
+                ['query' => urlencode($query)]
+            )
+        );
     }
 }

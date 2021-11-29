@@ -15,7 +15,6 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
 use Elastica\Query;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 
 interface RequestInterface
 {

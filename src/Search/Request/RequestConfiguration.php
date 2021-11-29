@@ -57,7 +57,7 @@ final class RequestConfiguration
 
     public function getLimit(): int
     {
-        $limit = (int)  $this->request->get('limit');
+        $limit = (int) $this->request->get('limit');
         $availableLimits = $this->getAvailableLimits();
 
         if (!\in_array($limit, $availableLimits, true)) {

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
-use Elastica\Query;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
 class RequestHandler

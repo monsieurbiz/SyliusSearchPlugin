@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Search;
 
-use Elastica\Aggregation;
-use Elastica\Aggregation\Nested;
-use Elastica\Aggregation\Terms;
 use Elastica\Query;
 use Elastica\Query\MultiMatch;
 use MonsieurBiz\SyliusSearchPlugin\Helper\SlugHelper;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
@@ -30,23 +28,25 @@ use Sylius\Component\Registry\ServiceRegistryInterface;
 class Product implements RequestInterface
 {
     private DocumentableInterface $documentable;
-
     private RequestConfiguration $configuration;
     private ProductAttributeRepositoryInterface $productAttributeRepository;
     private ProductOptionRepositoryInterface $productOptionRepository;
     private ChannelContextInterface $channelContext;
+    private AggregationBuilder $aggregationBuilder;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
         ProductAttributeRepositoryInterface $productAttributeRepository,
         ProductOptionRepositoryInterface $productOptionRepository,
-        ChannelContextInterface $channelContext
+        ChannelContextInterface $channelContext,
+        AggregationBuilder $aggregationBuilder
     ) {
         //TODO check if exist, return a dummy documentable if not
         $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
         $this->channelContext = $channelContext;
+        $this->aggregationBuilder = $aggregationBuilder;
     }
 
     public function getType(): string
@@ -102,11 +102,12 @@ class Product implements RequestInterface
         $bool->addMust($searchQuery);
 
         $esQuery = Query::create($bool);
-        $boolFilter = $this->getFilters();
+        $boolFilter = new Query\BoolQuery();
+        foreach ($this->getFilters() as $filter) {
+            $boolFilter->addMust($filter);
+        }
         $esQuery->setPostFilter($boolFilter);
         $this->addAggregations($esQuery);
-        $esQuery->addAggregation($this->getMainTaxonAggregation());
-        $esQuery->addAggregation($this->getPriceAggregation());
 
         // Manage sorting
         foreach ($this->configuration->getSorting() as $field => $order) {
@@ -152,159 +153,49 @@ class Product implements RequestInterface
 
     private function addAggregations(Query $query): void
     {
-        $attributesAgg = new Nested('attributes', 'attributes');
-        $filtredAttributesAgg = new Aggregation\Filter('attributes');
-        $filtredAttributesAgg->setFilter($this->getFilters(null, ['options', 'taxon', 'price']));
-        $filtredAttributesAgg->addAggregation($attributesAgg);
-        foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
-            if (!$productAttribute->isFilterable()) {
-                continue;
-            }
-            $attributeValuesAgg = new Terms('values');
-            $attributeValuesAgg->setField(sprintf('attributes.%s.value.keyword', $productAttribute->getCode()));
+        $newAggs = $this->aggregationBuilder->buildAggregations(
+            [
+                $this->productAttributeRepository->findIsSearchableOrFilterable(),
+                $this->productOptionRepository->findIsSearchableOrFilterable(),
+                'main_taxon',
+                'price',
+            ],
+            $this->getFilters()
+        );
 
-            $attributeCodesAgg = new Terms('names');
-            $attributeCodesAgg->setField(sprintf('attributes.%s.name', $productAttribute->getCode()));
-            $attributeCodesAgg->addAggregation($attributeValuesAgg);
-
-            $attributeAgg = new Nested($productAttribute->getCode(), sprintf('attributes.%s', $productAttribute->getCode()));
-            $attributeAgg->addAggregation($attributeCodesAgg);
-
-            $boolFilter = $this->getFilters($productAttribute->getCode(), ['attributes']);
-            $filter = new Aggregation\Filter($productAttribute->getCode());
-            $filter->setFilter($boolFilter);
-            $filter->addAggregation($attributeAgg);
-
-            $attributesAgg->addAggregation($filter);
-        }
-
-        $optionsAgg = new Nested('options', 'variants.options');
-        $filtredOptionsAgg = new Aggregation\Filter('options');
-        $filtredOptionsAgg->setFilter($this->getFilters(null, ['attributes', 'taxon', 'price']));
-        $filtredOptionsAgg->addAggregation($optionsAgg);
-        foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
-            if (!$productOption->isFilterable()) {
-                continue;
-            }
-            $attributeValuesAgg = new Terms('values');
-            $attributeValuesAgg->setField(sprintf('variants.options.%s.value.keyword', $productOption->getCode()));
-
-            $attributeCodesAgg = new Terms('names');
-            $attributeCodesAgg->setField(sprintf('variants.options.%s.name', $productOption->getCode()));
-            $attributeCodesAgg->addAggregation($attributeValuesAgg);
-
-            $attributeAgg = new Nested($productOption->getCode(), sprintf('variants.options.%s', $productOption->getCode()));
-            $attributeAgg->addAggregation($attributeCodesAgg);
-
-            $boolFilter = $this->getFilters($productOption->getCode(), ['options']);
-            $filter = new Aggregation\Filter($productOption->getCode());
-            $filter->setFilter($boolFilter);
-            $filter->addAggregation($attributeAgg);
-
-            $optionsAgg->addAggregation($filter);
-        }
-
-        if (0 < \count($attributesAgg->getAggs())) {
-            $query->addAggregation($filtredAttributesAgg);
-        }
-
-        if (0 < \count($optionsAgg->getAggs())) {
-            $query->addAggregation($filtredOptionsAgg);
+        foreach ($newAggs as $aggregation) {
+            $query->addAggregation($aggregation);
         }
     }
 
-    private function getMainTaxonAggregation(): Aggregation\AbstractAggregation
+    private function getFilters(): array
     {
+        $filters = [];
+
         $qb = new \Elastica\QueryBuilder();
 
-        $otherFilters = $this->getFilters(null, ['attributes', 'options', 'price']);
-
-        return $qb->aggregation()
-            ->filter('main_taxon')
-            ->setFilter($otherFilters)
-            ->addAggregation(
-                $qb->aggregation()
-                    ->nested('main_taxon', 'main_taxon')
-                    ->addAggregation(
-                        $qb->aggregation()
-                            ->terms('codes')
-                            ->setField('main_taxon.code')
-                            ->addAggregation(
-                                $qb->aggregation()
-                                    ->terms('levels')
-                                    ->setField('main_taxon.level')
-                                    ->addAggregation(
-                                        $qb->aggregation()
-                                            ->terms('names')
-                                            ->setField('main_taxon.name')
-                                    )
-                            )
-                    )
-            )
-        ;
-    }
-
-    private function getPriceAggregation(): Aggregation\AbstractAggregation
-    {
-        $qb = new \Elastica\QueryBuilder();
-
-        $otherFilters = $this->getFilters(null, ['attributes', 'options', 'taxon']);
-
-        return $qb->aggregation()
-            ->filter('prices')
-            ->setFilter($otherFilters)
-            ->addAggregation(
-                $qb->aggregation()
-                    ->nested('prices', 'prices')
-                    ->addAggregation(
-                        $qb->aggregation()
-                            ->filter('prices')
-                            ->setFilter(
-                                $qb->query()->term()
-                                    ->setTerm('prices.channel_code', $this->channelContext->getChannel()->getCode())
-                            )
-                            ->addAggregation(
-                                $qb->aggregation()
-                                    ->stats('prices_stats')
-                                    ->setField('prices.price')
-                            )
-                    )
-            )
-        ;
-    }
-
-    private function getFilters($currentAttribute = null, array $filtreTypes = ['attributes', 'options', 'taxon', 'price']): Query\BoolQuery
-    {
-        $bool = new Query\BoolQuery();
-
-        //todo
-        if (\in_array('taxon', $filtreTypes, true)) {
-            $qb = new \Elastica\QueryBuilder();
-            foreach ($this->configuration->getAppliedFilters('taxon') as $field => $values) {
-                $mainTaxonQuery = $qb->query()
-                    ->bool()
-                ;
-                foreach ($values as $value) {
-                    $mainTaxonQuery->addShould(
-                        $qb->query()
-                            ->term()
-                            ->setTerm(sprintf('%s.code', $field), SlugHelper::toLabel($value))
-                    );
-                }
-                $bool->addMust(
+        foreach ($this->configuration->getAppliedFilters('taxon') as $field => $values) {
+            $mainTaxonQuery = $qb->query()
+                ->bool()
+            ;
+            foreach ($values as $value) {
+                $mainTaxonQuery->addShould(
                     $qb->query()
-                        ->nested()
-                        ->setPath($field)
-                        ->setQuery(
-                            $mainTaxonQuery
-                        )
+                        ->term()
+                        ->setTerm(sprintf('%s.code', $field), SlugHelper::toLabel($value))
                 );
             }
+            $filters['main_taxons'] = $qb->query()
+                ->nested()
+                ->setPath($field)
+                ->setQuery(
+                    $mainTaxonQuery
+                )
+            ;
         }
 
-        //todo
         $priceValue = $this->configuration->getAppliedFilters('price');
-        if (\in_array('price', $filtreTypes, true) && 0 !== \count($priceValue)) {
+        if (0 !== \count($priceValue)) {
             $qb = new \Elastica\QueryBuilder();
 
             // channel filter
@@ -321,58 +212,46 @@ class Product implements RequestInterface
             $priceQuery = $qb->query()
                 ->range('prices.price', $conditions)
             ;
-            $bool->addMust(
-                $qb->query()
-                    ->nested()
-                    ->setPath('prices')
-                    ->setQuery(
-                        $qb->query()->bool()
-                            ->addMust($channelPriceFilter)
-                            ->addMust($priceQuery)
-                    )
-            );
+            $filters['price'] = $qb->query()
+                ->nested()
+                ->setPath('prices')
+                ->setQuery(
+                    $qb->query()->bool()
+                        ->addMust($channelPriceFilter)
+                        ->addMust($priceQuery)
+                )
+            ;
         }
 
-        if (\in_array('attributes', $filtreTypes, true)) {
-            foreach ($this->configuration->getAppliedFilters('attributes') as $field => $values) {
-                if ($currentAttribute == $field) {
-                    continue;
-                }
-                $attributeValueQuery = new Query\BoolQuery();
+        foreach ($this->configuration->getAppliedFilters('attributes') as $field => $values) {
+            $attributeValueQuery = new Query\BoolQuery();
 
-                foreach ($values as $value) {
-                    $termQuery = new Query\Terms(sprintf('attributes.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
-                    $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
-                }
-
-                $attributeQuery = new Query\Nested();
-                $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
-
-                $bool->addMust($attributeQuery);
+            foreach ($values as $value) {
+                $termQuery = new Query\Terms(sprintf('attributes.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
+                $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
             }
+
+            $attributeQuery = new Query\Nested();
+            $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
+
+            $filters['attributes.' . $field] = $attributeQuery;
         }
 
-        if (\in_array('options', $filtreTypes, true)) {
-            foreach ($this->configuration->getAppliedFilters('options') as $field => $values) {
-                if ($currentAttribute == $field) {
-                    continue;
-                }
+        foreach ($this->configuration->getAppliedFilters('options') as $field => $values) {
+            $attributeValueQuery = new Query\BoolQuery();
 
-                $attributeValueQuery = new Query\BoolQuery();
-
-                foreach ($values as $value) {
-                    $termQuery = new Query\Terms(sprintf('variants.options.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
-                    $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
-                }
-
-                $attributeQuery = new Query\Nested();
-                $attributeQuery->setPath(sprintf('variants.options.%s', $field))->setQuery($attributeValueQuery);
-
-                $bool->addMust($attributeQuery);
+            foreach ($values as $value) {
+                $termQuery = new Query\Terms(sprintf('variants.options.%s.value.keyword', $field), [SlugHelper::toLabel($value)]);
+                $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
             }
+
+            $attributeQuery = new Query\Nested();
+            $attributeQuery->setPath(sprintf('variants.options.%s', $field))->setQuery($attributeValueQuery);
+
+            $filters['options.' . $field] = $attributeQuery;
         }
 
-        return $bool;
+        return $filters;
     }
 
     // todo find solution to get more extendable

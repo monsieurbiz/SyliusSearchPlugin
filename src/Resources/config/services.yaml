@@ -90,3 +90,19 @@ services:
         select: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\SelectReader',
         date: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\DateReader'
       }
+
+  # Define aggregation builders
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\MainTaxonAggregation:
+    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\PriceAggregation:
+    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\ProductAttributesAggregation:
+    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\ProductOptionsAggregation:
+    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder:
+    arguments: [ !tagged_iterator { tag: 'monsieurbiz.sarch.aggregation_builder' } ]

@@ -1,11 +1,4 @@
 imports:
   - { resource: "services.yaml" }
   - { resource: "monsieurbiz_search.yaml" }
-
-sylius_ui:
-  events:
-    sylius.shop.layout.header.content:
-      blocks:
-        search:
-          template: "@MonsieurBizSyliusSearchPlugin/Header/form.html.twig"
-          priority: 20
+  - { resource: "sylius/ui.yaml" }

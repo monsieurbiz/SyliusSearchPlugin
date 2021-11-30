@@ -1,7 +1,6 @@
 {% import "@SyliusShop/Common/Macro/money.html.twig" as money %}
 
 <div class="ui fluid card">
-    {# TODO find the locale... #}
     <a href="{{ path('sylius_shop_product_show', {'slug': item.slug, '_locale': sylius.localeCode}) }}" class="blurring dimmable image">
         <div class="ui dimmer">
             <div class="content">

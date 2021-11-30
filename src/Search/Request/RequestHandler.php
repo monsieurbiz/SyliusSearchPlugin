@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
+use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
 class RequestHandler
@@ -24,6 +25,9 @@ class RequestHandler
         $this->searchRequestsRegistry = $searchRequestsRegistry;
     }
 
+    /**
+     * @throws UnknownRequestTypeException
+     */
     public function getRequest(RequestConfiguration $requestConfiguration): RequestInterface
     {
         /** @var RequestInterface $request */
@@ -35,6 +39,6 @@ class RequestHandler
             }
         }
 
-        throw new \Exception('Unknow request type'); // TODO
+        throw new UnknownRequestTypeException();
     }
 }

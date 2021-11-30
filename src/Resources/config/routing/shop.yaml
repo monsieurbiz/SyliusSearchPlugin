@@ -11,3 +11,9 @@ monsieurbiz_search_post:
   methods: [POST]
   defaults:
     _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:postAction
+
+monsieurbiz_search_instant:
+  path: /instant
+  methods: [POST]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:instantAction

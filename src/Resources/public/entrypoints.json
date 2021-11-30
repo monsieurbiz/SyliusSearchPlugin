@@ -1,0 +1,9 @@
+{
+  "entrypoints": {
+    "monsieurbiz-search": {
+      "js": [
+        "/public/js/monsieurbiz-search.js"
+      ]
+    }
+  }
+}

@@ -42,6 +42,7 @@ final class Configuration implements ConfigurationInterface
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->scalarNode('item')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('instant')->isRequired()->cannotBeEmpty()->end()
                                 ->end()
                             ->end()
                         ->end()

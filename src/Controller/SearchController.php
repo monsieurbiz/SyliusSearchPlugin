@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
+use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
+use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,12 +58,8 @@ class SearchController extends AbstractController
 
     /**
      * Post search.
-     *
-     * @param Request $request
-     *
-     * @return RedirectResponse
      */
-    public function postAction(Request $request)
+    public function postAction(Request $request): RedirectResponse
     {
         $query = $request->request->get('monsieurbiz_searchplugin_search')['query'] ?? '';
 
@@ -70,5 +69,30 @@ class SearchController extends AbstractController
                 ['query' => urlencode($query)]
             )
         );
+    }
+
+    /**
+     * Perform the instant search action & display results.
+     */
+    public function instantAction(Request $request, ServiceRegistryInterface $documentableRegistry): Response
+    {
+        $results = [];
+        /** @var DocumentableInterface $documentable */
+        foreach ($documentableRegistry->all() as $documentable) {
+            $requestConfiguration = new RequestConfiguration(
+                $request,
+                RequestInterface::INSTANT_TYPE,
+                $documentable->getIndexCode()
+            );
+            try {
+                $results[] = $this->search->search($requestConfiguration);
+            } catch (UnknownRequestTypeException $e) {
+                continue;
+            }
+        }
+
+        return $this->render('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
+            'results' => $results,
+        ]);
     }
 }

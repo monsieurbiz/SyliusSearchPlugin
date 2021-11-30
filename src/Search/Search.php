@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use JoliCode\Elastically\Factory;
+use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestHandler;
@@ -34,6 +35,9 @@ class Search implements SearchInterface
         $this->requestHandler = $requestHandler;
     }
 
+    /**
+     * @throws UnknownRequestTypeException
+     */
     public function search(RequestConfiguration $requestConfiguration): ResponseInterface
     {
         $request = $this->requestHandler->getRequest($requestConfiguration);

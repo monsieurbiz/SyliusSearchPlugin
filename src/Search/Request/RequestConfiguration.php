@@ -13,19 +13,33 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
+use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 final class RequestConfiguration
 {
+    public const FALLBACK_LIMIT = 9;
+
     private Request $request;
     private string $type;
-    private string $documentType;
+    private DocumentableInterface $documentable;
+    private SettingsInterface $searchSettings;
+    private ChannelContextInterface $channelContext;
 
-    public function __construct(Request $request, string $type, string $documentType)
-    {
+    public function __construct(
+        Request $request,
+        string $type,
+        DocumentableInterface $documentable,
+        SettingsInterface $searchSettings,
+        ChannelContextInterface $channelContext
+    ) {
         $this->request = $request;
         $this->type = $type;
-        $this->documentType = $documentType;
+        $this->documentable = $documentable;
+        $this->searchSettings = $searchSettings;
+        $this->channelContext = $channelContext;
     }
 
     public function getQueryText(): string
@@ -64,13 +78,18 @@ final class RequestConfiguration
             $limit = reset($availableLimits);
         }
 
-        return $limit;
+        return $limit ?? self::FALLBACK_LIMIT;
     }
 
     public function getAvailableLimits(): array
     {
-        // TODO define this in config (by query type?)
-        return [9, 18, 27];
+        $configLimits = $this->searchSettings->getCurrentValue(
+            $this->channelContext->getChannel(),
+            null,
+            'limits__' . $this->getDocumentType()
+        );
+
+        return $configLimits[$this->getType()] ?? $this->documentable->getLimits($this->getType());
     }
 
     public function getType(): string
@@ -80,6 +99,6 @@ final class RequestConfiguration
 
     public function getDocumentType(): string
     {
-        return $this->documentType;
+        return $this->documentable->getIndexCode();
     }
 }

@@ -1,6 +1,10 @@
 monsieurbiz_sylius_search:
   documents:
     monsieurbiz_product:
+      instant_search_enabled: true # by default false
+      limits:
+        search: [9, 18, 27]
+        instant_search: [5]
       source: 'Sylius\Component\Core\Model\ProductInterface'
       target: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO'
       templates:

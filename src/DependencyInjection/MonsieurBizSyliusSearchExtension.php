@@ -28,6 +28,9 @@ final class MonsieurBizSyliusSearchExtension extends Extension
         $config = $this->processConfiguration($this->getConfiguration([], $container), $configs);
         foreach ($config as $name => $value) {
             $container->setParameter(self::EXTENSION_CONFIG_NAME . '.' . $name, $value);
+            if ('documents' === $name) {
+                $this->addDocumentsConfiguration(self::EXTENSION_CONFIG_NAME . '.' . $name, $value, $container);
+            }
         }
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -44,5 +47,19 @@ final class MonsieurBizSyliusSearchExtension extends Extension
     public function getAlias()
     {
         return str_replace(['monsieur_biz'], ['monsieurbiz'], parent::getAlias());
+    }
+
+    private function addDocumentsConfiguration(string $name, array $values, ContainerBuilder $container): void
+    {
+        foreach ($values as $documentIndexName => $documentValues) {
+            $this->addDocumentConfiguration($name . '.' . $documentIndexName, $documentValues, $container);
+        }
+    }
+
+    private function addDocumentConfiguration(string $name, array $values, ContainerBuilder $container): void
+    {
+        foreach ($values as $configName => $configValue) {
+            $container->setParameter($name . '.' . $configName, $configValue);
+        }
     }
 }

@@ -20,7 +20,7 @@ interface RequestInterface
 {
     public const SEARCH_TYPE = 'search';
     public const TAXON_TYPE = 'taxon';
-    public const INSTANT_TYPE = 'instant';
+    public const INSTANT_TYPE = 'instant_search';
 
     public function getType(): string;
 

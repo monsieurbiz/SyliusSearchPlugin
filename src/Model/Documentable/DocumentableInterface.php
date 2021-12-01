@@ -36,4 +36,6 @@ interface DocumentableInterface
     public function isTranslatable(): bool;
 
     public function getTemplate(string $type): ?string;
+
+    public function getLimits(?string $queryType): array;
 }

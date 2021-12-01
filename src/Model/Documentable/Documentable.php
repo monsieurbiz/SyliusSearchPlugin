@@ -26,13 +26,20 @@ class Documentable implements DocumentableInterface
      * @var array<string, string>
      */
     private array $templates;
+    private array $limits;
 
-    public function __construct(string $indexCode, string $sourceClass, string $targetClass, array $templates)
-    {
+    public function __construct(
+        string $indexCode,
+        string $sourceClass,
+        string $targetClass,
+        array $templates,
+        array $limits
+    ) {
         $this->indexCode = $indexCode;
         $this->sourceClass = $sourceClass;
         $this->targetClass = $targetClass;
         $this->templates = $templates;
+        $this->limits = $limits;
     }
 
     public function getIndexCode(): string
@@ -60,5 +67,14 @@ class Documentable implements DocumentableInterface
     public function getTemplate(string $type): ?string
     {
         return $this->templates[$type] ?? null;
+    }
+
+    public function getLimits(?string $queryType = null): array
+    {
+        if (null == $queryType) {
+            return $this->limits;
+        }
+
+        return $this->limits[$queryType] ?? [];
     }
 }

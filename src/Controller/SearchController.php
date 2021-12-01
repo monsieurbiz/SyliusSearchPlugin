@@ -18,6 +18,8 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
+use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
+use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
@@ -32,18 +34,36 @@ class SearchController extends AbstractController
     private Search $search;
     private CurrencyContextInterface $currencyContext;
     private LocaleContextInterface $localeContext;
+    private ChannelContextInterface $channelContext;
+    private SettingsInterface $searchSettings;
+    private ServiceRegistryInterface $documentableRegistry;
 
-    public function __construct(Search $search, CurrencyContextInterface $currencyContext, LocaleContextInterface $localeContext)
-    {
+    public function __construct(
+        Search $search,
+        CurrencyContextInterface $currencyContext,
+        LocaleContextInterface $localeContext,
+        ChannelContextInterface $channelContext,
+        SettingsInterface $searchSettings,
+        ServiceRegistryInterface $documentableRegistry
+    ) {
         $this->search = $search;
         $this->currencyContext = $currencyContext;
         $this->localeContext = $localeContext;
+        $this->channelContext = $channelContext;
+        $this->searchSettings = $searchSettings;
+        $this->documentableRegistry = $documentableRegistry;
     }
 
     // TODO add an optional parameter $documentType (nullable => get the default document type)
     public function searchAction(Request $request, string $query): Response
     {
-        $requestConfiguration = new RequestConfiguration($request, RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
+        $requestConfiguration = new RequestConfiguration(
+            $request,
+            RequestInterface::SEARCH_TYPE,
+            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $this->searchSettings,
+            $this->channelContext
+        );
         $result = $this->search->search($requestConfiguration);
 
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
@@ -74,15 +94,21 @@ class SearchController extends AbstractController
     /**
      * Perform the instant search action & display results.
      */
-    public function instantAction(Request $request, ServiceRegistryInterface $documentableRegistry): Response
+    public function instantAction(Request $request): Response
     {
         $results = [];
         /** @var DocumentableInterface $documentable */
-        foreach ($documentableRegistry->all() as $documentable) {
+        foreach ($this->documentableRegistry->all() as $documentable) {
+            if (!(bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'instant_search_enabled__' . $documentable->getIndexCode())) {
+                continue;
+            }
+
             $requestConfiguration = new RequestConfiguration(
                 $request,
                 RequestInterface::INSTANT_TYPE,
-                $documentable->getIndexCode()
+                $documentable,
+                $this->searchSettings,
+                $this->channelContext
             );
             try {
                 $results[] = $this->search->search($requestConfiguration);

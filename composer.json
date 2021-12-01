@@ -10,6 +10,7 @@
         "jacquesbh/eater": "^2.0",
         "jane-php/automapper-bundle": "^7.1",
         "jolicode/elastically": "dev-master",
+        "monsieurbiz/sylius-settings-plugin": "^1.0",
         "sylius/sylius": "^1.9"
     },
     "require-dev": {

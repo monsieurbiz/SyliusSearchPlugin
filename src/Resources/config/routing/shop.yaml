@@ -17,3 +17,13 @@ monsieurbiz_search_instant:
   methods: [POST]
   defaults:
     _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:instantAction
+
+monsieurbiz_sylius_search_taxon:
+  path: /taxons/{slug}
+  methods: [GET]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:taxonAction
+    _sylius:
+      taxon: "expr:notFoundOnNull(service('sylius.repository.taxon').findOneBySlug($slug, service('sylius.context.locale').getLocaleCode()))"
+  requirements:
+    slug: .+

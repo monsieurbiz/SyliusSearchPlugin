@@ -9,6 +9,7 @@ services:
     autoconfigure: true
     public: false
     bind:
+      Sylius\Bundle\ResourceBundle\Controller\ParametersParserInterface: '@sylius.resource_controller.parameters_parser'
       $localeProvider: '@sylius.translation_locale_provider'
       $productVariantResolver: '@sylius.product_variant_resolver.default'
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
@@ -93,6 +94,9 @@ services:
 
   # Define aggregation builders
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\MainTaxonAggregation:
+    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\TaxonsAggregation:
     tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\PriceAggregation:

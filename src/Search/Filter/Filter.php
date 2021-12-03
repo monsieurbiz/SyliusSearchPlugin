@@ -41,12 +41,8 @@ class Filter implements FilterInterface
 
     /**
      * Filter constructor.
-     *
-     * @param string $code
-     * @param string $label
-     * @param int $count
      */
-    public function __construct(string $code, string $label, int $count, string $type)
+    public function __construct(string $code, string $label, int $count, string $type = '')
     {
         $this->code = $code;
         $this->label = $label;

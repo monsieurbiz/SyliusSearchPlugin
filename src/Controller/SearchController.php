@@ -19,6 +19,8 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
 use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
+use Sylius\Bundle\ResourceBundle\Controller\Parameters;
+use Sylius\Bundle\ResourceBundle\Controller\ParametersParserInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
@@ -37,6 +39,7 @@ class SearchController extends AbstractController
     private ChannelContextInterface $channelContext;
     private SettingsInterface $searchSettings;
     private ServiceRegistryInterface $documentableRegistry;
+    private ParametersParserInterface $parametersParser;
 
     public function __construct(
         Search $search,
@@ -44,7 +47,8 @@ class SearchController extends AbstractController
         LocaleContextInterface $localeContext,
         ChannelContextInterface $channelContext,
         SettingsInterface $searchSettings,
-        ServiceRegistryInterface $documentableRegistry
+        ServiceRegistryInterface $documentableRegistry,
+        ParametersParserInterface $parametersParser
     ) {
         $this->search = $search;
         $this->currencyContext = $currencyContext;
@@ -52,6 +56,7 @@ class SearchController extends AbstractController
         $this->channelContext = $channelContext;
         $this->searchSettings = $searchSettings;
         $this->documentableRegistry = $documentableRegistry;
+        $this->parametersParser = $parametersParser;
     }
 
     // TODO add an optional parameter $documentType (nullable => get the default document type)
@@ -71,7 +76,6 @@ class SearchController extends AbstractController
             'requestConfiguration' => $requestConfiguration,
             'query' => $query,
             'result' => $result,
-            'limits' => $requestConfiguration->getAvailableLimits(),
             'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
         ]);
     }
@@ -119,6 +123,25 @@ class SearchController extends AbstractController
 
         return $this->render('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
             'results' => $results,
+        ]);
+    }
+
+    public function taxonAction(Request $request): Response
+    {
+        $requestConfiguration = new RequestConfiguration(
+            $request,
+            RequestInterface::TAXON_TYPE,
+            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $this->searchSettings,
+            $this->channelContext,
+            new Parameters($this->parametersParser->parseRequestValues($request->attributes->get('_sylius', []), $request))
+        );
+        $result = $this->search->search($requestConfiguration);
+
+        return $this->render('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
+            'requestConfiguration' => $requestConfiguration,
+            'result' => $result,
+            'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
         ]);
     }
 }

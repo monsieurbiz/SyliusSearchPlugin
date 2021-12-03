@@ -111,6 +111,31 @@ class Response implements ResponseInterface
             }
         }
 
+        // todo taxons
+        $taxonAggregation = $aggregations['taxons']['taxons']['taxons']['taxons'] ?? null;
+        if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
+            $filter = new Filter('taxons', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
+
+            // Get main taxon code in aggregation
+            $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
+            foreach ($taxonCodeBuckets as $taxonCodeBucket) {
+                if (0 === $taxonCodeBucket['doc_count']) {
+                    continue;
+                }
+                $taxonCode = $taxonCodeBucket['key'];
+                $taxonName = null;
+                $taxonNameBuckets = $taxonCodeBucket['names']['buckets'] ?? [];
+                foreach ($taxonNameBuckets as $taxonNameBucket) {
+                    $taxonName = $taxonNameBucket['key'];
+                    $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count'], $taxonCode);
+                }
+            }
+
+            // Put taxon filter in first if contains value
+            if (0 !== \count($filter->getValues())) {
+                $this->filters[] = $filter;
+            }
+        }
         // todo price
         $priceAggregation = $aggregations['prices']['prices']['prices'] ?? null;
         if ($priceAggregation && $priceAggregation['doc_count'] > 0) {

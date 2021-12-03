@@ -15,7 +15,9 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
+use Sylius\Bundle\ResourceBundle\Controller\Parameters;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 final class RequestConfiguration
@@ -27,19 +29,22 @@ final class RequestConfiguration
     private DocumentableInterface $documentable;
     private SettingsInterface $searchSettings;
     private ChannelContextInterface $channelContext;
+    private ?Parameters $parameters;
 
     public function __construct(
         Request $request,
         string $type,
         DocumentableInterface $documentable,
         SettingsInterface $searchSettings,
-        ChannelContextInterface $channelContext
+        ChannelContextInterface $channelContext,
+        ?Parameters $parameters = null
     ) {
         $this->request = $request;
         $this->type = $type;
         $this->documentable = $documentable;
         $this->searchSettings = $searchSettings;
         $this->channelContext = $channelContext;
+        $this->parameters = $parameters ?? new Parameters();
     }
 
     public function getQueryText(): string
@@ -54,6 +59,7 @@ final class RequestConfiguration
             'price' => array_filter($this->request->get('price', [])),
             'attributes' => $this->request->get('attributes', []),
             'options' => $this->request->get('options', []),
+            'taxons' => $this->request->get('taxons', []),
         ];
 
         return null !== $type ? ($appliedFilters[$type] ?? []) : $appliedFilters;
@@ -78,7 +84,7 @@ final class RequestConfiguration
             $limit = reset($availableLimits);
         }
 
-        return $limit ?? self::FALLBACK_LIMIT;
+        return $limit ?: self::FALLBACK_LIMIT;
     }
 
     public function getAvailableLimits(): array
@@ -100,5 +106,11 @@ final class RequestConfiguration
     public function getDocumentType(): string
     {
         return $this->documentable->getIndexCode();
+    }
+
+    public function getTaxon(): TaxonInterface
+    {
+        // todo throw exception if not exist
+        return $this->parameters->get('taxon');
     }
 }

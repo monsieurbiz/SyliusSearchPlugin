@@ -1,5 +1,15 @@
-{% set appliedAttributes = app.request.query.get(filter.type) %}
-{% set currentValues = (appliedAttributes[filter.code] is defined) ? appliedAttributes[filter.code] : [] %}
+{% set inputName = filter.code %}
+{% set filterName = filter.code %}
+{% if filter.type is not empty %}
+    {% set inputName = filter.type ~ '[' ~ inputName ~ ']' %}
+    {% set filterName = filter.type %}
+{% endif %}
+{% set appliedAttributes = requestConfiguration.appliedFilters(filterName) %}
+
+{% set currentValues = appliedAttributes ?? [] %}
+{% if filter.type is not empty %}
+    {% set currentValues = (appliedAttributes[filter.code] is defined) ? appliedAttributes[filter.code] : [] %}
+{% endif %}
 {% if filter.values|length or currentValues is not empty %}
     <div class="item">
         <div class="filter-item" id="{{ 'filter-' ~ filter.code }}" >
@@ -12,7 +22,7 @@
                             <input
                                     type="checkbox"
                                     id="{{ 'filter-' ~ filter.code ~ '-value-' ~ value.slug }}"
-                                    name="{{ filter.type }}[{{ filter.code }}][]"
+                                    name="{{ inputName }}[]"
                                     value="{{ value.slug }}"
                                     class="hidden"
                                     {% if valueIsApplied %}

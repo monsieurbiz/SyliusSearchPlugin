@@ -98,6 +98,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
         $metadata->forMember('product_taxons', function(ProductInterface $product): array {
             return array_map(function(ProductTaxonInterface $productTaxon) {
+                // todo add parent taxon in Taxon object with automapper
                 return $this->autoMapper->map($productTaxon, ProductTaxon::class);
             }, $product->getProductTaxons()->toArray());
         });

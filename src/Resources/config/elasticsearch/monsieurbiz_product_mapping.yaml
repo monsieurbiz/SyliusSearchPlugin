@@ -36,7 +36,7 @@ mappings:
           type: integer
         level:
           type: integer
-    product_taxon:
+    product_taxons:
       type: nested
       properties:
         taxon:

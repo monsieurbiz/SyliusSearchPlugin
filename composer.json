@@ -9,9 +9,10 @@
         "babdev/pagerfanta-bundle": "^2.5",
         "jacquesbh/eater": "^2.0",
         "jane-php/automapper-bundle": "^7.1",
-        "jolicode/elastically": "dev-master",
+        "jolicode/elastically": "^1.4.0",
         "monsieurbiz/sylius-settings-plugin": "^1.0",
-        "sylius/sylius": "^1.9"
+        "sylius/sylius": "^1.9",
+        "symfony/messenger": "^4.4 || ^5.2"
     },
     "require-dev": {
         "behat/behat": "^3.6.1",

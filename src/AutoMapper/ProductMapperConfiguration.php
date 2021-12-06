@@ -92,8 +92,8 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $images;
         });
 
-        $metadata->forMember('mainTaxon', function(ProductInterface $product): Taxon {
-            return $this->autoMapper->map($product->getMainTaxon(), Taxon::class);
+        $metadata->forMember('mainTaxon', function(ProductInterface $product): ?Taxon {
+            return $product->getMainTaxon() ? $this->autoMapper->map($product->getMainTaxon(), Taxon::class) : null;
         });
 
         $metadata->forMember('product_taxons', function(ProductInterface $product): array {

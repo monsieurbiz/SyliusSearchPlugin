@@ -96,7 +96,7 @@ final class Indexer implements LoggerAwareInterface
             }
 
             $indexer->flush();
-            $this->logger->info('flush', ['monsieurbiz.search"']);
+            $this->logger->info('flush', ['monsieurbiz.search']);
 
             return;
         }
@@ -107,7 +107,38 @@ final class Indexer implements LoggerAwareInterface
             }
             $dto = $this->autoMapper->map($document, $documentable->getTargetClass());
             $indexer->scheduleIndex($indexName, new Document((string) $document->getId(), $dto));
-            $this->logger->info('index: ' . $document->getId(), ['monsieurbiz.search"']);
+            $this->logger->info('index - ' . $locale . ': ' . $document->getId(), ['monsieurbiz.search']);
+        }
+    }
+
+    public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?\JoliCode\Elastically\Indexer $indexer = null): void
+    {
+        if (null === $indexer) {
+            $factory = new Factory([
+                Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
+                Factory::CONFIG_SERIALIZER => $this->serializer,
+            ]);
+            $indexer = $factory->buildIndexer();
+        }
+
+        if (null === $locale && $documentable->isTranslatable()) {
+            foreach ($this->getLocales() as $localeCode) {
+                $this->deleteByDocuments($documentable, $documents, $localeCode, $indexer);
+            }
+
+            $indexer->flush();
+            $this->logger->info('flush', ['monsieurbiz.search']);
+
+            return;
+        }
+
+        $indexName = $this->getIndexName($documentable, $locale);
+        foreach ($documents as $document) {
+            if (null !== $locale && $document instanceof TranslatableInterface) {
+                $document->setCurrentLocale($locale);
+            }
+            $indexer->scheduleDelete($indexName, (string) $document->getId());
+            $this->logger->info('delete - ' . $locale . ': ' . $document->getId(), ['monsieurbiz.search']);
         }
     }
 

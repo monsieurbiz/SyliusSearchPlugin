@@ -3,3 +3,4 @@ imports:
   - { resource: "monsieurbiz_search.yaml" }
   - { resource: "sylius/ui.yaml" }
   - { resource: "monsieurbiz/settings.yaml" }
+  - { resource: "messenger.yaml" }

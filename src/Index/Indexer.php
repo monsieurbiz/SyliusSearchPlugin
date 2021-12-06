@@ -18,14 +18,18 @@ use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final class Indexer
+final class Indexer implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private ServiceRegistryInterface $documentableRegistry;
     private RepositoryInterface $localeRepository;
     private array $locales = [];
@@ -73,6 +77,37 @@ final class Indexer
         /** @var DocumentableInterface $documentable */
         foreach ($this->documentableRegistry->all() as $documentable) {
             $this->indexDocumentable($documentable);
+        }
+    }
+
+    public function indexByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?\JoliCode\Elastically\Indexer $indexer = null): void
+    {
+        if (null === $indexer) {
+            $factory = new Factory([
+                Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
+                Factory::CONFIG_SERIALIZER => $this->serializer,
+            ]);
+            $indexer = $factory->buildIndexer();
+        }
+
+        if (null === $locale && $documentable->isTranslatable()) {
+            foreach ($this->getLocales() as $localeCode) {
+                $this->indexByDocuments($documentable, $documents, $localeCode, $indexer);
+            }
+
+            $indexer->flush();
+            $this->logger->info('flush', ['monsieurbiz.search"']);
+
+            return;
+        }
+        $indexName = $this->getIndexName($documentable, $locale);
+        foreach ($documents as $document) {
+            if (null !== $locale && $document instanceof TranslatableInterface) {
+                $document->setCurrentLocale($locale);
+            }
+            $dto = $this->autoMapper->map($document, $documentable->getTargetClass());
+            $indexer->scheduleIndex($indexName, new Document((string) $document->getId(), $dto));
+            $this->logger->info('index: ' . $document->getId(), ['monsieurbiz.search"']);
         }
     }
 

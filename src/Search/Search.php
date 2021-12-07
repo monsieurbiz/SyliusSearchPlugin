@@ -24,15 +24,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class Search implements SearchInterface
 {
-    private SerializerInterface $serializer;
     private LocaleContextInterface $localeContext;
     private RequestHandler $requestHandler;
+    private ClientFactory $clientFactory;
 
-    public function __construct(SerializerInterface $serializer, LocaleContextInterface $localeContext, RequestHandler $requestHandler)
+    public function __construct(ClientFactory $clientFactory, LocaleContextInterface $localeContext, RequestHandler $requestHandler)
     {
-        $this->serializer = $serializer;
         $this->localeContext = $localeContext;
         $this->requestHandler = $requestHandler;
+        $this->clientFactory = $clientFactory;
     }
 
     /**
@@ -42,24 +42,13 @@ class Search implements SearchInterface
     {
         $request = $this->requestHandler->getRequest($requestConfiguration);
 
-        $indexName = $this->getIndexName($request->getDocumentable(), $this->localeContext->getLocaleCode());
-        $factory = new Factory([
-            Factory::CONFIG_INDEX_CLASS_MAPPING => [
-                $indexName => $request->getDocumentable()->getTargetClass(),
-            ],
-            Factory::CONFIG_SERIALIZER => $this->serializer,
-        ]);
-        $client = $factory->buildClient();
+        $indexName = $this->clientFactory->getIndexName($request->getDocumentable(), $this->localeContext->getLocaleCode());
+        $client = $this->clientFactory->getClient($request->getDocumentable(), $this->localeContext->getLocaleCode());
 
         return new Response(
             $requestConfiguration,
             new ElasticaAdapter($client->getIndex($indexName), $request->getQuery()),
             $request->getDocumentable()
         );
-    }
-
-    private function getIndexName(DocumentableInterface $documentable, ?string $locale = null): string
-    {
-        return $documentable->getIndexCode() . strtolower((null !== $locale && $documentable->isTranslatable()) ? '_' . $locale : '');
     }
 }

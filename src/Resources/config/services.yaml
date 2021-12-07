@@ -28,49 +28,25 @@ services:
   MonsieurBiz\SyliusSearchPlugin\Generated\:
     resource: '../../../generated'
 
-  JoliCode\Elastically\IndexNameMapper:
-    arguments:
-      $prefix: null # or a string to prefix index name
-      $indexClassMapping: {}
-
-  JoliCode\Elastically\Serializer\StaticContextBuilder:
-    arguments:
-      $mapping: {}
-
-  JoliCode\Elastically\ResultSetBuilder:
-    arguments:
-      $indexNameMapper: '@JoliCode\Elastically\IndexNameMapper'
-      $contextBuilder: '@JoliCode\Elastically\Serializer\StaticContextBuilder'
-      $denormalizer: '@serializer'
-
   # ES Client configuration
-  monsieurbiz.search.elasticsearch.client:
-    class: JoliCode\Elastically\Client
+  MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory:
     arguments:
       $config:
         host: '%env(ELASTICSEARCH_HOST)%'
-      $logger: '@logger'
-      $resultSetBuilder: '@JoliCode\Elastically\ResultSetBuilder'
-      $indexNameMapper: '@JoliCode\Elastically\IndexNameMapper'
-
-  JoliCode\Elastically\Mapping\YamlProvider: ~
+        port: '%env(ELASTICSEARCH_PORT)%'
 
   MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepository:
     arguments:
       $attributeRepository: '@sylius.repository.product_attribute'
 
   # Define our mapping provider
+  JoliCode\Elastically\Mapping\YamlProvider: ~
   MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider:
     decorates: JoliCode\Elastically\Mapping\YamlProvider
     arguments:
       $decorated: '@.inner'
 
-  # Replace the mapping provider by our mapping provider
-  JoliCode\Elastically\IndexBuilder:
-    arguments:
-      $client: '@monsieurbiz.search.elasticsearch.client'
-      $mappingProvider: '@MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider'
-
+  # Defines our registries
   monsieurbiz.search.registry.documentable:
     class: Sylius\Component\Registry\ServiceRegistry
     arguments:

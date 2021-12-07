@@ -18,6 +18,7 @@ use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sylius\Component\Locale\Model\LocaleInterface;
@@ -35,20 +36,20 @@ final class Indexer implements LoggerAwareInterface
     private array $locales = [];
     private EntityManagerInterface $entityManager;
     private AutoMapperInterface $autoMapper;
-    private SerializerInterface $serializer;
+    private ClientFactory $clientFactory;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
         RepositoryInterface $localeRepository,
         EntityManagerInterface $entityManager,
         AutoMapperInterface $autoMapper,
-        SerializerInterface $serializer
+        ClientFactory $clientFactory
     ) {
         $this->documentableRegistry = $documentableRegistry;
         $this->localeRepository = $localeRepository;
         $this->entityManager = $entityManager;
         $this->autoMapper = $autoMapper;
-        $this->serializer = $serializer;
+        $this->clientFactory = $clientFactory;
     }
 
     /**
@@ -83,11 +84,7 @@ final class Indexer implements LoggerAwareInterface
     public function indexByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?\JoliCode\Elastically\Indexer $indexer = null): void
     {
         if (null === $indexer) {
-            $factory = new Factory([
-                Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
-                Factory::CONFIG_SERIALIZER => $this->serializer,
-            ]);
-            $indexer = $factory->buildIndexer();
+            $indexer = $this->clientFactory->getIndexer($documentable, $locale);
         }
 
         if (null === $locale && $documentable->isTranslatable()) {
@@ -114,11 +111,7 @@ final class Indexer implements LoggerAwareInterface
     public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?\JoliCode\Elastically\Indexer $indexer = null): void
     {
         if (null === $indexer) {
-            $factory = new Factory([
-                Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
-                Factory::CONFIG_SERIALIZER => $this->serializer,
-            ]);
-            $indexer = $factory->buildIndexer();
+            $indexer = $this->clientFactory->getIndexer($documentable, $locale);
         }
 
         if (null === $locale && $documentable->isTranslatable()) {
@@ -151,18 +144,14 @@ final class Indexer implements LoggerAwareInterface
 
             return;
         }
-        $indexName = $this->getIndexName($documentable, $locale);
-        $factory = new Factory([
-            Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
-            Factory::CONFIG_SERIALIZER => $this->serializer,
-        ]);
-        $indexBuilder = $factory->buildIndexBuilder();
+        $indexName = $this->clientFactory->getIndexName($documentable, $locale);
+        $indexBuilder = $this->clientFactory->getIndexBuilder($documentable, $locale);
         $newIndex = $indexBuilder->createIndex($indexName, [
             'index_code' => $documentable->getIndexCode(),
             'locale' => $locale ? strtolower($locale) : null,
         ]);
 
-        $indexer = $factory->buildIndexer();
+        $indexer = $this->clientFactory->getIndexer($documentable, $locale);
         foreach ($documentable->getDatasource()->getItems($documentable->getSourceClass()) as $item) {
             if (null !== $locale && $item instanceof TranslatableInterface) {
                 $item->setCurrentLocale($locale);

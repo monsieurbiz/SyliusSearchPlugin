@@ -25,7 +25,7 @@ class PriceAggregation implements AggregationBuilderInterface
         $this->channelContext = $channelContext;
     }
 
-    public function build($aggregation, array $filters): ?AbstractAggregation
+    public function build($aggregation, array $filters)
     {
         if (!$this->isSupported($aggregation)) {
             return null;

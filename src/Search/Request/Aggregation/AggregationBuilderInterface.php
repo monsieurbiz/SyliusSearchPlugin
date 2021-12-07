@@ -19,6 +19,8 @@ interface AggregationBuilderInterface
 {
     /**
      * @param string|array $aggregation
+     *
+     * @return AbstractAggregation|bool|null
      */
-    public function build($aggregation, array $filters): ?AbstractAggregation;
+    public function build($aggregation, array $filters);
 }

@@ -18,7 +18,7 @@ use Sylius\Component\Core\Model\TaxonInterface;
 
 class TaxonsAggregation implements AggregationBuilderInterface
 {
-    public function build($aggregation, array $filters): ?AbstractAggregation
+    public function build($aggregation, array $filters)
     {
         if (!$this->isSupported($aggregation)) {
             return null;

@@ -23,7 +23,7 @@ class ProductAttributesAggregation implements AggregationBuilderInterface
         $this->productAttributeAggregationBuilder = new ProductAttributeAggregation();
     }
 
-    public function build($aggregation, array $filters): ?AbstractAggregation
+    public function build($aggregation, array $filters)
     {
         if (!$this->isSupport($aggregation)) {
             return null;
@@ -49,7 +49,7 @@ class ProductAttributesAggregation implements AggregationBuilderInterface
         }
 
         if (0 == \count($attributesAggregation->getAggs())) {
-            return null;
+            return false;
         }
 
         return $qb->aggregation()->filter('attributes')

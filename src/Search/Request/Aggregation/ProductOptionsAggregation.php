@@ -25,7 +25,7 @@ class ProductOptionsAggregation implements AggregationBuilderInterface
         $this->productOptionAggregationBuilder = $productOptionAggregationBuilder;
     }
 
-    public function build($aggregation, array $filters): ?AbstractAggregation
+    public function build($aggregation, array $filters)
     {
         if (!$this->isSupport($aggregation)) {
             return null;
@@ -51,7 +51,7 @@ class ProductOptionsAggregation implements AggregationBuilderInterface
         }
 
         if (0 == \count($optionsAggregation->getAggs())) {
-            return null;
+            return false;
         }
 
         return $qb->aggregation()->filter('options')

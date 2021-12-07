@@ -19,7 +19,7 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 
 class ProductAttributeAggregation implements AggregationBuilderInterface
 {
-    public function build($aggregation, array $filters): ?AbstractAggregation
+    public function build($aggregation, array $filters)
     {
         /** @var ProductAttributeInterface&SearchableInterface $aggregation */
         if (!$this->isSupport($aggregation) || !$aggregation->isFilterable()) {

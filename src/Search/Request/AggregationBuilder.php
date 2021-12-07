@@ -33,7 +33,11 @@ class AggregationBuilder
         $buckets = [];
 
         foreach ($aggregations as $aggregation) {
-            $buckets[] = $this->buildAggregation($aggregation, $filters);
+            $aggregationQuery = $this->buildAggregation($aggregation, $filters);
+            if (false === $aggregationQuery) {
+                continue;
+            }
+            $buckets[] = $aggregationQuery;
         }
 
         return array_filter($buckets);
@@ -41,8 +45,10 @@ class AggregationBuilder
 
     /**
      * @param string|array $aggregation
+     *
+     * @return AbstractAggregation|bool|null
      */
-    private function buildAggregation($aggregation, array $filters): AbstractAggregation
+    private function buildAggregation($aggregation, array $filters)
     {
         foreach ($this->aggregationBuilders as $aggregationBuilder) {
             $aggregationQuery = $aggregationBuilder->build($aggregation, $filters);
@@ -51,6 +57,6 @@ class AggregationBuilder
             }
         }
 
-        throw new \RuntimeException('Aggregation can be build');
+        throw new \RuntimeException('Aggregation can be build'); // it's throw an exception if we have not filtreable attribute
     }
 }

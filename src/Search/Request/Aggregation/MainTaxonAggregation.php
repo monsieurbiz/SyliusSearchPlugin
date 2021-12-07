@@ -17,7 +17,7 @@ use Elastica\Aggregation\AbstractAggregation;
 
 class MainTaxonAggregation implements AggregationBuilderInterface
 {
-    public function build($aggregation, array $filters): ?AbstractAggregation
+    public function build($aggregation, array $filters)
     {
         if (!$this->isSupported($aggregation)) {
             return null;

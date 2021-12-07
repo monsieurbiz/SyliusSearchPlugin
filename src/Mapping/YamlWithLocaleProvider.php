@@ -78,9 +78,9 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
     private function getLocaleCode(string $locale): array
     {
-        return [
+        return array_unique([
             current(explode('_', $locale)),
             $locale,
-        ];
+        ]);
     }
 }

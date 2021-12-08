@@ -20,11 +20,6 @@ class FilterValue
     /**
      * @var string
      */
-    private $slug;
-
-    /**
-     * @var string
-     */
     private $label;
 
     /**
@@ -33,6 +28,7 @@ class FilterValue
     private $count;
 
     private string $value;
+    private bool $isApplied;
 
     /**
      * Filter constructor.
@@ -40,12 +36,12 @@ class FilterValue
      * @param string $label
      * @param int $count
      */
-    public function __construct(string $label, int $count, string $value = null)
+    public function __construct(string $label, int $count, string $value = null, bool $isApplied = false)
     {
         $this->value = $value ?? $label;
-        $this->slug = SlugHelper::toSlug($this->value);
         $this->label = $label;
         $this->count = $count;
+        $this->isApplied = $isApplied;
     }
 
     /**
@@ -53,7 +49,7 @@ class FilterValue
      */
     public function getSlug(): string
     {
-        return $this->slug;
+        return SlugHelper::toSlug($this->value);
     }
 
     /**
@@ -75,5 +71,15 @@ class FilterValue
     public function getValue(): string
     {
         return $this->value;
+    }
+
+    public function setValue($value): void
+    {
+        $this->value = $value;
+    }
+
+    public function isApplied(): bool
+    {
+        return $this->isApplied;
     }
 }

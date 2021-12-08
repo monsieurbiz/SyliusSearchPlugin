@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Filter;
 
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterInterface;
 
 class RangeFilter implements FilterInterface
@@ -33,11 +34,6 @@ class RangeFilter implements FilterInterface
     private $minLabel;
 
     /**
-     * @var string
-     */
-    private $maxLabel;
-
-    /**
      * @var int
      */
     private $min;
@@ -47,24 +43,23 @@ class RangeFilter implements FilterInterface
      */
     private $max;
 
+    private array $values = [];
+    private RequestConfiguration $requestConfiguration;
+
     /**
      * Filter constructor.
-     *
-     * @param string $code
-     * @param string $label
-     * @param string $minLabel
-     * @param string $maxLabel
-     * @param int $min
-     * @param int $max
      */
-    public function __construct(string $code, string $label, string $minLabel, string $maxLabel, int $min, int $max)
+    public function __construct(RequestConfiguration $requestConfiguration, string $code, string $label, string $minLabel, string $maxLabel, int $min, int $max)
     {
+        $this->requestConfiguration = $requestConfiguration;
         $this->code = $code;
         $this->label = $label;
         $this->minLabel = $minLabel;
-        $this->maxLabel = $maxLabel;
         $this->min = $min;
         $this->max = $max;
+
+        $this->addValue($minLabel, 0, (string) $min);
+        $this->addValue($maxLabel, 0, (string) $max);
     }
 
     /**
@@ -83,40 +78,56 @@ class RangeFilter implements FilterInterface
         return $this->label;
     }
 
-    /**
-     * @return string
-     */
-    public function getMinLabel(): string
+    public function addValue(string $label, int $count, ?string $value = null): void
     {
-        return $this->minLabel;
+        $currentValueType = $this->getValueType($label);
+        $currentValues = $this->getCurrentValues();
+        $isApplied = \array_key_exists($currentValueType, $currentValues);
+        $value = $isApplied ? $currentValues[$currentValueType] : $value;
+
+        $this->values[] = new FilterValue($label, $count, $value, $isApplied);
     }
 
-    /**
-     * @return string
-     */
-    public function getMaxLabel(): string
+    public function getValues(): array
     {
-        return $this->maxLabel;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMin(): int
-    {
-        return $this->min;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMax(): int
-    {
-        return $this->max;
+        return $this->values;
     }
 
     public function getType(): string
     {
         return 'range';
+    }
+
+    public function getAppliedValues(): array
+    {
+        return array_filter($this->values, function(FilterValue $filterValue): bool {
+            return $filterValue->isApplied();
+        });
+    }
+
+    public function getDefaultValue(string $type): int
+    {
+        if ('min' == $type) {
+            return $this->min;
+        }
+
+        return $this->max;
+    }
+
+    public function getValueType($valueLabel): string
+    {
+        if ($valueLabel == $this->minLabel) {
+            return 'min';
+        }
+
+        return 'max';
+    }
+
+    protected function getCurrentValues(): array
+    {
+        $appliedFilters = $this->requestConfiguration->getAppliedFilters();
+        $appliedFilters = $appliedFilters[$this->getType()] ?? $appliedFilters[$this->getCode()];
+
+        return $appliedFilters[$this->getCode()] ?? $appliedFilters;
     }
 }

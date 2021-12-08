@@ -81,7 +81,7 @@ class Response implements ResponseInterface
         // todo main taxon
         $taxonAggregation = $aggregations['main_taxon']['main_taxon'] ?? null;
         if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
-            $filter = new Filter('main_taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count'], 'taxon');
+            $filter = new Filter($this->requestConfiguration, 'main_taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count'], 'taxon');
 
             // Get main taxon code in aggregation
             $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
@@ -114,7 +114,7 @@ class Response implements ResponseInterface
         // todo taxons
         $taxonAggregation = $aggregations['taxons']['taxons']['taxons']['taxons'] ?? null;
         if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
-            $filter = new Filter('taxons', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
+            $filter = new Filter($this->requestConfiguration, 'taxons', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
 
             // Get main taxon code in aggregation
             $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
@@ -140,6 +140,7 @@ class Response implements ResponseInterface
         $priceAggregation = $aggregations['prices']['prices']['prices'] ?? null;
         if ($priceAggregation && $priceAggregation['doc_count'] > 0) {
             $this->filters[] = new RangeFilter(
+                $this->requestConfiguration,
                 'price',
                 'monsieurbiz_searchplugin.filters.price_filter',
                 'monsieurbiz_searchplugin.filters.price_min',
@@ -161,7 +162,7 @@ class Response implements ResponseInterface
                 $attributeNameBuckets = $attributeAggregation['names']['buckets'] ?? [];
                 foreach ($attributeNameBuckets as $attributeNameBucket) {
                     $attributeValueBuckets = $attributeNameBucket['values']['buckets'] ?? [];
-                    $filter = new Filter($attributeCode, $attributeNameBucket['key'], $attributeNameBucket['doc_count'], $aggregationType);
+                    $filter = new Filter($this->requestConfiguration, $attributeCode, $attributeNameBucket['key'], $attributeNameBucket['doc_count'], $aggregationType);
                     foreach ($attributeValueBuckets as $attributeValueBucket) {
                         if (0 === $attributeValueBucket['doc_count']) {
                             continue;

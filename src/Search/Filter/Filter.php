@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Filter;
 
+use MonsieurBiz\SyliusSearchPlugin\Helper\SlugHelper;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterInterface;
 
 class Filter implements FilterInterface
@@ -38,16 +40,18 @@ class Filter implements FilterInterface
     private $count;
 
     private string $type;
+    private RequestConfiguration $requestConfiguration;
 
     /**
      * Filter constructor.
      */
-    public function __construct(string $code, string $label, int $count, string $type = '')
+    public function __construct(RequestConfiguration $requestConfiguration, string $code, string $label, int $count, string $type = '')
     {
         $this->code = $code;
         $this->label = $label;
         $this->count = $count;
         $this->type = $type;
+        $this->requestConfiguration = $requestConfiguration;
     }
 
     /**
@@ -76,7 +80,12 @@ class Filter implements FilterInterface
 
     public function addValue(string $label, int $count, ?string $value = null): void
     {
-        $this->values[] = new FilterValue($label, $count, $value);
+        $this->values[] = new FilterValue(
+            $label,
+            $count,
+            $value,
+            in_array(SlugHelper::toSlug($value ?? $label), $this->getCurrentValues())
+        );
     }
 
     /**
@@ -101,5 +110,20 @@ class Filter implements FilterInterface
     public function setType(string $type): void
     {
         $this->type = $type;
+    }
+
+    public function getAppliedValues(): array
+    {
+        return array_filter($this->getValues(), function(FilterValue $filterValue): bool {
+            return $filterValue->isApplied();
+        });
+    }
+
+    protected function getCurrentValues(): array
+    {
+        $appliedFilters = $this->requestConfiguration->getAppliedFilters();
+        $appliedFilters = $appliedFilters[$this->getType()] ?? $appliedFilters[$this->getCode()];
+
+        return $appliedFilters[$this->getCode()] ?? $appliedFilters;
     }
 }

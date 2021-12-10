@@ -74,7 +74,7 @@ class SearchController extends AbstractController
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
             'documentable' => $result->getDocumentable(),
             'requestConfiguration' => $requestConfiguration,
-            'query' => $query,
+            'query' => urldecode($query),
             'result' => $result,
             'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
         ]);

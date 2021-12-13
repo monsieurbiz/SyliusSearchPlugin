@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Normalizer\Product;
 
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image;
+use MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Taxon;
@@ -75,6 +76,15 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
                 $values[$key] = $this->denormalizer->denormalize($value, ProductAttribute::class, 'json', $context);
             }
             $object->setAttributes($values);
+            unset($data['channels']);
+        }
+
+        if (\array_key_exists('prices', $data)) {
+            $values = [];
+            foreach ($data['prices'] as $key => $value) {
+                $values[$key] = $this->denormalizer->denormalize($value, PricingDTO::class, 'json', $context);
+            }
+            $object->setPrices($values);
             unset($data['channels']);
         }
 

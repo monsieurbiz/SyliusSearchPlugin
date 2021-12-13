@@ -22,8 +22,11 @@ final class AutomapperConfigurationRegistryPass implements CompilerPassInterface
     {
         $automapperConfig = $container->getDefinition(\MonsieurBiz\SyliusSearchPlugin\AutoMapper\Configuration::class);
         $automapperClasses = $container->getParameter('monsieurbiz.search.config.automapper_classes');
-        foreach ($automapperClasses as $identifier => $sourceClass) {
+        foreach ($automapperClasses['sources'] as $identifier => $sourceClass) {
             $automapperConfig->addMethodCall('addSourceClass', [$identifier, $sourceClass]);
+        }
+        foreach ($automapperClasses['targets'] as $identifier => $sourceClass) {
+            $automapperConfig->addMethodCall('addTargetClass', [$identifier, $sourceClass]);
         }
     }
 }

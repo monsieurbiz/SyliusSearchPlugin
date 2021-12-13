@@ -16,7 +16,6 @@ namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper;
 use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
 use MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\ReaderInterface;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute;
 use RuntimeException;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 
@@ -58,6 +57,6 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
 
     public function getTarget(): string
     {
-        return ProductAttribute::class;
+        return $this->configuration->getTargetClass('product_attribute');
     }
 }

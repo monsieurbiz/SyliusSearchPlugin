@@ -15,7 +15,6 @@ namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper;
 
 use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
-use MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 
@@ -58,6 +57,6 @@ final class VariantMapperConfiguration implements MapperConfigurationInterface
 
     public function getTarget(): string
     {
-        return VariantDTO::class;
+        return $this->configuration->getTargetClass('product_variant');
     }
 }

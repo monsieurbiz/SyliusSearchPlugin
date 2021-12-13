@@ -18,14 +18,6 @@ use Jane\Component\AutoMapper\AutoMapperInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
 use Jane\Component\AutoMapper\MapperMetadata;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Taxon;
-use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
-use MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
@@ -85,33 +77,35 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
         $metadata->forMember('images', function(ProductInterface $product): array {
             $images = [];
+            $imageDTOClass = $this->configuration->getTargetClass('image');
             foreach ($product->getImages() as $image) {
-                $images[] = $this->autoMapper->map($image, Image::class); // rename the target class to DTO
+                $images[] = $this->autoMapper->map($image, $imageDTOClass);
             }
 
             return $images;
         });
 
-        $metadata->forMember('mainTaxon', function(ProductInterface $product): ?Taxon {
-            return $product->getMainTaxon() ? $this->autoMapper->map($product->getMainTaxon(), Taxon::class) : null;
+        $metadata->forMember('mainTaxon', function(ProductInterface $product) {
+            return $product->getMainTaxon() ? $this->autoMapper->map($product->getMainTaxon(), $this->configuration->getTargetClass('taxon')) : null;
         });
 
         $metadata->forMember('product_taxons', function(ProductInterface $product): array {
             return array_map(function(ProductTaxonInterface $productTaxon) {
                 // todo add parent taxon in Taxon object with automapper
-                return $this->autoMapper->map($productTaxon, ProductTaxon::class);
+                return $this->autoMapper->map($productTaxon, $this->configuration->getTargetClass('product_taxon'));
             }, $product->getProductTaxons()->toArray());
         });
 
         $metadata->forMember('channels', function(ProductInterface $product): array {
             return array_map(function(ChannelInterface $channel) {
-                return $this->autoMapper->map($channel, Channel::class);
+                return $this->autoMapper->map($channel, $this->configuration->getTargetClass('channel'));
             }, $product->getChannels()->toArray());
         });
 
         $metadata->forMember('attributes', function(ProductInterface $product): array {
             $attributes = [];
-            $currentLocale = $product->getTranslation()->getLocale(); // TODO default locale if it's null?
+            $currentLocale = $product->getTranslation()->getLocale();
+            $productAttributeDTOClass = $this->configuration->getTargetClass('product_attribute');
             foreach ($product->getAttributesByLocale($currentLocale, $currentLocale) as $attributeValue) {
                 if (null === $attributeValue->getName() || null === $attributeValue->getValue()) {
                     continue;
@@ -120,7 +114,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
                 if (!$attribute instanceof SearchableInterface || (!$attribute->isSearchable() && !$attribute->isFilterable())) {
                     continue;
                 }
-                $attributes[$attributeValue->getCode()] = $this->autoMapper->map($attributeValue, ProductAttribute::class);
+                $attributes[$attributeValue->getCode()] = $this->autoMapper->map($attributeValue, $productAttributeDTOClass);
             }
 
             return $attributes;
@@ -128,8 +122,9 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
         $metadata->forMember('variants', function(ProductInterface $product): array {
             $variants = [];
+            $productVariantDTOClass = $this->configuration->getTargetClass('product_variant');
             foreach ($product->getEnabledVariants() as $variant) {
-                $variants[] = $this->autoMapper->map($variant, VariantDTO::class);
+                $variants[] = $this->autoMapper->map($variant, $productVariantDTOClass);
             }
 
             return $variants;
@@ -140,7 +135,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             /** @var ProductVariantInterface $variant */
             $variant = $this->productVariantResolver->getVariant($product);
             foreach ($variant->getChannelPricings() as $channelPricing) {
-                $prices[] = $this->autoMapper->map($channelPricing, PricingDTO::class);
+                $prices[] = $this->autoMapper->map($channelPricing, $this->configuration->getTargetClass('pricing'));
             }
 
             return $prices;
@@ -154,6 +149,6 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
     public function getTarget(): string
     {
-        return ProductDTO::class;
+        return $this->configuration->getTargetClass('product');
     }
 }

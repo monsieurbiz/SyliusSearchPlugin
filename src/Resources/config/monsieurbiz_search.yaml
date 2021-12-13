@@ -14,6 +14,17 @@ monsieurbiz_sylius_search:
       #mapping_provider: '...' # by default monsieurbiz.search.mapper_provider
       #dataprovider: '...' # by default MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource
   automapper_classes:
-    product: '%sylius.model.product.class%'
-    product_variant: '%sylius.model.product_variant.class%'
-    product_attribute_value: '%sylius.model.product_attribute_value.class%'
+    sources:
+      product: '%sylius.model.product.class%'
+      product_variant: '%sylius.model.product_variant.class%'
+      product_attribute_value: '%sylius.model.product_attribute_value.class%'
+    targets:
+      product: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO'
+      image: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image' #  todo rename the target class to DTO
+      taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\Taxon'
+      product_taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon'
+      channel: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel'
+      product_attribute: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute'
+      product_variant: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO'
+      pricing: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO'
+

@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Normalizer\Product;
 
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon;
-use MonsieurBiz\SyliusSearchPlugin\Generated\Model\Taxon;
-use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
+use Jacquesbh\Eater\EaterInterface;
+use MonsieurBiz\SyliusSearchPlugin\AutoMapper\Configuration;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -33,20 +33,46 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
 
+    private Configuration $automapperConfiguration;
+
+    public function __construct(
+        Configuration $automapperConfiguration,
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        NameConverterInterface $nameConverter = null,
+        PropertyAccessorInterface $propertyAccessor = null,
+        PropertyTypeExtractorInterface $propertyTypeExtractor = null,
+        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        callable $objectClassResolver = null,
+        array $defaultContext = []
+    ) {
+        parent::__construct(
+            $classMetadataFactory,
+            $nameConverter,
+            $propertyAccessor,
+            $propertyTypeExtractor,
+            $classDiscriminatorResolver,
+            $objectClassResolver,
+            $defaultContext
+        );
+        $this->automapperConfiguration = $automapperConfiguration;
+    }
+
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        /** @var ProductDTO $object */
+        /** @var EaterInterface $object */
         $object = parent::denormalize($data, $type, $format, $context);
 
         if (\array_key_exists('main_taxon', $data)) {
-            $object->setMainTaxon($this->denormalizer->denormalize($data['main_taxon'], Taxon::class, 'json', $context));
+            $taxonDTOClass = $this->automapperConfiguration->getTargetClass('taxon');
+            $object->setMainTaxon($this->denormalizer->denormalize($data['main_taxon'], $taxonDTOClass, 'json', $context));
             unset($data['main_taxon']);
         }
 
         if (\array_key_exists('product_taxons', $data)) {
             $values = [];
+            $productTaxonDTOClass = $this->automapperConfiguration->getTargetClass('product_taxon');
             foreach ($data['product_taxons'] as $value) {
-                $values[] = $this->denormalizer->denormalize($value, ProductTaxon::class, 'json', $context);
+                $values[] = $this->denormalizer->denormalize($value, $productTaxonDTOClass, 'json', $context);
             }
             $object->setProductTaxons($values);
             unset($data['product_taxons']);
@@ -54,8 +80,9 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
 
         if (\array_key_exists('images', $data) && null !== $data['images']) {
             $values = [];
+            $imageDTOClass = $this->automapperConfiguration->getTargetClass('image');
             foreach ($data['images'] as $value) {
-                $values[] = $this->denormalizer->denormalize($value, Image::class, 'json', $context);
+                $values[] = $this->denormalizer->denormalize($value, $imageDTOClass, 'json', $context);
             }
             $object->setImages($values);
             unset($data['product_taxons']);
@@ -63,8 +90,9 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
 
         if (\array_key_exists('channels', $data)) {
             $values = [];
+            $channelDTOClass = $this->automapperConfiguration->getTargetClass('channel');
             foreach ($data['channels'] as $value) {
-                $values[] = $this->denormalizer->denormalize($value, Channel::class, 'json', $context);
+                $values[] = $this->denormalizer->denormalize($value, $channelDTOClass, 'json', $context);
             }
             $object->setChannels($values);
             unset($data['channels']);
@@ -72,8 +100,9 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
 
         if (\array_key_exists('attributes', $data)) {
             $values = [];
+            $productAttributeDTOClass = $this->automapperConfiguration->getTargetClass('product_attribute');
             foreach ($data['attributes'] as $key => $value) {
-                $values[$key] = $this->denormalizer->denormalize($value, ProductAttribute::class, 'json', $context);
+                $values[$key] = $this->denormalizer->denormalize($value, $productAttributeDTOClass, 'json', $context);
             }
             $object->setAttributes($values);
             unset($data['channels']);
@@ -81,8 +110,9 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
 
         if (\array_key_exists('prices', $data)) {
             $values = [];
+            $pricingDTOClass = $this->automapperConfiguration->getTargetClass('pricing');
             foreach ($data['prices'] as $key => $value) {
-                $values[$key] = $this->denormalizer->denormalize($value, PricingDTO::class, 'json', $context);
+                $values[$key] = $this->denormalizer->denormalize($value, $pricingDTOClass, 'json', $context);
             }
             $object->setPrices($values);
             unset($data['channels']);
@@ -93,7 +123,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
 
     public function supportsDenormalization($data, string $type, string $format = null)
     {
-        return ProductDTO::class === $type;
+        return $this->automapperConfiguration->getTargetClass('product') === $type;
     }
 
     public function supportsNormalization($data, string $format = null)

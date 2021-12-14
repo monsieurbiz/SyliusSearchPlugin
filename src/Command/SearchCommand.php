@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
+use Elastica\Exception\Connection\HttpException;
 use Jacquesbh\Eater\EaterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
@@ -76,7 +77,14 @@ class SearchCommand extends Command
             $this->channelContext
         );
 
-        $result = $this->search->search($requestConfiguration);
+        try {
+            $result = $this->search->search($requestConfiguration);
+        } catch (HttpException $exception) {
+            $io->error('Error with the HTTP request: ' . $exception->getMessage());
+
+            return Command::FAILURE;
+        }
+
         $io->title('Search result for: ' . $query);
         $io->section('Nb results: ' . $result->count());
         $documents = [];

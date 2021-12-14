@@ -84,7 +84,7 @@ class Filter implements FilterInterface
             $label,
             $count,
             $value,
-            in_array(SlugHelper::toSlug($value ?? $label), $this->getCurrentValues())
+            \in_array(SlugHelper::toSlug($value ?? $label), $this->getCurrentValues(), true)
         );
     }
 

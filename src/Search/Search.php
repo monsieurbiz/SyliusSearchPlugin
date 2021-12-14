@@ -13,14 +13,11 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
-use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
-use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestHandler;
 use Pagerfanta\Elastica\ElasticaAdapter;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class Search implements SearchInterface
 {

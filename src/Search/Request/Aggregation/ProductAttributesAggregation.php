@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
-use Elastica\Aggregation\AbstractAggregation;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
 
 class ProductAttributesAggregation implements AggregationBuilderInterface

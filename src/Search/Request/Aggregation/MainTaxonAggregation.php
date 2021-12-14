@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
-use Elastica\Aggregation\AbstractAggregation;
-
 class MainTaxonAggregation implements AggregationBuilderInterface
 {
     public function build($aggregation, array $filters)

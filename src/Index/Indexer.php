@@ -16,7 +16,6 @@ namespace MonsieurBiz\SyliusSearchPlugin\Index;
 use Doctrine\ORM\EntityManagerInterface;
 use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
-use JoliCode\Elastically\Factory;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
 use Psr\Log\LoggerAwareInterface;
@@ -25,7 +24,6 @@ use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 final class Indexer implements LoggerAwareInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of SyliusSearchPlugin.
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
  *
- * (c) Monsieur Biz
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -35,7 +35,7 @@ class ProductReindexFromIdsHandler implements MessageHandlerInterface
         $this->documentableRegistry = $documentableRegistry;
     }
 
-    public function __invoke(ProductReindexFromIds $message)
+    public function __invoke(ProductReindexFromIds $message): void
     {
         $products = $this->productRepository->findBy(['id' => $message->getProductIds()]);
 

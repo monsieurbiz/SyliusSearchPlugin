@@ -1,7 +1,7 @@
 framework:
   messenger:
     transports:
-      async_search: '%env(MESSENGER_TRANSPORT_DSN)%'
+      async_search: '%env(MONSIEURBIZ_SEARCHPLUGIN_MESSENGER_TRANSPORT_DSN)%'
 
     routing:
       MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon: async_search

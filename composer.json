@@ -63,7 +63,8 @@
         }
     },
     "scripts": {
-        "phpcs": "php-cs-fixer fix --using-cache=no"
+        "phpcs": "php-cs-fixer fix --using-cache=no",
+        "jane-generate": "jane generate --config-file=src/Resources/config/jane/jane-configuration.php"
     },
     "config": {
         "sort-packages": true

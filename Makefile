@@ -116,6 +116,12 @@ sylius.assets: ## Install all assets with symlinks
 	${CONSOLE} sylius:theme:assets:install --symlink
 
 ###
+### JANE
+### ¯¯¯¯¯¯
+jane.generate: ## Generate Models classes with Jane
+	${COMPOSER} run -- jane-generate
+
+###
 ### PLATFORM
 ### ¯¯¯¯¯¯¯¯
 

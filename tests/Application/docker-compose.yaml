@@ -17,6 +17,8 @@ services:
     elasticsearch:
         build:
             context: ./docker/elasticsearch/
+            args:
+                - ELASTICSEARCH_VERSION=7.16.1
         volumes:
             - esdata:/usr/share/elasticsearch/data:rw
         environment:
@@ -32,7 +34,7 @@ services:
         ports:
             - "9200"
     kibana:
-        image: docker.elastic.co/kibana/kibana:7.15.0
+        image: docker.elastic.co/kibana/kibana:7.16.1
         environment:
             - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
             - "XPACK_GRAPH_ENABLED=false"

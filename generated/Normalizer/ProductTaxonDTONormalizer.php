@@ -11,18 +11,18 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-class ProductTaxonNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+class ProductTaxonDTONormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
     use CheckArray;
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductTaxon';
+        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductTaxonDTO';
     }
     public function supportsNormalization($data, $format = null)
     {
-        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon;
+        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO;
     }
     public function denormalize($data, $class, $format = null, array $context = array())
     {
@@ -32,12 +32,12 @@ class ProductTaxonNormalizer implements DenormalizerInterface, NormalizerInterfa
         if (isset($data['$recursiveRef'])) {
             return new Reference($data['$recursiveRef'], $context['document-origin']);
         }
-        $object = new \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon();
+        $object = new \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO();
         if (null === $data || false === \is_array($data)) {
             return $object;
         }
         if (\array_key_exists('taxon', $data)) {
-            $object->setTaxon($this->denormalizer->denormalize($data['taxon'], 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\Taxon', 'json', $context));
+            $object->setTaxon($this->denormalizer->denormalize($data['taxon'], 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\TaxonDTO', 'json', $context));
         }
         if (\array_key_exists('position', $data) && $data['position'] !== null) {
             $value = $data['position'];

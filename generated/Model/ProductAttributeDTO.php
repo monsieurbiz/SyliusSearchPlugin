@@ -2,7 +2,7 @@
 
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
-class ProductAttribute
+class ProductAttributeDTO
 {
     /**
      * 

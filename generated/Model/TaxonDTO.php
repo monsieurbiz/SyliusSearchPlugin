@@ -2,7 +2,7 @@
 
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
-class Taxon
+class TaxonDTO
 {
     /**
      * 

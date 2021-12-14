@@ -11,18 +11,18 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-class ChannelNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+class ProductAttributeDTONormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
     use CheckArray;
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\Channel';
+        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductAttributeDTO';
     }
     public function supportsNormalization($data, $format = null)
     {
-        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel;
+        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO;
     }
     public function denormalize($data, $class, $format = null, array $context = array())
     {
@@ -32,12 +32,27 @@ class ChannelNormalizer implements DenormalizerInterface, NormalizerInterface, D
         if (isset($data['$recursiveRef'])) {
             return new Reference($data['$recursiveRef'], $context['document-origin']);
         }
-        $object = new \MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel();
+        $object = new \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO();
         if (null === $data || false === \is_array($data)) {
             return $object;
         }
         if (\array_key_exists('code', $data)) {
             $object->setCode($data['code']);
+        }
+        if (\array_key_exists('name', $data)) {
+            $object->setName($data['name']);
+        }
+        if (\array_key_exists('value', $data) && $data['value'] !== null) {
+            $value = $data['value'];
+            if (is_null($data['value'])) {
+                $value = $data['value'];
+            } elseif (isset($data['value'])) {
+                $value = $data['value'];
+            }
+            $object->setValue($value);
+        }
+        elseif (\array_key_exists('value', $data) && $data['value'] === null) {
+            $object->setValue(null);
         }
         return $object;
     }
@@ -46,6 +61,18 @@ class ChannelNormalizer implements DenormalizerInterface, NormalizerInterface, D
         $data = array();
         if (null !== $object->getCode()) {
             $data['code'] = $object->getCode();
+        }
+        if (null !== $object->getName()) {
+            $data['name'] = $object->getName();
+        }
+        if (null !== $object->getValue()) {
+            $value = $object->getValue();
+            if (is_null($object->getValue())) {
+                $value = $object->getValue();
+            } elseif (!is_null($object->getValue())) {
+                $value = $object->getValue();
+            }
+            $data['value'] = $value;
         }
         return $data;
     }

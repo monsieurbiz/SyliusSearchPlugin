@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/2019-09/schema#",
   "definitions": {
-    "Image": {
+    "ImageDTO": {
       "type": "object",
       "properties": {
         "path": {
@@ -12,7 +12,7 @@
         }
       }
     },
-    "Channel": {
+    "ChannelDTO": {
       "type": "object",
       "properties": {
         "code": {
@@ -20,11 +20,11 @@
         }
       }
     },
-    "ProductTaxon": {
+    "ProductTaxonDTO": {
       "type": "object",
       "properties": {
         "taxon": {
-          "$ref": "#/definitions/Taxon"
+          "$ref": "#/definitions/TaxonDTO"
         },
         "position": {
           "type": [
@@ -34,7 +34,7 @@
         }
       }
     },
-    "Taxon": {
+    "TaxonDTO": {
       "type": "object",
       "properties": {
         "name": {
@@ -51,7 +51,7 @@
         }
       }
     },
-    "ProductAttribute": {
+    "ProductAttributeDTO": {
       "type": "object",
       "properties": {
         "code": {

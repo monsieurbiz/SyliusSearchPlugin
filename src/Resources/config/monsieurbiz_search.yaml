@@ -20,11 +20,11 @@ monsieurbiz_sylius_search:
       product_attribute_value: '%sylius.model.product_attribute_value.class%'
     targets:
       product: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO'
-      image: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image' #  todo rename the target class to DTO
-      taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\Taxon'
-      product_taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxon'
-      channel: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\Channel'
-      product_attribute: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttribute'
+      image: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO'
+      taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\TaxonDTO'
+      product_taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO'
+      channel: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ChannelDTO'
+      product_attribute: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO'
       product_variant: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO'
       pricing: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO'
 

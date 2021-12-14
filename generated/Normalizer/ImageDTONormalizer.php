@@ -11,18 +11,18 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-class ImageNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+class ImageDTONormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
     use CheckArray;
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\Image';
+        return $type === 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ImageDTO';
     }
     public function supportsNormalization($data, $format = null)
     {
-        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image;
+        return $data instanceof \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO;
     }
     public function denormalize($data, $class, $format = null, array $context = array())
     {
@@ -32,7 +32,7 @@ class ImageNormalizer implements DenormalizerInterface, NormalizerInterface, Den
         if (isset($data['$recursiveRef'])) {
             return new Reference($data['$recursiveRef'], $context['document-origin']);
         }
-        $object = new \MonsieurBiz\SyliusSearchPlugin\Generated\Model\Image();
+        $object = new \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO();
         if (null === $data || false === \is_array($data)) {
             return $object;
         }

@@ -2,12 +2,12 @@
 
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
-class ProductTaxon
+class ProductTaxonDTO
 {
     /**
      * 
      *
-     * @var Taxon
+     * @var TaxonDTO
      */
     protected $taxon;
     /**
@@ -19,20 +19,20 @@ class ProductTaxon
     /**
      * 
      *
-     * @return Taxon
+     * @return TaxonDTO
      */
-    public function getTaxon() : Taxon
+    public function getTaxon() : TaxonDTO
     {
         return $this->taxon;
     }
     /**
      * 
      *
-     * @param Taxon $taxon
+     * @param TaxonDTO $taxon
      *
      * @return self
      */
-    public function setTaxon(Taxon $taxon) : self
+    public function setTaxon(TaxonDTO $taxon) : self
     {
         $this->taxon = $taxon;
         return $this;

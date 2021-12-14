@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
-use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
+use Jacquesbh\Eater\EaterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
+use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
+use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,15 +34,24 @@ class SearchCommand extends Command
     protected static $defaultName = 'monsieurbiz:search:search';
     private Search $search;
     private RequestStack $requestStack;
+    private ChannelContextInterface $channelContext;
+    private SettingsInterface $searchSettings;
+    private ServiceRegistryInterface $documentableRegistry;
 
     public function __construct(
         Search $search,
         RequestStack $requestStack,
+        ChannelContextInterface $channelContext,
+        SettingsInterface $searchSettings,
+        ServiceRegistryInterface $documentableRegistry,
         $name = null
     ) {
         parent::__construct($name);
         $this->search = $search;
         $this->requestStack = $requestStack;
+        $this->channelContext = $channelContext;
+        $this->searchSettings = $searchSettings;
+        $this->documentableRegistry = $documentableRegistry;
     }
 
     protected function configure(): void
@@ -56,14 +68,20 @@ class SearchCommand extends Command
         $query = $input->getArgument('query');
         $request = new Request(['query' => $query, '_channel_code' => $input->getOption('channel')]);
         $this->requestStack->push($request);
-        $requestConfiguration = new RequestConfiguration($request, RequestInterface::SEARCH_TYPE, 'monsieurbiz_product');
+        $requestConfiguration = new RequestConfiguration(
+            $request,
+            RequestInterface::SEARCH_TYPE,
+            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $this->searchSettings,
+            $this->channelContext
+        );
 
         $result = $this->search->search($requestConfiguration);
         $io->title('Search result for: ' . $query);
         $io->section('Nb results: ' . $result->count());
         $documents = [];
         foreach ($result->getIterator() as $resultItem) {
-            /** @var ProductDTO $productDTO */
+            /** @var EaterInterface $productDTO */
             $productDTO = $resultItem->getModel();
             $documents[] = [$resultItem->getScore(), $productDTO->getId()];
         }

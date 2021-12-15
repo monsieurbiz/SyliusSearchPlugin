@@ -16,7 +16,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
 
-class ProductAttributeAggregation implements AggregationBuilderInterface
+final class ProductAttributeAggregation implements AggregationBuilderInterface
 {
     public function build($aggregation, array $filters)
     {
@@ -26,10 +26,13 @@ class ProductAttributeAggregation implements AggregationBuilderInterface
         }
 
         $qb = new \Elastica\QueryBuilder();
+        $filters = array_filter($filters, function($filter) use ($aggregation): bool {
+            return !$filter->hasParam('path') || (
+                false !== strpos($filter->getParam('path'), 'attributes.')
+                && 'attributes.' . $aggregation->getCode() !== $filter->getParam('path')
+            );
+        });
 
-        $filters = array_filter($filters, function($key) use ($aggregation) {
-            return false !== strpos($key, 'attributes.') && 'attributes.' . $aggregation->getCode() !== $key;
-        }, \ARRAY_FILTER_USE_KEY);
         $filterQuery = $qb->query()->bool();
         foreach ($filters as $filter) {
             $filterQuery->addMust($filter);

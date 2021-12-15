@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
+use Elastica\Query\AbstractQuery;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 
-class ProductOptionsAggregation implements AggregationBuilderInterface
+final class ProductOptionsAggregation implements AggregationBuilderInterface
 {
     private ProductOptionAggregation $productOptionAggregationBuilder;
 
@@ -31,10 +32,9 @@ class ProductOptionsAggregation implements AggregationBuilderInterface
         }
 
         $qb = new \Elastica\QueryBuilder();
-
-        $currentFilters = array_filter($filters, function($key): bool {
-            return false === strpos($key, 'options.');
-        }, \ARRAY_FILTER_USE_KEY);
+        $currentFilters = array_filter($filters, function(AbstractQuery $filter): bool {
+            return !$filter->hasParam('path') || false === strpos($filter->getParam('path'), 'options.');
+        });
         $filterQuery = $qb->query()->bool();
         foreach ($currentFilters as $filter) {
             $filterQuery->addMust($filter);

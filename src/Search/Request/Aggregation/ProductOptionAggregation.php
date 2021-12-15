@@ -17,7 +17,7 @@ use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 
-class ProductOptionAggregation implements AggregationBuilderInterface
+final class ProductOptionAggregation implements AggregationBuilderInterface
 {
     public function build($aggregation, array $filters)
     {
@@ -28,9 +28,13 @@ class ProductOptionAggregation implements AggregationBuilderInterface
 
         $qb = new QueryBuilder();
 
-        $filters = array_filter($filters, function($key) use ($aggregation): bool {
-            return false !== strpos($key, 'options.') && 'options.' . $aggregation->getCode() !== $key;
-        }, \ARRAY_FILTER_USE_KEY);
+        $filters = array_filter($filters, function($filter) use ($aggregation): bool {
+            return !$filter->hasParam('path') || (
+                    false !== strpos($filter->getParam('path'), 'options.')
+                    && 'variants.options.' . $aggregation->getCode() !== $filter->getParam('path')
+                );
+        });
+
         $filterQuery = $qb->query()->bool();
         foreach ($filters as $filter) {
             $filterQuery->addMust($filter);

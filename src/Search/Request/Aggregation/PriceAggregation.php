@@ -15,7 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 
-class PriceAggregation implements AggregationBuilderInterface
+final class PriceAggregation implements AggregationBuilderInterface
 {
     private ChannelContextInterface $channelContext;
 
@@ -32,9 +32,10 @@ class PriceAggregation implements AggregationBuilderInterface
 
         $qb = new \Elastica\QueryBuilder();
 
-        $filters = array_filter($filters, function($key) {
-            return false === strpos($key, 'price');
-        }, \ARRAY_FILTER_USE_KEY);
+        $filters = array_filter($filters, function($filter): bool {
+            return !$filter->hasParam('path') || 'prices' !== $filter->getParam('path');
+        });
+
         $filterQuery = $qb->query()->bool();
         foreach ($filters as $filter) {
             $filterQuery->addMust($filter);

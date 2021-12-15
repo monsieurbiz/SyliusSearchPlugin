@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
-class MainTaxonAggregation implements AggregationBuilderInterface
+final class MainTaxonAggregation implements AggregationBuilderInterface
 {
     public function build($aggregation, array $filters)
     {
@@ -22,10 +22,9 @@ class MainTaxonAggregation implements AggregationBuilderInterface
         }
 
         $qb = new \Elastica\QueryBuilder();
-
-        $filters = array_filter($filters, function($key) {
-            return false === strpos($key, 'main_taxon');
-        }, \ARRAY_FILTER_USE_KEY);
+        $filters = array_filter($filters, function($filter): bool {
+            return !$filter->hasParam('path') || 'main_taxon' !== $filter->getParam('path');
+        });
         $filterQuery = $qb->query()->bool();
         foreach ($filters as $filter) {
             $filterQuery->addMust($filter);

@@ -15,7 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
 use Sylius\Component\Core\Model\TaxonInterface;
 
-class TaxonsAggregation implements AggregationBuilderInterface
+final class TaxonsAggregation implements AggregationBuilderInterface
 {
     public function build($aggregation, array $filters)
     {
@@ -26,9 +26,10 @@ class TaxonsAggregation implements AggregationBuilderInterface
         $currentTaxon = $aggregation['taxons'];
         $qb = new \Elastica\QueryBuilder();
 
-        $filters = array_filter($filters, function($key) {
-            return false === strpos($key, 'taxons');
-        }, \ARRAY_FILTER_USE_KEY);
+        $filters = array_filter($filters, function($filter) {
+            return !$filter->hasParam('path') || 'product_taxons' !== $filter->getParam('path');
+        });
+
         $filterQuery = $qb->query()->bool();
         foreach ($filters as $filter) {
             $filterQuery->addMust($filter);

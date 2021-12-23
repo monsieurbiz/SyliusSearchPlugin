@@ -62,7 +62,7 @@ final class TaxonsAggregation implements AggregationBuilderInterface
             ;
     }
 
-    protected function isSupported($aggregation): bool
+    private function isSupported($aggregation): bool
     {
         return \array_key_exists('taxons', $aggregation);
     }

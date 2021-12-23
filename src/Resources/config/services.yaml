@@ -142,3 +142,13 @@ services:
       $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry'
       $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
       $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
+
+  # Define the filter builders
+  MonsieurBiz\SyliusSearchPlugin\Search\ResponseFactory:
+    arguments:
+      $filterBuilders: {
+        product_main_taxon: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\MainTaxonFilterBuilder',
+        product_taxons: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\TaxonsFilterBuilder',
+        product_price: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\PriceFilterBuilder',
+        product_attribute: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\AttributeFilterBuilder'
+      }

@@ -24,12 +24,18 @@ class Search implements SearchInterface
     private LocaleContextInterface $localeContext;
     private RequestHandler $requestHandler;
     private ClientFactory $clientFactory;
+    private ResponseFactory $responseFactory;
 
-    public function __construct(ClientFactory $clientFactory, LocaleContextInterface $localeContext, RequestHandler $requestHandler)
-    {
+    public function __construct(
+        ClientFactory $clientFactory,
+        LocaleContextInterface $localeContext,
+        RequestHandler $requestHandler,
+        ResponseFactory $responseFactory
+    ) {
         $this->localeContext = $localeContext;
         $this->requestHandler = $requestHandler;
         $this->clientFactory = $clientFactory;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -42,7 +48,7 @@ class Search implements SearchInterface
         $indexName = $this->clientFactory->getIndexName($request->getDocumentable(), $this->localeContext->getLocaleCode());
         $client = $this->clientFactory->getClient($request->getDocumentable(), $this->localeContext->getLocaleCode());
 
-        return new Response(
+        return $this->responseFactory->build(
             $requestConfiguration,
             new ElasticaAdapter($client->getIndex($indexName), $request->getQuery()),
             $request->getDocumentable()

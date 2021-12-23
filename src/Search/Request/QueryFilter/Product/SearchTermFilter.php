@@ -61,7 +61,7 @@ final class SearchTermFilter implements QueryFilterInterface
         $boolQuery->addMust($searchQuery);
     }
 
-    protected function addAttributesQueries(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
+    private function addAttributesQueries(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
     {
         $qb = new QueryBuilder();
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
@@ -83,7 +83,7 @@ final class SearchTermFilter implements QueryFilterInterface
         }
     }
 
-    protected function addOptionsQueries(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
+    private function addOptionsQueries(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
     {
         $qb = new QueryBuilder();
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {

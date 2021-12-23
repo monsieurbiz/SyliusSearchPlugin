@@ -110,10 +110,10 @@ final class Taxon implements RequestInterface
     {
         $aggregations = $this->aggregationBuilder->buildAggregations(
             [
-                $this->productAttributeRepository->findIsSearchableOrFilterable(),
-                $this->productOptionRepository->findIsSearchableOrFilterable(),
                 ['taxons' => $this->configuration->getTaxon()],
                 'price',
+                $this->productAttributeRepository->findIsSearchableOrFilterable(),
+                $this->productOptionRepository->findIsSearchableOrFilterable(),
             ],
             $postFilter->hasParam('must') ? $postFilter->getParam('must') : []
         );

@@ -15,8 +15,6 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use Elastica\ResultSet;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
-use MonsieurBiz\SyliusSearchPlugin\Search\Filter\RangeFilter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use Pagerfanta\Adapter\AdapterInterface;
 use Pagerfanta\Pagerfanta;
@@ -28,12 +26,18 @@ class Response implements ResponseInterface
     private DocumentableInterface $documentable;
     private ?Pagerfanta $paginator = null;
     private array $filters = [];
+    private iterable $filterBuilders;
 
-    public function __construct(RequestConfiguration $requestConfiguration, AdapterInterface $adapter, DocumentableInterface $documentable)
-    {
+    public function __construct(
+        RequestConfiguration $requestConfiguration,
+        AdapterInterface $adapter,
+        DocumentableInterface $documentable,
+        iterable $filterBuilders
+    ) {
         $this->requestConfiguration = $requestConfiguration;
         $this->adapter = $adapter;
         $this->documentable = $documentable;
+        $this->filterBuilders = $filterBuilders;
         $this->buildFilters();
     }
 
@@ -78,102 +82,21 @@ class Response implements ResponseInterface
             return;
         }
 
-        // todo main taxon
-        $taxonAggregation = $aggregations['main_taxon']['main_taxon'] ?? null;
-        if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
-            $filter = new Filter($this->requestConfiguration, 'main_taxon', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count'], 'taxon');
-
-            // Get main taxon code in aggregation
-            $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
-            foreach ($taxonCodeBuckets as $taxonCodeBucket) {
-                if (0 === $taxonCodeBucket['doc_count']) {
-                    continue;
-                }
-                $taxonCode = $taxonCodeBucket['key'];
-                $taxonName = null;
-
-                // Get main taxon level in aggregation
-                $taxonLevelBuckets = $taxonCodeBucket['levels']['buckets'] ?? [];
-                foreach ($taxonLevelBuckets as $taxonLevelBucket) {
-                    // Get main taxon name in aggregation
-                    $taxonNameBuckets = $taxonLevelBucket['names']['buckets'] ?? [];
-                    foreach ($taxonNameBuckets as $taxonNameBucket) {
-                        $taxonName = $taxonNameBucket['key'];
-                        $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count'], $taxonCode);
-                        break 2;
-                    }
+        array_map(function($aggregationCode, $aggregationData): void {
+            foreach ($this->filterBuilders as $filterBuilder) {
+                if (null !== $filter = $filterBuilder->build($this->getDocumentable(), $this->requestConfiguration, $aggregationCode, $aggregationData)) {
+                    $this->filters[$filterBuilder->getPosition()] = $filter;
                 }
             }
+        }, array_keys($aggregations), $aggregations);
 
-            // Put taxon filter in first if contains value
-            if (0 !== \count($filter->getValues())) {
-                $this->filters[] = $filter;
+        $result = [];
+        ksort($this->filters);
+        foreach ($this->filters as $filters) {
+            foreach ($filters as $filter) {
+                $result[] = $filter;
             }
         }
-
-        // todo taxons
-        $taxonAggregation = $aggregations['taxons']['taxons']['taxons']['taxons'] ?? null;
-        if ($taxonAggregation && $taxonAggregation['doc_count'] > 0) {
-            $filter = new Filter($this->requestConfiguration, 'taxons', 'monsieurbiz_searchplugin.filters.taxon_filter', $taxonAggregation['doc_count']);
-
-            // Get main taxon code in aggregation
-            $taxonCodeBuckets = $taxonAggregation['codes']['buckets'] ?? [];
-            foreach ($taxonCodeBuckets as $taxonCodeBucket) {
-                if (0 === $taxonCodeBucket['doc_count']) {
-                    continue;
-                }
-                $taxonCode = $taxonCodeBucket['key'];
-                $taxonName = null;
-                $taxonNameBuckets = $taxonCodeBucket['names']['buckets'] ?? [];
-                foreach ($taxonNameBuckets as $taxonNameBucket) {
-                    $taxonName = $taxonNameBucket['key'];
-                    $filter->addValue($taxonName ?? $taxonCode, $taxonCodeBucket['doc_count'], $taxonCode);
-                }
-            }
-
-            // Put taxon filter in first if contains value
-            if (0 !== \count($filter->getValues())) {
-                $this->filters[] = $filter;
-            }
-        }
-        // todo price
-        $priceAggregation = $aggregations['prices']['prices']['prices'] ?? null;
-        if ($priceAggregation && $priceAggregation['doc_count'] > 0) {
-            $this->filters[] = new RangeFilter(
-                $this->requestConfiguration,
-                'price',
-                'monsieurbiz_searchplugin.filters.price_filter',
-                'monsieurbiz_searchplugin.filters.price_min',
-                'monsieurbiz_searchplugin.filters.price_max',
-                (int) floor(($priceAggregation['prices_stats']['min'] ?? 0) / 100),
-                (int) ceil(($priceAggregation['prices_stats']['max'] ?? 0) / 100)
-            );
-        }
-
-        // Retrieve filters in aggregations
-        foreach (['attributes', 'options'] as $aggregationType) {
-            $attributeAggregations = $aggregations[$aggregationType] ?? [];
-            $attributeAggregations = $attributeAggregations[$aggregationType] ?? $attributeAggregations;
-            unset($attributeAggregations['doc_count']);
-            foreach ($attributeAggregations as $attributeCode => $attributeAggregation) {
-                if (isset($attributeAggregation[$attributeCode])) {
-                    $attributeAggregation = $attributeAggregation[$attributeCode];
-                }
-                $attributeNameBuckets = $attributeAggregation['names']['buckets'] ?? [];
-                foreach ($attributeNameBuckets as $attributeNameBucket) {
-                    $attributeValueBuckets = $attributeNameBucket['values']['buckets'] ?? [];
-                    $filter = new Filter($this->requestConfiguration, $attributeCode, $attributeNameBucket['key'], $attributeNameBucket['doc_count'], $aggregationType);
-                    foreach ($attributeValueBuckets as $attributeValueBucket) {
-                        if (0 === $attributeValueBucket['doc_count']) {
-                            continue;
-                        }
-                        if (isset($attributeValueBucket['key']) && isset($attributeValueBucket['doc_count'])) {
-                            $filter->addValue($attributeValueBucket['key'], $attributeValueBucket['doc_count']);
-                        }
-                    }
-                    $this->filters[] = $filter;
-                }
-            }
-        }
+        $this->filters = $result;
     }
 }

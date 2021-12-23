@@ -112,10 +112,10 @@ final class Search implements RequestInterface
     {
         $aggregations = $this->aggregationBuilder->buildAggregations(
             [
-                $this->productAttributeRepository->findIsSearchableOrFilterable(),
-                $this->productOptionRepository->findIsSearchableOrFilterable(),
                 'main_taxon',
                 'price',
+                $this->productAttributeRepository->findIsSearchableOrFilterable(),
+                $this->productOptionRepository->findIsSearchableOrFilterable(),
             ],
             $postFilter->hasParam('must') ? $postFilter->getParam('must') : []
         );

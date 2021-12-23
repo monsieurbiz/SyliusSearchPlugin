@@ -122,8 +122,7 @@ class Filter implements FilterInterface
     protected function getCurrentValues(): array
     {
         $appliedFilters = $this->requestConfiguration->getAppliedFilters();
-        $appliedFilters = $appliedFilters[$this->getType()] ?? $appliedFilters[$this->getCode()];
 
-        return $appliedFilters[$this->getCode()] ?? $appliedFilters;
+        return $appliedFilters[$this->getType()] ?? $appliedFilters[$this->getCode()] ?? $appliedFilters;
     }
 }

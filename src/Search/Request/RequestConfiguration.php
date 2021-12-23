@@ -54,15 +54,12 @@ final class RequestConfiguration
 
     public function getAppliedFilters($type = null): array
     {
-        $appliedFilters = [
-            'taxon' => $this->request->get('taxon', []),
-            'price' => array_filter($this->request->get('price', [])),
-            'attributes' => $this->request->get('attributes', []),
-            'options' => $this->request->get('options', []),
-            'taxons' => $this->request->get('taxons', []),
-        ];
+        $requestQuery = $this->request->query->all();
+        $requestQuery = array_map(function($query): ?array {
+            return array_filter($query);
+        }, $requestQuery);
 
-        return null !== $type ? ($appliedFilters[$type] ?? []) : $appliedFilters;
+        return null !== $type ? ($requestQuery[$type] ?? []) : $requestQuery;
     }
 
     public function getSorting(): array

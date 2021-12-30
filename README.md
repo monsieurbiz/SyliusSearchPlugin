@@ -361,11 +361,11 @@ services:
                 port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
                     elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
                 elastically_index_class_mapping:
-                    documents-it_it: \App\SearchPlugin\Model\Result
-                    documents-fr_fr: \App\SearchPlugin\Model\Result
-                    documents-fr: \App\SearchPlugin\Model\Result
-                    documents-en: \App\SearchPlugin\Model\Result
-                    documents-en_us: \App\SearchPlugin\Model\Result
+                    documents-it_it: App\SearchPlugin\Model\Document\Result
+                    documents-fr_fr: App\SearchPlugin\Model\Document\Result
+                    documents-fr: App\SearchPlugin\Model\Document\Result
+                    documents-en: App\SearchPlugin\Model\Document\Result
+                    documents-en_us: App\SearchPlugin\Model\Document\Result
                 elastically_bulk_size: 100
 ```
 

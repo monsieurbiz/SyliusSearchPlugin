@@ -102,10 +102,6 @@ class Indexer extends AbstractIndex
     {
         $indexName = $this->getIndexName($locale);
         $newIndex = $this->getIndexBuilder()->createIndex($indexName);
-        $this->getIndexBuilder()->markAsLive(
-            $newIndex,
-            $indexName
-        );
 
         $repositories = $this->documentRepositoryProvider->getRepositories();
         foreach ($repositories as $repository) {
@@ -113,9 +109,15 @@ class Indexer extends AbstractIndex
             /** @var DocumentableInterface $document */
             foreach ($documents as $document) {
                 Assert::isInstanceOf($document, DocumentableInterface::class);
-                $this->indexOneByLocale($document->convertToDocument($locale), $locale);
+                $convertToDocument = $document->convertToDocument($locale);
+                $this->getIndexer()->scheduleIndex($newIndex, new Document($convertToDocument->getUniqId(), $convertToDocument));
             }
         }
+
+        $this->getIndexBuilder()->markAsLive(
+            $newIndex,
+            $indexName
+        );
 
         $this->getIndexer()->flush();
 

@@ -17,29 +17,114 @@
 
 A search plugin for Sylius using [Elastically](https://github.com/jolicode/elastically) and [Jane](https://github.com/janephp/janephp).
 
-TODO
+## Installation
 
-## Jane
+Require the plugin :
+```
+composer require monsieurbiz/sylius-search-plugin="2.0.x-dev@dev"
+```
+
+If you are using Symfony Flex, the recipe will automatically do some actions.
+
+<details>
+<summary>For the installation without flex, follow these additional steps</summary>
+<p>
+
+Change your `config/bundles.php` file to add this line for the plugin declaration:
+```php
+<?php
+
+return [
+    //..
+    MonsieurBiz\SyliusSearchPlugin\MonsieurBizSyliusSearchPlugin::class => ['all' => true],
+    Jane\Bundle\AutoMapperBundle\JaneAutoMapperBundle::class => ['all' => true],
+];
+```
+
+Create the config file in `config/packages/monsieurbiz_sylius_search_plugin.yaml`:
+
+```yaml
+imports:
+  - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
+```
+
+Create the route config file in `config/routes/monsieurbiz_sylius_search_plugin.yaml`:
+
+```yaml
+monsieurbiz_search_plugin:
+  resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/routing.yaml"
+```
+
+Copy the override templates:
+
+```shell
+cp -Rv vendor/monsieurbiz/sylius-search-plugin/src/Resources/templates/* templates/
+```
+
+Finally configure plugin in your .env file by adding these lines at the end :
+
+```
+###> MonsieurBizSearchPlugin ###
+MONSIEURBIZ_SEARCHPLUGIN_MESSENGER_TRANSPORT_DSN=doctrine://default
+MONSIEURBIZ_SEARCHPLUGIN_ES_HOST=${ELASTICSEARCH_HOST:-localhost}
+MONSIEURBIZ_SEARCHPLUGIN_ES_PORT=${ELASTICSEARCH_PORT:-9200}
+###< MonsieurBizSearchPlugin ###
+```
+
+</p>
+</details>
+
+1. Install Elasticsearch 💪. See [Infrastructure](#infrastructure) below.
+
+2. Your `ProductAttribute` and `ProductOption` entities need to implement the `MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface` interface and use the `MonsieurBiz\SyliusSearchPlugin\Model\Product\SearchableTrait` trait. Example with the `ProductAttribute`:
+
+```diff
+namespace App\Entity\Product;
+
+use Doctrine\ORM\Mapping as ORM;
++use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
++use MonsieurBiz\SyliusSearchPlugin\Model\Product\SearchableTrait;
+use Sylius\Component\Attribute\Model\AttributeTranslationInterface;
+use Sylius\Component\Product\Model\ProductAttribute as BaseProductAttribute;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="sylius_product_attribute")
+ */
+-class ProductAttribute extends BaseProductAttribute
++class ProductAttribute extends BaseProductAttribute implements SearchableInterface
+{
++    use SearchableTrait;
+
+    protected function createTranslation(): AttributeTranslationInterface
+    {
+        return new ProductAttributeTranslation();
+```
+
+3. You need to run a diff of your doctrine's migrations: `console doctrine:migrations:diff`. Don't forget to run it! (`console doctrine:migrations:migrate`)
+
+4. Run the populate command.
+
+## Infrastructure
+
+The plugin was developed for Elasticsearch 7.16.x versions. You need to have analysis-icu and analysis-phonetic elasticsearch plugin installed.
+
+## Other information
+
+### Jane
 
 We are using [Jane](https://github.com/janephp/janephp) to create a DTO (Data-transfer object).  
-Generated classes are on `src/MonsieurBizSearchPlugin/generated` folder.  
-Jane configuration and JSON Schema are on `src/MonsieurBizSearchPlugin/Resources/config/jane` folder. 
+Generated classes are on `generated` folder.  
+Jane configuration and JSON Schema are on `src/Resources/config/jane` folder. 
 
 To rebuild generated class during plugin development, we are using : 
 
 ```bash
-symfony php vendor/bin/jane generate --config-file=src/Resources/config/jane/dto-config.php
+symfony php vendor/bin/jane generate --config-file=src/Resources/config/jane/jane-configuration.php
 ```
 
-## Elastically
+### Elastically
 
-The [Elastically](https://github.com/jolicode/elastically) Client is configured in `src/MonsieurBizSearchPlugin/Resources/config/services.yaml` file.  
-You can customize it if you want in `config/services.yaml`.  
-Analyzers and YAML mappings are on `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/mappings` folder.
-
-You can also find YAML used by plugin to perform the search on Elasticsearch : 
-- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/queries/search.yaml`
-- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/queries/instant.yaml`
-- `src/MonsieurBizSearchPlugin/Resources/config/elasticsearch/queries/taxon.yaml`
-
-These queries can be customized in another folder if you change the plugin config.
+The [Elastically](https://github.com/jolicode/elastically) Client is configured in `src/Resources/config/services.yaml` file.  
+You can customize it in your `.env` file or if you want in `config/services.yaml`.  
+Analyzers and YAML mappings are on `src/Resources/config/elasticsearch` folder.

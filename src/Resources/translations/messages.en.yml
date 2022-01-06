@@ -8,6 +8,10 @@ monsieurbiz_searchplugin:
       form:
         title: Search
         filterable: Filterable
+    setting_form:
+      instant_search_enabled_monsieurbiz_product: 'Product: Instant search enabled'
+      limit_search_monsieurbiz_product: 'Product: Available limits for search'
+      limit_instant_search_monsieurbiz_product: 'Product: Available limits for instant search'
   form:
     query: 'Search'
     query_placeholder: 'Search…'

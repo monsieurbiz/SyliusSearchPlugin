@@ -33,7 +33,7 @@ class LimitsSearchType extends AbstractSettingsType
             CollectionType::class,
             [
                 'entry_type' => NumberType::class,
-                'label' => $documentable->getIndexCode() . ' search',
+                'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_search_' . $documentable->getIndexCode(),
                 'required' => true,
                 'allow_add' => true,
                 'allow_delete' => true,
@@ -45,7 +45,7 @@ class LimitsSearchType extends AbstractSettingsType
             CollectionType::class,
             [
                 'entry_type' => NumberType::class,
-                'label' => $documentable->getIndexCode() . ' instant_search',
+                'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_instant_search_' . $documentable->getIndexCode(),
                 'required' => true,
                 'allow_add' => true,
                 'allow_delete' => true,

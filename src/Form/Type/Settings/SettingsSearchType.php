@@ -38,6 +38,7 @@ class SettingsSearchType extends AbstractSettingsType
                 CheckboxType::class,
                 [
                     'required' => false,
+                    'label' => 'monsieurbiz_searchplugin.admin.setting_form.instant_search_enabled_' . $documentable->getIndexCode(),
                 ]
             );
             $subOptions = $options;

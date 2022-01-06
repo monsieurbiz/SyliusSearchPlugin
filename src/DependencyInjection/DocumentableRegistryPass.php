@@ -32,6 +32,11 @@ class DocumentableRegistryPass implements CompilerPassInterface
         if (!\is_array($documentables)) {
             return;
         }
+        $searchSettings = [];
+        if ($container->hasParameter('monsieurbiz.settings.config.plugins')) {
+            $searchSettings = $container->getParameter('monsieurbiz.settings.config.plugins');
+        }
+
         foreach ($documentables as $indexCode => $documentableConfiguration) {
             $documentableServiceId = 'search.documentable.' . $indexCode;
             $documentableDefinition = (new Definition(Documentable::class)) // TODO - move into config
@@ -51,6 +56,14 @@ class DocumentableRegistryPass implements CompilerPassInterface
 
             // Add documentable into registry
             $registry->addMethodCall('register', [$documentableServiceId, new Reference($documentableServiceId)]);
+
+            // Add the default settings value of documentable
+            $searchSettings['monsieurbiz.search']['default_values'] = [
+                'instant_search_enabled__' . $indexCode => $documentableConfiguration['instant_search_enabled'],
+                'limits__' . $indexCode => $documentableConfiguration['limits'],
+            ];
         }
+
+        $container->setParameter('monsieurbiz.settings.config.plugins', $searchSettings);
     }
 }

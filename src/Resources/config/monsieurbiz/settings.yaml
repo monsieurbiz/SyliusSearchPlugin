@@ -9,6 +9,4 @@ monsieurbiz_sylius_settings:
       use_locales: false
       classes:
         form: MonsieurBiz\SyliusSearchPlugin\Form\Type\Settings\SettingsSearchType
-      default_values:
-        instant_search_enabled__monsieurbiz_product: '%monsieurbiz.search.config.documents.monsieurbiz_product.instant_search_enabled%'
-        limits__monsieurbiz_product: '%monsieurbiz.search.config.documents.monsieurbiz_product.limits%'
+      default_values: # default values are defined in MonsieurBiz\SyliusSearchPlugin\DependencyInjection\DocumentableRegistryPass

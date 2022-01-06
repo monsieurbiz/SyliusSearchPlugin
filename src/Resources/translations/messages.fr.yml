@@ -4,6 +4,8 @@ monsieurbiz_searchplugin:
       form:
         title: Recherche
         filterable: Filtrable
+        searchable: Recherchable
+        search_weight: Pondération dans la recherche
     product_option:
       form:
         title: Recherche

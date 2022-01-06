@@ -16,7 +16,6 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
-use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterInterface;
 
 class TaxonsFilterBuilder
 {

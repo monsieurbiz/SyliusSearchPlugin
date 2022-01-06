@@ -17,7 +17,6 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\RangeFilter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\FilterBuilderInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterInterface;
 
 class PriceFilterBuilder implements FilterBuilderInterface
 {

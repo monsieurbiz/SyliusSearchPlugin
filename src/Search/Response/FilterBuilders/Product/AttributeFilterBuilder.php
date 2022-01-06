@@ -17,7 +17,6 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\FilterBuilderInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterInterface;
 
 class AttributeFilterBuilder implements FilterBuilderInterface
 {

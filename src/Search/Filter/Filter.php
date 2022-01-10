@@ -123,6 +123,6 @@ class Filter implements FilterInterface
     {
         $appliedFilters = $this->requestConfiguration->getAppliedFilters();
 
-        return $appliedFilters[$this->getType()] ?? $appliedFilters[$this->getCode()] ?? $appliedFilters;
+        return $appliedFilters[$this->getType()][$this->getCode()] ?? $appliedFilters[$this->getCode()] ?? $appliedFilters;
     }
 }

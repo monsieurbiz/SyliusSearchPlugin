@@ -33,18 +33,20 @@ class PriceFilterBuilder implements FilterBuilderInterface
         $filter = null;
         $priceAggregation = $aggregationData['prices']['prices'] ?? null;
         if ($priceAggregation && $priceAggregation['doc_count'] > 0) {
-            $filter = new RangeFilter(
-                $requestConfiguration,
-                'price',
-                'monsieurbiz_searchplugin.filters.price_filter',
-                'monsieurbiz_searchplugin.filters.price_min',
-                'monsieurbiz_searchplugin.filters.price_max',
-                (int) floor(($priceAggregation['prices_stats']['min'] ?? 0) / 100),
-                (int) ceil(($priceAggregation['prices_stats']['max'] ?? 0) / 100)
-            );
+            $filter = [
+                new RangeFilter(
+                    $requestConfiguration,
+                    'price',
+                    'monsieurbiz_searchplugin.filters.price_filter',
+                    'monsieurbiz_searchplugin.filters.price_min',
+                    'monsieurbiz_searchplugin.filters.price_max',
+                    (int) floor(($priceAggregation['prices_stats']['min'] ?? 0) / 100),
+                    (int) ceil(($priceAggregation['prices_stats']['max'] ?? 0) / 100)
+                ),
+            ];
         }
 
-        return [$filter];
+        return $filter;
     }
 
     public function getPosition(): int

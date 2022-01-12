@@ -15,6 +15,10 @@ services:
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
       $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
 
+  _instanceof:
+    MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\ReaderInterface:
+      tags: [ 'monsieurbiz.search.automapper.product_attribute_value_reader' ]
+
   MonsieurBiz\SyliusSearchPlugin\:
     resource: '../../*'
     exclude: '../../{Entity,Migrations,Tests,Kernel.php}'
@@ -63,11 +67,7 @@ services:
   # Define product attribute value readers
   MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueConfiguration:
     arguments:
-      $productAttributeValueReaders: {
-        default: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\DefaultReader',
-        select: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\SelectReader',
-        date: '@MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\DateReader'
-      }
+      $productAttributeValueReaders: !tagged_iterator { tag: 'monsieurbiz.search.automapper.product_attribute_value_reader', default_index_method: 'getReaderCode' }
 
   # Define aggregation builders
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\MainTaxonAggregation:

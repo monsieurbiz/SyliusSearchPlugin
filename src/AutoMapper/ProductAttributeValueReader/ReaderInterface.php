@@ -17,6 +17,8 @@ use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 
 interface ReaderInterface
 {
+    public static function getReaderCode(): string;
+
     /**
      * @return string|array
      */

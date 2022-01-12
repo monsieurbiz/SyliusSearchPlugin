@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader;
 
-class DateReader extends DateTimeReader implements ReaderInterface
+class TextareaReader extends DefaultReader
 {
-    protected string $defaultFormat = 'Y-m-d';
-
     public static function getReaderCode(): string
     {
-        return 'date';
+        return 'textarea';
     }
 }

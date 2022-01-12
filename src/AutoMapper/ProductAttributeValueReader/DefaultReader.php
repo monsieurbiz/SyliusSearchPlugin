@@ -15,10 +15,12 @@ namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader;
 
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 
-class DefaultReader implements ReaderInterface
+abstract class DefaultReader implements ReaderInterface
 {
     public function getValue(ProductAttributeValueInterface $productAttribute)
     {
         return (string) $productAttribute->getValue();
     }
+
+    abstract public static function getReaderCode(): string;
 }

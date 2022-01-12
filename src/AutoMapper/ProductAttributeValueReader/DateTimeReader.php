@@ -32,4 +32,9 @@ class DateTimeReader implements ReaderInterface
 
         return $productAttributeValue;
     }
+
+    public static function getReaderCode(): string
+    {
+        return 'datetime';
+    }
 }

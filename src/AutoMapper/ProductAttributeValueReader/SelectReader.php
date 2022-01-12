@@ -49,4 +49,9 @@ class SelectReader implements ReaderInterface
 
         return $result;
     }
+
+    public static function getReaderCode(): string
+    {
+        return 'select';
+    }
 }

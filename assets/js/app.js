@@ -30,12 +30,21 @@ global.MonsieurBizInstantSearch = class {
             }, keyUpTimeOut);
         });
 
-        // Hide results when user leave the search field
-        document.querySelector(searchInputSelector).addEventListener('focusout', function (e) {
-            var resultElement = e.currentTarget.closest(resultClosestSelector).querySelector(resultFindSelector);
-            setTimeout(function () {
+        // Hide results when user leave the autocomplete form
+        const searchForm = document.querySelector(searchInputSelector).closest(resultClosestSelector);
+        searchForm.addEventListener('focusout', function (e) {
+            if (e.relatedTarget === null || !searchForm.contains(e.relatedTarget)) {
+                const resultElement = searchForm.querySelector(resultFindSelector);
                 resultElement.style.display = 'none';
-            }, 100); // Add timeout to keep the click on the result
+            }
+        });
+
+        document.querySelector(searchInputSelector).addEventListener('focus', function (e) {
+            var query = e.currentTarget.value;
+            if (query !== '') {
+                const resultElement = searchForm.querySelector(resultFindSelector);
+                resultElement.style.display = 'block';
+            }
         });
     }
 }

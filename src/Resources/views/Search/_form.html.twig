@@ -1,6 +1,6 @@
 {% form_theme form '@SyliusShop/Form/theme.html.twig' %}
 <div class="ui form items">
-        {{ form_start(form, {'action': path('monsieurbiz_search_post'), 'method': 'POST', 'attr': {'class': 'ui search item category autocomplete-search'}}) }}
+        {{ form_start(form, {'action': path('monsieurbiz_search_post'), 'method': 'POST', 'attr': {'class': 'ui search item category autocomplete-search', 'tabindex': '-1'}}) }}
         {{ form_errors(form) }}
         {{ form_row(form.query, {'value': query, 'label': false}) }}
         {{ form_row(form.submit, {'attr': {'class': 'ui primary button'}}) }}

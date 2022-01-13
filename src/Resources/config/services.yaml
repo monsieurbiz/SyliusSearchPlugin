@@ -1,6 +1,7 @@
 parameters:
   monsieurbiz.search.model.documentable.interface: MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface
   monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface
+  monsieurbiz.search.product_attribute_analyzer: 'search_standard'
 
 services:
 
@@ -68,6 +69,11 @@ services:
   MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueConfiguration:
     arguments:
       $productAttributeValueReaders: !tagged_iterator { tag: 'monsieurbiz.search.automapper.product_attribute_value_reader', default_index_method: 'getReaderCode' }
+
+  #
+  MonsieurBiz\SyliusSearchPlugin\EventSubscriber\AppendProductAttributeMappingSubscriber:
+    arguments:
+      $fieldAnalyzer: '%monsieurbiz.search.product_attribute_analyzer%'
 
   # Define aggregation builders
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\MainTaxonAggregation:

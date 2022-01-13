@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\EventSubscriber;
 
+use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
@@ -22,13 +23,16 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
 {
     private ProductAttributeRepositoryInterface $productAttributeRepository;
     private ProductOptionRepositoryInterface $productOptionRepository;
+    private string $fieldAnalyzer;
 
     public function __construct(
         ProductAttributeRepositoryInterface $productAttributeRepository,
-        ProductOptionRepositoryInterface $productOptionRepository
+        ProductOptionRepositoryInterface $productOptionRepository,
+        string $fieldAnalyzer
     ) {
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
+        $this->fieldAnalyzer = $fieldAnalyzer;
     }
 
     public static function getSubscribedEvents()
@@ -48,62 +52,52 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
             return;
         }
         $mappings = $mapping->offsetGet('mappings');
+        $attributesMapping = [];
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
-            if (!\array_key_exists('attributes', $mappings['properties'])) {
-                $mappings['properties']['attributes'] = [
-                    'type' => 'nested',
-                    'properties' => [],
-                ];
-            }
-            $mappings['properties']['attributes']['properties'][$productAttribute->getCode()] = [
+            $attributesMapping[$productAttribute->getCode()] = $this->getProductAttributeOrOptionProperties($productAttribute);
+        }
+        if (0 < \count($attributesMapping)) {
+            $mappings['properties']['attributes'] = [
                 'type' => 'nested',
-                'properties' => [
-                    'code' => ['type' => 'keyword'],
-                    'name' => ['type' => 'keyword'],
-                    'value' => ['type' => 'text'],
-                ],
+                'properties' => $attributesMapping,
             ];
-
-            if ($productAttribute->isFilterable()) {
-                $mappings['properties']['attributes']['properties'][$productAttribute->getCode()]['properties']['value']['fields'] = [
-                    'keyword' => ['type' => 'keyword'],
-                ];
-            }
-
-            if ($productAttribute->isSearchable()) {
-                // TODO replace to a configurable value
-                $mappings['properties']['attributes']['properties'][$productAttribute->getCode()]['properties']['value']['analyzer'] = 'search_standard';
-            }
         }
 
+        $optionsMapping = [];
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
-            if (!\array_key_exists('options', $mappings['properties']['variants']['properties'])) {
-                $mappings['properties']['variants']['properties']['options'] = [
-                    'type' => 'nested',
-                    'properties' => [],
-                ];
-            }
-            $mappings['properties']['variants']['properties']['options']['properties'][$productOption->getCode()] = [
+            $optionsMapping[$productOption->getCode()] = $this->getProductAttributeOrOptionProperties($productOption);
+        }
+        if (0 < \count($optionsMapping)) {
+            $mappings['properties']['variants']['properties']['options'] = [
                 'type' => 'nested',
-                'properties' => [
-                    'code' => ['type' => 'keyword'],
-                    'name' => ['type' => 'keyword'],
-                    'value' => ['type' => 'text'],
-                ],
+                'properties' => $optionsMapping,
             ];
-
-            if ($productOption->isFilterable()) {
-                $mappings['properties']['variants']['properties']['options']['properties'][$productOption->getCode()]['properties']['value']['fields'] = [
-                    'keyword' => ['type' => 'keyword'],
-                ];
-            }
-
-            if ($productOption->isSearchable()) {
-                // TODO replace to a configurable value
-                $mappings['properties']['variants']['properties']['options']['properties'][$productOption->getCode()]['properties']['value']['analyzer'] = 'search_standard';
-            }
         }
 
         $mapping->offsetSet('mappings', $mappings);
+    }
+
+    private function getProductAttributeOrOptionProperties(SearchableInterface $productAttributeOrOption): array
+    {
+        $properties = [
+            'type' => 'nested',
+            'properties' => [
+                'code' => ['type' => 'keyword'],
+                'name' => ['type' => 'keyword'],
+                'value' => ['type' => 'text'],
+            ],
+        ];
+
+        if ($productAttributeOrOption->isFilterable()) {
+            $properties['properties']['value']['fields'] = [
+                'keyword' => ['type' => 'keyword'],
+            ];
+        }
+
+        if ($productAttributeOrOption->isSearchable()) {
+            $properties['properties']['value']['analyzer'] = $this->fieldAnalyzer;
+        }
+
+        return $properties;
     }
 }

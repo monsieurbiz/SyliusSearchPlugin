@@ -2,7 +2,7 @@ sylius_ui:
   events:
     sylius.shop.layout.javascripts:
       blocks:
-        monsieurbiz_toolbox_javascripts:
+        monsieurbiz_search_javascripts:
           template: "@MonsieurBizSyliusSearchPlugin/_scripts.html.twig"
     sylius.shop.layout.header.content:
       blocks:

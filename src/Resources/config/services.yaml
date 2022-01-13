@@ -71,22 +71,22 @@ services:
 
   # Define aggregation builders
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\MainTaxonAggregation:
-    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\TaxonsAggregation:
-    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\PriceAggregation:
-    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\ProductAttributesAggregation:
-    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\ProductOptionsAggregation:
-    tags: { name: 'monsieurbiz.sarch.aggregation_builder' }
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder:
-    arguments: [ !tagged_iterator { tag: 'monsieurbiz.sarch.aggregation_builder' } ]
+    arguments: [ !tagged_iterator { tag: 'monsieurbiz.search.aggregation_builder' } ]
 
   # Define query filters
   MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry:

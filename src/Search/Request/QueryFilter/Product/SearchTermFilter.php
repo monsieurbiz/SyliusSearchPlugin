@@ -20,19 +20,21 @@ use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterfac
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 
 final class SearchTermFilter implements QueryFilterInterface
 {
     private ProductAttributeRepositoryInterface $productAttributeRepository;
     private ProductOptionRepositoryInterface $productOptionRepository;
+    private array $fieldsToSearch;
 
     public function __construct(
         ProductAttributeRepositoryInterface $productAttributeRepository,
-        ProductOptionRepositoryInterface $productOptionRepository
+        ProductOptionRepositoryInterface $productOptionRepository,
+        array $fieldsToSearch
     ) {
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
+        $this->fieldsToSearch = $fieldsToSearch;
     }
 
     public function apply(BoolQuery $boolQuery, RequestConfiguration $requestConfiguration): void
@@ -41,29 +43,28 @@ final class SearchTermFilter implements QueryFilterInterface
 
         $searchCode = $qb->query()->term(['code' => $requestConfiguration->getQueryText()]);
 
-        $nameAndDescriptionQuery = $qb->query()->multi_match();
-        $fieldsToSearch = [
-            'name^5', // todo configuration
-            'description', // move to should ? score impact but not include in result
-        ];
-        if (RequestInterface::INSTANT_TYPE === $requestConfiguration->getType()) {
-            $fieldsToSearch[] = 'name.autocomplete';
-        }
-        $nameAndDescriptionQuery->setFields($fieldsToSearch);
-        $nameAndDescriptionQuery->setQuery($requestConfiguration->getQueryText());
-        $nameAndDescriptionQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
-        $nameAndDescriptionQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
-
         $searchQuery = $qb->query()->bool();
-        $searchQuery
-            ->addShould($searchCode)
-            ->addShould($nameAndDescriptionQuery)
-        ;
+        $searchQuery->addShould($searchCode);
+        $this->addFieldsToSearchCondition($searchQuery, $requestConfiguration);
 
         $this->addAttributesQueries($searchQuery, $requestConfiguration);
         $this->addOptionsQueries($searchQuery, $requestConfiguration);
 
         $boolQuery->addMust($searchQuery);
+    }
+
+    private function addFieldsToSearchCondition(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
+    {
+        if (0 === \count($this->fieldsToSearch)) {
+            return;
+        }
+        $qb = new QueryBuilder();
+        $nameAndDescriptionQuery = $qb->query()->multi_match();
+        $nameAndDescriptionQuery->setFields($this->fieldsToSearch);
+        $nameAndDescriptionQuery->setQuery($requestConfiguration->getQueryText());
+        $nameAndDescriptionQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
+        $nameAndDescriptionQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
+        $searchQuery->addShould($nameAndDescriptionQuery);
     }
 
     private function addAttributesQueries(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void

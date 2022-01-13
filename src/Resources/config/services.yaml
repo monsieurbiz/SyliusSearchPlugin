@@ -95,10 +95,34 @@ services:
     arguments: [ !tagged_iterator { tag: 'monsieurbiz.search.aggregation_builder' } ]
 
   # Define query filters
+  monsieurbiz.search.request.query_filter.product_search.search_term_filter:
+    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
+    arguments:
+      $fieldsToSearch:
+        - 'name^5'
+        - 'description'
+
+  monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
+    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
+    arguments:
+      $fieldsToSearch:
+        - 'name^5'
+        - 'description'
+        - 'name.autocomplete'
+
   MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry:
     arguments:
       - [
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter',
+          '@monsieurbiz.search.request.query_filter.product_search.search_term_filter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter'
+      ]
+
+  monsieurbiz.search.request.query_filter.product_instant_search_registry:
+    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry
+    arguments:
+      - [
+          '@monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter',
           '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
           '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter'
       ]
@@ -141,7 +165,7 @@ services:
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\InstantSearch:
     arguments:
-      $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry'
+      $queryFilterRegistry: '@monsieurbiz.search.request.query_filter.product_instant_search_registry'
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Taxon:
     arguments:

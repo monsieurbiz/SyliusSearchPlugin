@@ -16,6 +16,10 @@ mappings:
       fields:
         keyword:
           type: keyword
+        autocomplete:
+          type: text
+          analyzer: search_autocomplete
+          search_analyzer: standard
     created_at:
       type: date
     description:

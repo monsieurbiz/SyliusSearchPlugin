@@ -20,6 +20,7 @@ use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterfac
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 
 final class SearchTermFilter implements QueryFilterInterface
 {
@@ -41,10 +42,14 @@ final class SearchTermFilter implements QueryFilterInterface
         $searchCode = $qb->query()->term(['code' => $requestConfiguration->getQueryText()]);
 
         $nameAndDescriptionQuery = $qb->query()->multi_match();
-        $nameAndDescriptionQuery->setFields([
+        $fieldsToSearch = [
             'name^5', // todo configuration
             'description', // move to should ? score impact but not include in result
-        ]);
+        ];
+        if (RequestInterface::INSTANT_TYPE === $requestConfiguration->getType()) {
+            $fieldsToSearch[] = 'name.autocomplete';
+        }
+        $nameAndDescriptionQuery->setFields($fieldsToSearch);
         $nameAndDescriptionQuery->setQuery($requestConfiguration->getQueryText());
         $nameAndDescriptionQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
         $nameAndDescriptionQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);

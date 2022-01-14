@@ -85,7 +85,7 @@ class Response implements ResponseInterface
         array_map(function($aggregationCode, $aggregationData): void {
             foreach ($this->filterBuilders as $filterBuilder) {
                 if (null !== $filter = $filterBuilder->build($this->getDocumentable(), $this->requestConfiguration, $aggregationCode, $aggregationData)) {
-                    $this->filters[$filterBuilder->getPosition()] = $filter;
+                    $this->filters[$filterBuilder->getPosition()][] = $filter;
                 }
             }
         }, array_keys($aggregations), $aggregations);
@@ -97,6 +97,6 @@ class Response implements ResponseInterface
                 $result[] = $filter;
             }
         }
-        $this->filters = $result;
+        $this->filters = array_merge(...$result);
     }
 }

@@ -21,24 +21,28 @@ use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
-use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
     private Configuration $configuration;
     private AutoMapperInterface $autoMapper;
     private ProductVariantResolverInterface $productVariantResolver;
+    private RequestStack $requestStack;
 
     public function __construct(
         Configuration $configuration,
         AutoMapperInterface $autoMapper,
-        ProductVariantResolverInterface $productVariantResolver
+        ProductVariantResolverInterface $productVariantResolver,
+        RequestStack $requestStack
     ) {
         $this->configuration = $configuration;
         $this->autoMapper = $autoMapper;
         // todo change the resolver from the configuration
         $this->productVariantResolver = $productVariantResolver;
+        $this->requestStack = $requestStack;
     }
 
     public function process(MapperGeneratorMetadataInterface $metadata): void
@@ -132,10 +136,17 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
         $metadata->forMember('prices', function(ProductInterface $product): array {
             $prices = [];
-            /** @var ProductVariantInterface $variant */
-            $variant = $this->productVariantResolver->getVariant($product);
-            foreach ($variant->getChannelPricings() as $channelPricing) {
-                $prices[] = $this->autoMapper->map($channelPricing, $this->configuration->getTargetClass('pricing'));
+            foreach ($product->getChannels() as $channel) {
+                $request = new Request(['_channel_code' => $channel->getCode()]);
+                $this->requestStack->push($request);
+                if (null === ($variant = $this->productVariantResolver->getVariant($product))) {
+                    continue;
+                }
+                $this->requestStack->pop();
+                $prices[] = $this->autoMapper->map(
+                    $variant->getChannelPricingForChannel($channel),
+                    $this->configuration->getTargetClass('pricing')
+                );
             }
 
             return $prices;

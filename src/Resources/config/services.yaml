@@ -12,7 +12,7 @@ services:
     bind:
       Sylius\Bundle\ResourceBundle\Controller\ParametersParserInterface: '@sylius.resource_controller.parameters_parser'
       $localeProvider: '@sylius.translation_locale_provider'
-      $productVariantResolver: '@sylius.product_variant_resolver.default'
+      $productVariantResolver: '@MonsieurBiz\SyliusSearchPlugin\Resolver\CheapestProductVariantResolver'
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
       $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
 

@@ -2,6 +2,7 @@ parameters:
   monsieurbiz.search.model.documentable.interface: MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface
   monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface
   monsieurbiz.search.product_attribute_analyzer: 'search_standard'
+  monsieurbiz.search.product.enable_stock_filter: false
 
 services:
 
@@ -15,6 +16,7 @@ services:
       $productVariantResolver: '@MonsieurBiz\SyliusSearchPlugin\Resolver\CheapestProductVariantResolver'
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
       $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
+      $enableStockFilter: '%monsieurbiz.search.product.enable_stock_filter%'
 
   _instanceof:
     MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\ReaderInterface:
@@ -115,7 +117,8 @@ services:
       - [
           '@monsieurbiz.search.request.query_filter.product_search.search_term_filter',
           '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter'
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
       ]
 
   monsieurbiz.search.request.query_filter.product_instant_search_registry:
@@ -124,7 +127,8 @@ services:
       - [
           '@monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter',
           '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter'
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
       ]
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry:
@@ -132,7 +136,8 @@ services:
       - [
           '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
           '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\TaxonFilter'
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\TaxonFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
       ]
 
   # Define post filters

@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
-use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\Documentable;
+use InvalidArgumentException;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -39,7 +40,9 @@ class DocumentableRegistryPass implements CompilerPassInterface
 
         foreach ($documentables as $indexCode => $documentableConfiguration) {
             $documentableServiceId = 'search.documentable.' . $indexCode;
-            $documentableDefinition = (new Definition(Documentable::class)) // TODO - move into config
+            $documentableClass = $documentableConfiguration['document_class'];
+            $this->validateDocumentableResource($documentableClass);
+            $documentableDefinition = (new Definition($documentableClass))
                 ->setAutowired(true)
                 ->setArguments([
                     '$indexCode' => $indexCode,
@@ -65,5 +68,17 @@ class DocumentableRegistryPass implements CompilerPassInterface
         }
 
         $container->setParameter('monsieurbiz.settings.config.plugins', $searchSettings);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function validateDocumentableResource(string $class): void
+    {
+        $interfaces = (array) (class_implements($class) ?? []);
+
+        if (!\in_array(DocumentableInterface::class, $interfaces, true)) {
+            throw new InvalidArgumentException(sprintf('Class "%s" must implement "%s" to be registered as a Documentable.', $class, DocumentableInterface::class));
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
 use MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider;
 use MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\Documentable;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -34,6 +35,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([])
                     ->arrayPrototype()
                         ->children()
+                            ->scalarNode('document_class')->defaultValue(Documentable::class)->end()
                             ->scalarNode('instant_search_enabled')->defaultValue(false)->end()
                             ->scalarNode('source')->isRequired()->cannotBeEmpty()->end()
                             ->scalarNode('target')->isRequired()->cannotBeEmpty()->end()

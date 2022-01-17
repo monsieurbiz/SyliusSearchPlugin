@@ -44,20 +44,6 @@ final class VariantMapperConfiguration implements MapperConfigurationInterface
 
             return $this->availabilityChecker->isStockAvailable($productVariant);
         });
-
-        $metadata->forMember('options', function(ProductVariantInterface $productVariant): array {
-            $currentLocale = $productVariant->getTranslation()->getLocale();
-            $options = [];
-            foreach ($productVariant->getOptionValues() as $optionValue) {
-                $options[$optionValue->getOptionCode()] = [
-                    'name' => $optionValue->getName(),
-                    'code' => $optionValue->getCode(),
-                    'value' => $optionValue->getTranslation($currentLocale)->getValue(),
-                ];
-            }
-
-            return $options;
-        });
     }
 
     public function getSource(): string

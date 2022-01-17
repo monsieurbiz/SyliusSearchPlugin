@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
 use Elastica\Query\AbstractQuery;
+use Elastica\QueryBuilder;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 
 final class ProductOptionsAggregation implements AggregationBuilderInterface
@@ -31,7 +32,7 @@ final class ProductOptionsAggregation implements AggregationBuilderInterface
             return null;
         }
 
-        $qb = new \Elastica\QueryBuilder();
+        $qb = new QueryBuilder();
         $currentFilters = array_filter($filters, function(AbstractQuery $filter): bool {
             return !$filter->hasParam('path') || false === strpos($filter->getParam('path'), 'options.');
         });
@@ -40,7 +41,7 @@ final class ProductOptionsAggregation implements AggregationBuilderInterface
             $filterQuery->addMust($filter);
         }
 
-        $optionsAggregation = $qb->aggregation()->nested('options', 'variants.options');
+        $optionsAggregation = $qb->aggregation()->nested('options', 'options');
         foreach ($aggregation as $subAggregation) {
             $subAggregationObject = $this->productOptionAggregationBuilder->build($subAggregation, $filters);
             if (null === $subAggregationObject) {

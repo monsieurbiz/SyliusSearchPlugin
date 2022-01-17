@@ -18,7 +18,7 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\FilterBuilderInterface;
 
-class AttributeFilterBuilder implements FilterBuilderInterface
+class OptionFilterBuilder implements FilterBuilderInterface
 {
     public function build(
         DocumentableInterface $documentable,
@@ -26,7 +26,7 @@ class AttributeFilterBuilder implements FilterBuilderInterface
         string $aggregationCode,
         array $aggregationData
     ): ?array {
-        if ('monsieurbiz_product' !== $documentable->getIndexCode() || 'attributes' !== $aggregationCode) {
+        if ('monsieurbiz_product' !== $documentable->getIndexCode() || 'options' !== $aggregationCode) {
             return null;
         }
 
@@ -40,7 +40,7 @@ class AttributeFilterBuilder implements FilterBuilderInterface
             }
             $attributeNameBuckets = $attributeAggregation['names']['buckets'] ?? [];
             foreach ($attributeNameBuckets as $attributeNameBucket) {
-                $attributeValueBuckets = $attributeNameBucket['values']['buckets'] ?? [];
+                $attributeValueBuckets = $attributeNameBucket['values']['values']['values']['buckets'] ?? [];
                 $filter = new Filter(
                     $requestConfiguration,
                     $attributeCode,

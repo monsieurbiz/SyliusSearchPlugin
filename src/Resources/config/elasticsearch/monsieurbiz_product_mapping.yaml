@@ -2,6 +2,7 @@ mappings:
   dynamic: false
   properties:
     # attributes mapping is managed dynamically
+    # options mapping is managed dynamically
     code:
       type: keyword
     enabled:
@@ -70,8 +71,9 @@ mappings:
     variants:
       type: nested
       properties:
+        code:
+          type: keyword
         enabled:
           type: boolean
         is_in_stock:
           type: boolean
-        # variant options mapping is managed dynamically

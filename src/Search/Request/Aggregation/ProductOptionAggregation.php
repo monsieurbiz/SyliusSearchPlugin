@@ -13,12 +13,20 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
+use Elastica\Query\AbstractQuery;
 use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 
 final class ProductOptionAggregation implements AggregationBuilderInterface
 {
+    private bool $enableStockFilter;
+
+    public function __construct(bool $enableStockFilter)
+    {
+        $this->enableStockFilter = $enableStockFilter;
+    }
+
     public function build($aggregation, array $filters)
     {
         /** @var ProductOptionInterface&SearchableInterface $aggregation */
@@ -28,10 +36,10 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
 
         $qb = new QueryBuilder();
 
-        $filters = array_filter($filters, function($filter) use ($aggregation): bool {
+        $filters = array_filter($filters, function(AbstractQuery $filter) use ($aggregation): bool {
             return !$filter->hasParam('path') || (
                     false !== strpos($filter->getParam('path'), 'options.')
-                    && 'variants.options.' . $aggregation->getCode() !== $filter->getParam('path')
+                    && 'options.' . $aggregation->getCode() . '.values' !== $filter->getParam('path')
                 );
         });
 
@@ -41,17 +49,31 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
         }
 
         $qb = new QueryBuilder();
+        $optionBoolConditions = $qb->query()->bool()
+                ->addMust($qb->query()->term([sprintf('options.%s.values.enabled', $aggregation->getCode()) => ['value' => true]]))
+        ;
+        if ($this->enableStockFilter) {
+            $optionBoolConditions->addMust($qb->query()->term([sprintf('options.%s.values.is_in_stock', $aggregation->getCode()) => ['value' => true]]));
+        }
+        $valuesAggregation = $qb->aggregation()->filter('values', $optionBoolConditions)
+            ->addAggregation(
+                $qb->aggregation()->terms('values')
+                    ->setField(sprintf('options.%s.values.value.keyword', $aggregation->getCode()))
+            )
+        ;
 
         return $qb->aggregation()->filter($aggregation->getCode())
             ->setFilter($filterQuery)
             ->addAggregation(
-                $qb->aggregation()->nested($aggregation->getCode(), sprintf('variants.options.%s', $aggregation->getCode()))
+                $qb->aggregation()->nested($aggregation->getCode(), sprintf('options.%s', $aggregation->getCode()))
                     ->addAggregation(
                         $qb->aggregation()->terms('names')
-                            ->setField(sprintf('variants.options.%s.name', $aggregation->getCode()))
+                            ->setField(sprintf('options.%s.name', $aggregation->getCode()))
                             ->addAggregation(
-                                $qb->aggregation()->terms('values')
-                                    ->setField(sprintf('variants.options.%s.value.keyword', $aggregation->getCode()))
+                                $qb->aggregation()->nested('values', sprintf('options.%s.values', $aggregation->getCode()))
+                                    ->addAggregation(
+                                        $valuesAggregation
+                                    )
                             )
                     )
             )

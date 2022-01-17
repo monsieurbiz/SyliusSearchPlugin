@@ -21,6 +21,9 @@ use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
+use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
+use Sylius\Component\Inventory\Model\StockableInterface;
+use Sylius\Component\Product\Model\ProductVariantInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -31,18 +34,21 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
     private AutoMapperInterface $autoMapper;
     private ProductVariantResolverInterface $productVariantResolver;
     private RequestStack $requestStack;
+    private AvailabilityCheckerInterface $availabilityChecker;
 
     public function __construct(
         Configuration $configuration,
         AutoMapperInterface $autoMapper,
         ProductVariantResolverInterface $productVariantResolver,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AvailabilityCheckerInterface $availabilityChecker
     ) {
         $this->configuration = $configuration;
         $this->autoMapper = $autoMapper;
         // todo change the resolver from the configuration
         $this->productVariantResolver = $productVariantResolver;
         $this->requestStack = $requestStack;
+        $this->availabilityChecker = $availabilityChecker;
     }
 
     public function process(MapperGeneratorMetadataInterface $metadata): void
@@ -124,6 +130,37 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $attributes;
         });
 
+        $metadata->forMember('options', function(ProductInterface $product): array {
+            $options = [];
+            $currentLocale = $product->getTranslation()->getLocale();
+            foreach ($product->getVariants() as $variant) {
+                foreach ($variant->getOptionValues() as $optionValue) {
+                    if (!isset($options[$optionValue->getOptionCode()])) {
+                        $options[$optionValue->getOptionCode()] = [
+                            'name' => $optionValue->getOption()->getTranslation($currentLocale)->getName(),
+                            'values' => [],
+                        ];
+                    }
+                    $isEnabled = ($options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()]['enabled'] ?? false)
+                        || $variant->isEnabled();
+                    // A variant option is considered to be in stock if the current option is enabled and is in stock
+                    $isInStock = ($options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()]['is_in_stock'] ?? false)
+                        || ($variant->isEnabled() && $this->isProductVariantInStock($variant));
+                    $options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()] = [
+                        'value' => $optionValue->getTranslation($currentLocale)->getValue(),
+                        'enabled' => $isEnabled,
+                        'is_in_stock' => $isInStock,
+                    ];
+                }
+            }
+
+            foreach ($options as $optionCode => $optionValues) {
+                $options[$optionCode]['values'] = array_values($optionValues['values']);
+            }
+
+            return $options;
+        });
+
         $metadata->forMember('variants', function(ProductInterface $product): array {
             $variants = [];
             $productVariantDTOClass = $this->configuration->getTargetClass('product_variant');
@@ -161,5 +198,14 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
     public function getTarget(): string
     {
         return $this->configuration->getTargetClass('product');
+    }
+
+    private function isProductVariantInStock(ProductVariantInterface $productVariant): bool
+    {
+        if (!$productVariant instanceof StockableInterface) {
+            return true;
+        }
+
+        return $this->availabilityChecker->isStockAvailable($productVariant);
     }
 }

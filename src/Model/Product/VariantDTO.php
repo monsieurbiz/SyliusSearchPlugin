@@ -17,6 +17,16 @@ use Jacquesbh\Eater\Eater;
 
 final class VariantDTO extends Eater
 {
+    public function getCode(): ?string
+    {
+        return $this->getData('code');
+    }
+
+    public function setCode(string $code): void
+    {
+        $this->setData('code', $code);
+    }
+
     /**
      * @return bool
      */

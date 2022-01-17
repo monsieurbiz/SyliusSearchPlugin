@@ -54,7 +54,7 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
         $mappings = $mapping->offsetGet('mappings');
         $attributesMapping = [];
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
-            $attributesMapping[$productAttribute->getCode()] = $this->getProductAttributeOrOptionProperties($productAttribute);
+            $attributesMapping[$productAttribute->getCode()] = $this->getProductAttributeProperties($productAttribute);
         }
         if (0 < \count($attributesMapping)) {
             $mappings['properties']['attributes'] = [
@@ -65,10 +65,10 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
 
         $optionsMapping = [];
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
-            $optionsMapping[$productOption->getCode()] = $this->getProductAttributeOrOptionProperties($productOption);
+            $optionsMapping[$productOption->getCode()] = $this->getProductOptionProperties($productOption);
         }
         if (0 < \count($optionsMapping)) {
-            $mappings['properties']['variants']['properties']['options'] = [
+            $mappings['properties']['options'] = [
                 'type' => 'nested',
                 'properties' => $optionsMapping,
             ];
@@ -77,7 +77,7 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
         $mapping->offsetSet('mappings', $mappings);
     }
 
-    private function getProductAttributeOrOptionProperties(SearchableInterface $productAttributeOrOption): array
+    private function getProductAttributeProperties(SearchableInterface $productAttribute): array
     {
         $properties = [
             'type' => 'nested',
@@ -88,14 +88,45 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
             ],
         ];
 
-        if ($productAttributeOrOption->isFilterable()) {
+        if ($productAttribute->isFilterable()) {
             $properties['properties']['value']['fields'] = [
                 'keyword' => ['type' => 'keyword'],
             ];
         }
 
-        if ($productAttributeOrOption->isSearchable()) {
+        if ($productAttribute->isSearchable()) {
             $properties['properties']['value']['analyzer'] = $this->fieldAnalyzer;
+        }
+
+        return $properties;
+    }
+
+    private function getProductOptionProperties(SearchableInterface $productOption): array
+    {
+        $properties = [
+            'type' => 'nested',
+            'properties' => [
+                'code' => ['type' => 'keyword'],
+                'name' => ['type' => 'keyword'],
+                'values' => [
+                    'type' => 'nested',
+                    'properties' => [
+                        'value' => ['type' => 'text'],
+                        'enabled' => ['type' => 'boolean'],
+                        'is_in_stock' => ['type' => 'boolean'],
+                    ],
+                ],
+            ],
+        ];
+
+        if ($productOption->isFilterable()) {
+            $properties['properties']['values']['properties']['value']['fields'] = [
+                'keyword' => ['type' => 'keyword'],
+            ];
+        }
+
+        if ($productOption->isSearchable()) {
+            $properties['properties']['values']['properties']['value']['analyzer'] = $this->fieldAnalyzer;
         }
 
         return $properties;

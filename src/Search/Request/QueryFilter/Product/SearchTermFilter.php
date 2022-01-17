@@ -99,13 +99,13 @@ final class SearchTermFilter implements QueryFilterInterface
 
             $attributeValueQuery = $qb->query()->multi_match();
             $attributeValueQuery->setFields([
-                sprintf('variants.options.%s.value^%d', $productOption->getCode(), $productOption->getSearchWeight()),
+                sprintf('options.%s.values.value^%d', $productOption->getCode(), $productOption->getSearchWeight()),
             ]);
             $attributeValueQuery->setQuery($requestConfiguration->getQueryText());
             $attributeValueQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
 
             $attributeQuery = $qb->query()->nested();
-            $attributeQuery->setPath(sprintf('variants.options.%s', $productOption->getCode()))->setQuery($attributeValueQuery);
+            $attributeQuery->setPath(sprintf('options.%s.values', $productOption->getCode()))->setQuery($attributeValueQuery);
 
             $searchQuery->addShould($attributeQuery);
         }

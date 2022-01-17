@@ -185,5 +185,6 @@ services:
         product_main_taxon: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\MainTaxonFilterBuilder',
         product_taxons: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\TaxonsFilterBuilder',
         product_price: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\PriceFilterBuilder',
-        product_attribute: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\AttributeFilterBuilder'
+        product_attribute: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\AttributeFilterBuilder',
+        product_option: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\OptionFilterBuilder'
       }

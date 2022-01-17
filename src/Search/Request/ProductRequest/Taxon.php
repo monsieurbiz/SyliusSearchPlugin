@@ -19,6 +19,7 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterRegistryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterRegistryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
@@ -38,6 +39,7 @@ final class Taxon implements RequestInterface
     private QueryFilterRegistryInterface $queryFilterRegistry;
     private PostFilterRegistryInterface $postFilterRegistry;
     private SorterRegistryInterface $sorterRegistry;
+    private FunctionScoreRegistryInterface $functionScoreRegistry;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
@@ -47,7 +49,8 @@ final class Taxon implements RequestInterface
         AggregationBuilder $aggregationBuilder,
         QueryFilterRegistryInterface $queryFilterRegistry,
         PostFilterRegistryInterface $postFilterRegistry,
-        SorterRegistryInterface $sorterRegistry
+        SorterRegistryInterface $sorterRegistry,
+        FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
         $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->productAttributeRepository = $productAttributeRepository;
@@ -57,6 +60,7 @@ final class Taxon implements RequestInterface
         $this->queryFilterRegistry = $queryFilterRegistry;
         $this->postFilterRegistry = $postFilterRegistry;
         $this->sorterRegistry = $sorterRegistry;
+        $this->functionScoreRegistry = $functionScoreRegistry;
     }
 
     public function getType(): string
@@ -91,7 +95,16 @@ final class Taxon implements RequestInterface
             $sorter->apply($query, $this->configuration);
         }
 
-        dump(json_encode($query->toArray(), 1));
+        $functionScore = $qb->query()->function_score()
+            ->setQuery($query->getQuery())
+            ->setBoostMode(Query\FunctionScore::BOOST_MODE_MULTIPLY)
+            ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
+        ;
+        foreach ($this->functionScoreRegistry->all() as $functionScoreClass) {
+            $functionScoreClass->addFunctionScore($functionScore, $this->configuration);
+        }
+
+        $query->setQuery($functionScore);
 
         return $query;
     }

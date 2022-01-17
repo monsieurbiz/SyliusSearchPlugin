@@ -31,7 +31,7 @@ final class PositionSorter implements SorterInterface
             return;
         }
 
-        $sort = $this->buildSort('_score', 'desc');
+        $query->addSort($this->buildSort('_score', 'desc'));
         if (RequestInterface::TAXON_TYPE == $requestConfiguration->getType()) {
             $qb = new QueryBuilder();
             $filter = $qb->query()->nested()
@@ -40,9 +40,7 @@ final class PositionSorter implements SorterInterface
                     $qb->query()->term(['product_taxons.taxon.code' => ['value' => $requestConfiguration->getTaxon()->getCode()]])
                 )
             ;
-            $sort = $this->buildSort('product_taxons.position', 'asc', 'product_taxons', null, $filter);
+            $query->addSort($this->buildSort('product_taxons.position', 'asc', 'product_taxons', null, $filter));
         }
-
-        $query->addSort($sort);
     }
 }

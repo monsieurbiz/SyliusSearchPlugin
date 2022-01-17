@@ -16,6 +16,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest;
 use Elastica\Query;
 use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterRegistryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
@@ -27,13 +28,16 @@ final class InstantSearch implements RequestInterface
     private DocumentableInterface $documentable;
     private ?RequestConfiguration $configuration;
     private QueryFilterRegistryInterface $queryFilterRegistry;
+    private FunctionScoreRegistryInterface $functionScoreRegistry;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
-        QueryFilterRegistryInterface $queryFilterRegistry
+        QueryFilterRegistryInterface $queryFilterRegistry,
+        FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
         $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->queryFilterRegistry = $queryFilterRegistry;
+        $this->functionScoreRegistry = $functionScoreRegistry;
     }
 
     public function getType(): string
@@ -58,7 +62,20 @@ final class InstantSearch implements RequestInterface
             $queryFilter->apply($boolQuery, $this->configuration);
         }
 
-        return Query::create($boolQuery);
+        $query = Query::create($boolQuery);
+
+        $functionScore = $qb->query()->function_score()
+            ->setQuery($query->getQuery())
+            ->setBoostMode(Query\FunctionScore::BOOST_MODE_MULTIPLY)
+            ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
+        ;
+        foreach ($this->functionScoreRegistry->all() as $functionScoreClass) {
+            $functionScoreClass->addFunctionScore($functionScore, $this->configuration);
+        }
+
+        $query->setQuery($functionScore);
+
+        return $query;
     }
 
     public function supports(string $type, string $documentableCode): bool

@@ -3,6 +3,11 @@ parameters:
   monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface
   monsieurbiz.search.product_attribute_analyzer: 'search_standard'
   monsieurbiz.search.product.enable_stock_filter: false
+  monsieurbiz.search.product.is_in_stock_scoring_boost: 0 # The value is used to multiply the document score (0 to disable the scoring boost)
+  monsieurbiz.search.product.apply_is_in_stock_scoring_boost_on:
+      - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::SEARCH_TYPE
+      - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::TAXON_TYPE
+      - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::INSTANT_TYPE
 
 services:
 
@@ -159,6 +164,18 @@ services:
         '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PriceSorter',
         '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\NameSorter',
         '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\CreatedAtSorter',
+      ]
+
+  # Functions score
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\Product\InStockWeightFunction:
+    arguments:
+      $inStockWeight: '%monsieurbiz.search.product.is_in_stock_scoring_boost%'
+      $applyOnRequestTypes: '%monsieurbiz.search.product.apply_is_in_stock_scoring_boost_on%'
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\ProductFunctionScoreRegistry:
+    arguments:
+      - [
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\Product\InStockWeightFunction'
       ]
 
   # Define the product queries

@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
+use MonsieurBiz\SyliusSearchPlugin\Exception\ObjectNotInstanceOfClassException;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
 use Sylius\Bundle\ResourceBundle\Controller\Parameters;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 
 final class RequestConfiguration
@@ -29,7 +31,7 @@ final class RequestConfiguration
     private DocumentableInterface $documentable;
     private SettingsInterface $searchSettings;
     private ChannelContextInterface $channelContext;
-    private ?Parameters $parameters;
+    private Parameters $parameters;
 
     public function __construct(
         Request $request,
@@ -107,7 +109,14 @@ final class RequestConfiguration
 
     public function getTaxon(): TaxonInterface
     {
-        // todo throw exception if not exist
+        if (!$this->parameters->has('taxon')) {
+            throw new ParameterNotFoundException('taxon');
+        }
+        $taxon = $this->parameters->get('taxon');
+        if (!$taxon instanceof TaxonInterface) {
+            throw ObjectNotInstanceOfClassException::fromClassName(TaxonInterface::class);
+        }
+
         return $this->parameters->get('taxon');
     }
 }

@@ -50,7 +50,6 @@ final class Search implements RequestInterface
         SorterRegistryInterface $sorterRegistry,
         FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
-        //TODO check if exist, return a dummy documentable if not
         $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;

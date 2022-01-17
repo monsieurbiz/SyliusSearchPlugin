@@ -45,7 +45,6 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
     ) {
         $this->configuration = $configuration;
         $this->autoMapper = $autoMapper;
-        // todo change the resolver from the configuration
         $this->productVariantResolver = $productVariantResolver;
         $this->requestStack = $requestStack;
         $this->availabilityChecker = $availabilityChecker;

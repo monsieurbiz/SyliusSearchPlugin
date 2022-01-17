@@ -52,11 +52,11 @@ final class RequestConfiguration
         return $this->request->get('query', '');
     }
 
-    public function getAppliedFilters($type = null): array
+    public function getAppliedFilters(string $type = null): array
     {
         $requestQuery = $this->request->query->all();
-        $requestQuery = array_map(function($query): ?array {
-            return array_filter($query);
+        $requestQuery = array_map(function($query) {
+            return \is_array($query) ? array_filter($query) : $query;
         }, $requestQuery);
 
         return null !== $type ? ($requestQuery[$type] ?? []) : $requestQuery;

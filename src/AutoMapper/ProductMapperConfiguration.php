@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper;
 
+use DateTimeInterface;
 use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
@@ -21,6 +22,7 @@ use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface as ModelProductVariantInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Inventory\Model\StockableInterface;
 use Sylius\Component\Product\Model\ProductVariantInterface;
@@ -80,7 +82,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $product->getDescription();
         });
 
-        $metadata->forMember('created_at', function(ProductInterface $product) {
+        $metadata->forMember('created_at', function(ProductInterface $product): ?DateTimeInterface {
             return $product->getCreatedAt();
         });
 
@@ -95,7 +97,9 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         });
 
         $metadata->forMember('mainTaxon', function(ProductInterface $product) {
-            return $product->getMainTaxon() ? $this->autoMapper->map($product->getMainTaxon(), $this->configuration->getTargetClass('taxon')) : null;
+            return null !== $product->getMainTaxon()
+                ? $this->autoMapper->map($product->getMainTaxon(), $this->configuration->getTargetClass('taxon'))
+                : null;
         });
 
         $metadata->forMember('product_taxons', function(ProductInterface $product): array {
@@ -114,6 +118,9 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         $metadata->forMember('attributes', function(ProductInterface $product): array {
             $attributes = [];
             $currentLocale = $product->getTranslation()->getLocale();
+            if (null === $currentLocale) {
+                return $attributes;
+            }
             $productAttributeDTOClass = $this->configuration->getTargetClass('product_attribute');
             foreach ($product->getAttributesByLocale($currentLocale, $currentLocale) as $attributeValue) {
                 if (null === $attributeValue->getName() || null === $attributeValue->getValue()) {
@@ -134,6 +141,9 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             $currentLocale = $product->getTranslation()->getLocale();
             foreach ($product->getVariants() as $variant) {
                 foreach ($variant->getOptionValues() as $optionValue) {
+                    if (null === $optionValue->getOption()) {
+                        continue;
+                    }
                     if (!isset($options[$optionValue->getOptionCode()])) {
                         $options[$optionValue->getOptionCode()] = [
                             'name' => $optionValue->getOption()->getTranslation($currentLocale)->getName(),
@@ -173,14 +183,20 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         $metadata->forMember('prices', function(ProductInterface $product): array {
             $prices = [];
             foreach ($product->getChannels() as $channel) {
+                /** @var ChannelInterface $channel */
                 $request = new Request(['_channel_code' => $channel->getCode()]);
                 $this->requestStack->push($request);
-                if (null === ($variant = $this->productVariantResolver->getVariant($product))) {
+                if (
+                    null === ($variant = $this->productVariantResolver->getVariant($product))
+                    || !$variant instanceof ModelProductVariantInterface
+                    || null === ($channelPricing = $variant->getChannelPricingForChannel($channel))
+                ) {
+                    $this->requestStack->pop();
                     continue;
                 }
                 $this->requestStack->pop();
                 $prices[] = $this->autoMapper->map(
-                    $variant->getChannelPricingForChannel($channel),
+                    $channelPricing,
                     $this->configuration->getTargetClass('pricing')
                 );
             }

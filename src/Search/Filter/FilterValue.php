@@ -17,16 +17,8 @@ use MonsieurBiz\SyliusSearchPlugin\Helper\SlugHelper;
 
 class FilterValue
 {
-    /**
-     * @var string
-     */
-    private $label;
-
-    /**
-     * @var int
-     */
-    private $count;
-
+    private string $label;
+    private int $count;
     private string $value;
     private bool $isApplied;
 
@@ -73,7 +65,7 @@ class FilterValue
         return $this->value;
     }
 
-    public function setValue($value): void
+    public function setValue(string $value): void
     {
         $this->value = $value;
     }

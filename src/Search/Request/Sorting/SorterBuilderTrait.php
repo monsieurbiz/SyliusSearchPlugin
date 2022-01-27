@@ -17,6 +17,9 @@ use Elastica\Query\AbstractQuery;
 
 trait SorterBuilderTrait
 {
+    /**
+     * @param string|AbstractQuery|null $sortFilterValue
+     */
     protected function buildSort(
         string $field,
         string $order,

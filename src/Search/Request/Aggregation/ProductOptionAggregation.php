@@ -62,9 +62,11 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
             )
         ;
 
+        /** @phpstan-ignore-next-line */
         return $qb->aggregation()->filter($aggregation->getCode())
             ->setFilter($filterQuery)
             ->addAggregation(
+                /** @phpstan-ignore-next-line */
                 $qb->aggregation()->nested($aggregation->getCode(), sprintf('options.%s', $aggregation->getCode()))
                     ->addAggregation(
                         $qb->aggregation()->terms('names')
@@ -80,8 +82,11 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
         ;
     }
 
+    /**
+     * @param string|array|object $aggregation
+     */
     private function isSupport($aggregation): bool
     {
-        return $aggregation instanceof ProductOptionInterface;
+        return $aggregation instanceof ProductOptionInterface && null !== $aggregation->getCode();
     }
 }

@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper;
 
 use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
+use Jane\Component\AutoMapper\MapperMetadata;
 use MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\ReaderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -49,11 +50,17 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
 
     public function process(MapperGeneratorMetadataInterface $metadata): void
     {
+        if (!$metadata instanceof MapperMetadata) {
+            return;
+        }
         if (0 === \count($this->productAttributeValueReaders)) {
             throw new RuntimeException('Undefined product attribute value reader');
         }
 
         $metadata->forMember('value', function(ProductAttributeValueInterface $productAttributeValue) {
+            if (null === $productAttributeValue->getType()) {
+                return null;
+            }
             if (!\array_key_exists($productAttributeValue->getType(), $this->productAttributeValueReaders)) {
                 $this->logger->alert(sprintf('Missing product attribute value reader for "%s" type', $productAttributeValue->getType()));
 

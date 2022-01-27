@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Event;
 
+use ArrayObject;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class MappingProviderEvent extends Event
@@ -20,9 +21,17 @@ class MappingProviderEvent extends Event
     public const EVENT_NAME = 'monsieurbiz.search.mapping.provider';
 
     private string $indexCode;
-    private ?\ArrayObject $mapping;
 
-    public function __construct(string $indexCode, ?\ArrayObject $mapping)
+    /**
+     * @var ArrayObject<string, array>|null
+     */
+    private ?ArrayObject $mapping;
+
+    /**
+     * @param string $indexCode
+     * @param ArrayObject<string, array>|null $mapping
+     */
+    public function __construct(string $indexCode, ?ArrayObject $mapping)
     {
         $this->indexCode = $indexCode;
         $this->mapping = $mapping;
@@ -33,7 +42,10 @@ class MappingProviderEvent extends Event
         return $this->indexCode;
     }
 
-    public function getMapping(): ?\ArrayObject
+    /**
+     * @return ArrayObject<string, array>|null
+     */
+    public function getMapping(): ?ArrayObject
     {
         return $this->mapping;
     }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Datasource;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Pagerfanta\Pagerfanta;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
@@ -28,10 +29,9 @@ class RepositoryDatasource implements DatasourceInterface
 
     public function getItems(string $sourceClass): iterable
     {
+        /** @phpstan-ignore-next-line */
         $repository = $this->entityManager->getRepository($sourceClass);
-        if ($repository instanceof RepositoryInterface) {
-            /** @var Pagerfanta $paginator */
-            $paginator = $repository->createPaginator();
+        if ($repository instanceof RepositoryInterface && ($paginator = $repository->createPaginator()) instanceof Pagerfanta) {
             $page = 1;
             while ($paginator->hasNextPage()) {
                 $paginator->setCurrentPage($page);
@@ -46,6 +46,6 @@ class RepositoryDatasource implements DatasourceInterface
             return null;
         }
 
-        return $repository->createQueryBuilder('o')->getQuery()->toIterable();
+        return $repository instanceof EntityRepository ? $repository->createQueryBuilder('o')->getQuery()->toIterable() : null;
     }
 }

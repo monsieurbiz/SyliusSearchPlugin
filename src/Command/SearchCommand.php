@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
 use Elastica\Exception\Connection\HttpException;
-use Jacquesbh\Eater\EaterInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Search;
@@ -69,10 +70,12 @@ class SearchCommand extends Command
         $query = $input->getArgument('query');
         $request = new Request(['query' => $query, '_channel_code' => $input->getOption('channel')]);
         $this->requestStack->push($request);
+        /** @var DocumentableInterface $documentable */
+        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::SEARCH_TYPE,
-            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $documentable,
             $this->searchSettings,
             $this->channelContext
         );
@@ -89,9 +92,9 @@ class SearchCommand extends Command
         $io->section('Nb results: ' . $result->count());
         $documents = [];
         foreach ($result->getIterator() as $resultItem) {
-            /** @var EaterInterface $productDTO */
+            /** @var ProductDTO $productDTO */
             $productDTO = $resultItem->getModel();
-            $documents[] = [$resultItem->getScore(), $productDTO->getId()];
+            $documents[] = [$resultItem->getScore(), $productDTO->getData('id')];
         }
         $io->table(['Score', 'Document ID'], $documents);
 

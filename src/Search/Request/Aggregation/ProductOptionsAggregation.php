@@ -42,9 +42,10 @@ final class ProductOptionsAggregation implements AggregationBuilderInterface
         }
 
         $optionsAggregation = $qb->aggregation()->nested('options', 'options');
+        /** @phpstan-ignore-next-line */
         foreach ($aggregation as $subAggregation) {
             $subAggregationObject = $this->productOptionAggregationBuilder->build($subAggregation, $filters);
-            if (null === $subAggregationObject) {
+            if (null === $subAggregationObject || false === $subAggregationObject) {
                 continue;
             }
             $optionsAggregation->addAggregation($subAggregationObject);
@@ -60,6 +61,9 @@ final class ProductOptionsAggregation implements AggregationBuilderInterface
         ;
     }
 
+    /**
+     * @param string|array|object $aggregation
+     */
     private function isSupport($aggregation): bool
     {
         if (!\is_array($aggregation)) {

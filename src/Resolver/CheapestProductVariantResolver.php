@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Resolver;
 
 use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface as ModelProductVariantInterface;
 use Sylius\Component\Product\Model\ProductInterface;
 use Sylius\Component\Product\Model\ProductVariantInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
@@ -29,7 +31,8 @@ class CheapestProductVariantResolver implements ProductVariantResolverInterface
 
     public function getVariant(ProductInterface $subject): ?ProductVariantInterface
     {
-        if ($subject->getEnabledVariants()->isEmpty()) {
+        $channel = $this->channelContext->getChannel();
+        if ($subject->getEnabledVariants()->isEmpty() || !$channel instanceof ChannelInterface) {
             return null;
         }
 
@@ -37,7 +40,10 @@ class CheapestProductVariantResolver implements ProductVariantResolverInterface
         $cheapestPrice = null;
         $variants = $subject->getEnabledVariants();
         foreach ($variants as $variant) {
-            if (null === ($channelPrice = $variant->getChannelPricingForChannel($this->channelContext->getChannel()))) {
+            if (!$variant instanceof ModelProductVariantInterface) {
+                continue;
+            }
+            if (null === ($channelPrice = $variant->getChannelPricingForChannel($channel))) {
                 continue;
             }
             if (null === $cheapestPrice || $channelPrice->getPrice() < $cheapestPrice) {

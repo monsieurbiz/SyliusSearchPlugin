@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\MessageHandler;
 
 use MonsieurBiz\SyliusSearchPlugin\Index\Indexer;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromIds;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -37,10 +38,12 @@ class ProductReindexFromIdsHandler implements MessageHandlerInterface
 
     public function __invoke(ProductReindexFromIds $message): void
     {
+        /** @var DocumentableInterface $documentable */
+        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
         $products = $this->productRepository->findBy(['id' => $message->getProductIds()]);
 
         $this->indexer->indexByDocuments(
-            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $documentable,
             $products
         );
     }

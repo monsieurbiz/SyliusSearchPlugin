@@ -35,7 +35,9 @@ final class InstantSearch implements RequestInterface
         QueryFilterRegistryInterface $queryFilterRegistry,
         FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
-        $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
+        /** @var DocumentableInterface $documentable */
+        $documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
+        $this->documentable = $documentable;
         $this->queryFilterRegistry = $queryFilterRegistry;
         $this->functionScoreRegistry = $functionScoreRegistry;
     }
@@ -64,8 +66,10 @@ final class InstantSearch implements RequestInterface
 
         $query = Query::create($boolQuery);
 
+        /** @var Query\AbstractQuery $queryObject */
+        $queryObject = $query->getQuery();
         $functionScore = $qb->query()->function_score()
-            ->setQuery($query->getQuery())
+            ->setQuery($queryObject)
             ->setBoostMode(Query\FunctionScore::BOOST_MODE_MULTIPLY)
             ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
         ;

@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
 use Elastica\Aggregation\AbstractAggregation;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\AggregationBuilderInterface;
+use RuntimeException;
 
 class AggregationBuilder
 {
@@ -46,7 +47,7 @@ class AggregationBuilder
     /**
      * @param string|array $aggregation
      *
-     * @return AbstractAggregation|bool|null
+     * @return AbstractAggregation|bool
      */
     private function buildAggregation($aggregation, array $filters)
     {
@@ -57,6 +58,6 @@ class AggregationBuilder
             }
         }
 
-        throw new \RuntimeException('Aggregation can be build'); // it's throw an exception if we have not filtreable attribute
+        throw new RuntimeException('Aggregation can be build'); // it's throw an exception if we have not filtreable attribute
     }
 }

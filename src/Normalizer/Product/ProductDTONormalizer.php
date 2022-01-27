@@ -64,7 +64,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
 
         if (\array_key_exists('main_taxon', $data)) {
             $taxonDTOClass = $this->automapperConfiguration->getTargetClass('taxon');
-            $object->setMainTaxon($this->denormalizer->denormalize($data['main_taxon'], $taxonDTOClass, 'json', $context));
+            $object->setData('main_taxon', $this->denormalizer->denormalize($data['main_taxon'], $taxonDTOClass, 'json', $context));
             unset($data['main_taxon']);
         }
 
@@ -74,7 +74,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             foreach ($data['product_taxons'] as $value) {
                 $values[] = $this->denormalizer->denormalize($value, $productTaxonDTOClass, 'json', $context);
             }
-            $object->setProductTaxons($values);
+            $object->setData('product_taxons', $values);
             unset($data['product_taxons']);
         }
 
@@ -84,7 +84,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             foreach ($data['images'] as $value) {
                 $values[] = $this->denormalizer->denormalize($value, $imageDTOClass, 'json', $context);
             }
-            $object->setImages($values);
+            $object->setData('images', $values);
             unset($data['product_taxons']);
         }
 
@@ -94,7 +94,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             foreach ($data['channels'] as $value) {
                 $values[] = $this->denormalizer->denormalize($value, $channelDTOClass, 'json', $context);
             }
-            $object->setChannels($values);
+            $object->setData('channels', $values);
             unset($data['channels']);
         }
 
@@ -104,7 +104,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             foreach ($data['attributes'] as $key => $value) {
                 $values[$key] = $this->denormalizer->denormalize($value, $productAttributeDTOClass, 'json', $context);
             }
-            $object->setAttributes($values);
+            $object->setData('attributes', $values);
             unset($data['channels']);
         }
 
@@ -114,19 +114,19 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             foreach ($data['prices'] as $key => $value) {
                 $values[$key] = $this->denormalizer->denormalize($value, $pricingDTOClass, 'json', $context);
             }
-            $object->setPrices($values);
+            $object->setData('prices', $values);
             unset($data['channels']);
         }
 
         return $object;
     }
 
-    public function supportsDenormalization($data, string $type, string $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return $this->automapperConfiguration->getTargetClass('product') === $type;
     }
 
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization($data, string $format = null): bool
     {
         return false;
     }

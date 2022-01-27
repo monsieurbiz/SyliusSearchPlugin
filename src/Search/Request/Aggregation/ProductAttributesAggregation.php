@@ -14,10 +14,13 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
 use Elastica\Query\AbstractQuery;
+use Elastica\QueryBuilder;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
 
 final class ProductAttributesAggregation implements AggregationBuilderInterface
 {
+    private ProductAttributeAggregation $productAttributeAggregationBuilder;
+
     public function __construct()
     {
         $this->productAttributeAggregationBuilder = new ProductAttributeAggregation();
@@ -29,7 +32,7 @@ final class ProductAttributesAggregation implements AggregationBuilderInterface
             return null;
         }
 
-        $qb = new \Elastica\QueryBuilder();
+        $qb = new QueryBuilder();
 
         $currentFilters = array_filter($filters, function(AbstractQuery $filter): bool {
             return !$filter->hasParam('path') || false === strpos($filter->getParam('path'), 'attributes.');
@@ -41,9 +44,10 @@ final class ProductAttributesAggregation implements AggregationBuilderInterface
         }
 
         $attributesAggregation = $qb->aggregation()->nested('attributes', 'attributes');
+        /** @phpstan-ignore-next-line */
         foreach ($aggregation as $subAggregation) {
             $subAggregationObject = $this->productAttributeAggregationBuilder->build($subAggregation, $filters);
-            if (null === $subAggregationObject) {
+            if (null === $subAggregationObject || false === $subAggregationObject) {
                 continue;
             }
             $attributesAggregation->addAggregation($subAggregationObject);
@@ -59,6 +63,9 @@ final class ProductAttributesAggregation implements AggregationBuilderInterface
         ;
     }
 
+    /**
+     * @param string|array|object $aggregation
+     */
     private function isSupport($aggregation): bool
     {
         if (!\is_array($aggregation)) {

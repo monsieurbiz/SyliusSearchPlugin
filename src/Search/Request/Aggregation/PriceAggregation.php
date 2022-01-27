@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
+use Elastica\QueryBuilder;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 
 final class PriceAggregation implements AggregationBuilderInterface
@@ -30,7 +31,8 @@ final class PriceAggregation implements AggregationBuilderInterface
             return null;
         }
 
-        $qb = new \Elastica\QueryBuilder();
+        $qb = new QueryBuilder();
+        $channelCode = $this->channelContext->getChannel()->getCode() ?? '';
 
         $filters = array_filter($filters, function($filter): bool {
             return !$filter->hasParam('path') || 'prices' !== $filter->getParam('path');
@@ -52,7 +54,7 @@ final class PriceAggregation implements AggregationBuilderInterface
                             ->filter('prices')
                             ->setFilter(
                                 $qb->query()->term()
-                                    ->setTerm('prices.channel_code', $this->channelContext->getChannel()->getCode())
+                                    ->setTerm('prices.channel_code', $channelCode)
                             )
                             ->addAggregation(
                                 $qb->aggregation()
@@ -64,8 +66,11 @@ final class PriceAggregation implements AggregationBuilderInterface
             ;
     }
 
+    /**
+     * @param string|array|object $aggregation
+     */
     private function isSupported($aggregation): bool
     {
-        return 'price' === $aggregation;
+        return 'price' === $aggregation && null !== $this->channelContext->getChannel()->getCode();
     }
 }

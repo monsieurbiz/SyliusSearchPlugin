@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
+use Elastica\QueryBuilder;
 use Sylius\Component\Core\Model\TaxonInterface;
 
 final class TaxonsAggregation implements AggregationBuilderInterface
@@ -23,10 +24,10 @@ final class TaxonsAggregation implements AggregationBuilderInterface
             return null;
         }
         /** @var TaxonInterface $currentTaxon */
-        $currentTaxon = $aggregation['taxons'];
-        $qb = new \Elastica\QueryBuilder();
+        $currentTaxon = $aggregation['taxons']; /** @phpstan-ignore-line */
+        $qb = new QueryBuilder();
 
-        $filters = array_filter($filters, function($filter) {
+        $filters = array_filter($filters, function($filter): bool {
             return !$filter->hasParam('path') || 'product_taxons' !== $filter->getParam('path');
         });
 
@@ -34,6 +35,7 @@ final class TaxonsAggregation implements AggregationBuilderInterface
         foreach ($filters as $filter) {
             $filterQuery->addMust($filter);
         }
+        $taxonLevel = $currentTaxon->getLevel() ?? 0;
 
         return $qb->aggregation()
             ->filter('taxons')
@@ -46,7 +48,7 @@ final class TaxonsAggregation implements AggregationBuilderInterface
                             ->nested('taxons', 'product_taxons.taxon')
                             ->addAggregation(
                                 $qb->aggregation()
-                                    ->filter('taxons', $qb->query()->term(['product_taxons.taxon.level' => ['value' => $currentTaxon->getLevel() + 1]]))
+                                    ->filter('taxons', $qb->query()->term(['product_taxons.taxon.level' => ['value' => $taxonLevel + 1]]))
                                     ->addAggregation(
                                         $qb->aggregation()
                                             ->terms('codes')
@@ -62,8 +64,11 @@ final class TaxonsAggregation implements AggregationBuilderInterface
             ;
     }
 
+    /**
+     * @param string|array|object $aggregation
+     */
     private function isSupported($aggregation): bool
     {
-        return \array_key_exists('taxons', $aggregation);
+        return \is_array($aggregation) && \array_key_exists('taxons', $aggregation);
     }
 }

@@ -51,6 +51,7 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
         if (null === $mapping || !$mapping->offsetExists('mappings')) {
             return;
         }
+        /** @var array $mappings */
         $mappings = $mapping->offsetGet('mappings');
         $attributesMapping = [];
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {

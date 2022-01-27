@@ -18,17 +18,13 @@ use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
-final class Indexer implements LoggerAwareInterface
+final class Indexer
 {
-    use LoggerAwareTrait;
-
     private ServiceRegistryInterface $documentableRegistry;
     private RepositoryInterface $localeRepository;
     private array $locales = [];
@@ -55,7 +51,7 @@ final class Indexer implements LoggerAwareInterface
      */
     public function getLocales(): array
     {
-        if (empty($this->locales)) {
+        if (0 === \count($this->locales)) {
             $locales = $this->localeRepository->findAll();
             $this->locales = array_filter(array_map(
                 function(LocaleInterface $locale): string {
@@ -91,7 +87,6 @@ final class Indexer implements LoggerAwareInterface
             }
 
             $indexer->flush();
-            $this->logger->info('flush', ['monsieurbiz.search']);
 
             return;
         }
@@ -101,8 +96,8 @@ final class Indexer implements LoggerAwareInterface
                 $document->setCurrentLocale($locale);
             }
             $dto = $this->autoMapper->map($document, $documentable->getTargetClass());
+            /* @phpstan-ignore-next-line */
             $indexer->scheduleIndex($indexName, new Document((string) $document->getId(), $dto));
-            $this->logger->info('index - ' . $locale . ': ' . $document->getId(), ['monsieurbiz.search']);
         }
     }
 
@@ -118,7 +113,6 @@ final class Indexer implements LoggerAwareInterface
             }
 
             $indexer->flush();
-            $this->logger->info('flush', ['monsieurbiz.search']);
 
             return;
         }
@@ -129,7 +123,6 @@ final class Indexer implements LoggerAwareInterface
                 $document->setCurrentLocale($locale);
             }
             $indexer->scheduleDelete($indexName, (string) $document->getId());
-            $this->logger->info('delete - ' . $locale . ': ' . $document->getId(), ['monsieurbiz.search']);
         }
     }
 
@@ -146,7 +139,7 @@ final class Indexer implements LoggerAwareInterface
         $indexBuilder = $this->clientFactory->getIndexBuilder($documentable, $locale);
         $newIndex = $indexBuilder->createIndex($indexName, [
             'index_code' => $documentable->getIndexCode(),
-            'locale' => $locale ? strtolower($locale) : null,
+            'locale' => null !== $locale ? strtolower($locale) : null,
         ]);
 
         $indexer = $this->clientFactory->getIndexer($documentable, $locale);
@@ -155,6 +148,7 @@ final class Indexer implements LoggerAwareInterface
                 $item->setCurrentLocale($locale);
             }
             $dto = $this->autoMapper->map($item, $documentable->getTargetClass());
+            /* @phpstan-ignore-next-line */
             $indexer->scheduleIndex($newIndex, new Document((string) $item->getId(), $dto));
         }
         $indexer->flush();

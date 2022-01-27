@@ -114,7 +114,7 @@ class RangeFilter implements FilterInterface
         return $this->max;
     }
 
-    public function getValueType($valueLabel): string
+    public function getValueType(string $valueLabel): string
     {
         if ($valueLabel == $this->minLabel) {
             return 'min';

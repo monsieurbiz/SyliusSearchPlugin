@@ -76,14 +76,14 @@ final class RequestConfiguration
 
     public function getLimit(): int
     {
-        $limit = (int) $this->request->get('limit');
+        $limit = (int) $this->request->get('limit', self::FALLBACK_LIMIT);
         $availableLimits = $this->getAvailableLimits();
 
         if (!\in_array($limit, $availableLimits, true)) {
             $limit = reset($availableLimits);
         }
 
-        return $limit ?: self::FALLBACK_LIMIT;
+        return $limit;
     }
 
     public function getAvailableLimits(): array

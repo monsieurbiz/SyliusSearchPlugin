@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Mapping;
 
+use ArrayObject;
 use JoliCode\Elastically\Mapping\MappingProviderInterface;
 use JoliCode\Elastically\Mapping\YamlProvider;
 use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
@@ -45,14 +46,14 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
     public function provideMapping(string $indexName, array $context = []): ?array
     {
-        $mapping = $this->decorated->provideMapping($context['index_code'] ?? $indexName, $context);
+        $mapping = $this->decorated->provideMapping($context['index_code'] ?? $indexName, $context) ?? [];
 
         $locale = $context['locale'] ?? null;
-        if (null !== $mapping && null !== $locale) {
+        if (null !== $locale) {
             $mapping = $this->appendLocaleAnalyzers($mapping, $locale);
         }
 
-        $mappingProviderEvent = new MappingProviderEvent($context['index_code'] ?? $indexName, new \ArrayObject($mapping));
+        $mappingProviderEvent = new MappingProviderEvent($context['index_code'] ?? $indexName, new ArrayObject($mapping));
         $this->eventDispatcher->dispatch(
             $mappingProviderEvent,
             MappingProviderEvent::EVENT_NAME

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation;
 
+use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
 
@@ -25,7 +26,7 @@ final class ProductAttributeAggregation implements AggregationBuilderInterface
             return null;
         }
 
-        $qb = new \Elastica\QueryBuilder();
+        $qb = new QueryBuilder();
         $filters = array_filter($filters, function($filter) use ($aggregation): bool {
             return !$filter->hasParam('path') || (
                 false !== strpos($filter->getParam('path'), 'attributes.')
@@ -38,11 +39,11 @@ final class ProductAttributeAggregation implements AggregationBuilderInterface
             $filterQuery->addMust($filter);
         }
 
-        $qb = new \Elastica\QueryBuilder();
-
+        /** @phpstan-ignore-next-line */
         return $qb->aggregation()->filter($aggregation->getCode())
             ->setFilter($filterQuery)
             ->addAggregation(
+                /** @phpstan-ignore-next-line */
                 $qb->aggregation()->nested($aggregation->getCode(), sprintf('attributes.%s', $aggregation->getCode()))
                     ->addAggregation(
                         $qb->aggregation()->terms('names')
@@ -56,8 +57,11 @@ final class ProductAttributeAggregation implements AggregationBuilderInterface
         ;
     }
 
+    /**
+     * @param string|array|object $aggregation
+     */
     private function isSupport($aggregation): bool
     {
-        return $aggregation instanceof ProductAttributeInterface;
+        return $aggregation instanceof ProductAttributeInterface && null !== $aggregation->getCode();
     }
 }

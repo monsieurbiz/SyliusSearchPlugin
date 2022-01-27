@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\MessageHandler;
 
+use Doctrine\ORM\EntityRepository;
 use MonsieurBiz\SyliusSearchPlugin\Index\Indexer;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -37,6 +39,11 @@ class ProductReindexFromTaxonHandler implements MessageHandlerInterface
 
     public function __invoke(ProductReindexFromTaxon $message): void
     {
+        /** @var DocumentableInterface $documentable */
+        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
+        if (!$this->productRepository instanceof EntityRepository) {
+            return;
+        }
         $products = $this->productRepository->createQueryBuilder('o')
                 ->innerJoin('o.productTaxons', 'productTaxon')
                 ->andWhere('productTaxon.taxon = :taxonId')
@@ -44,7 +51,7 @@ class ProductReindexFromTaxonHandler implements MessageHandlerInterface
             ;
 
         $this->indexer->indexByDocuments(
-            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $documentable,
             $products
         );
     }

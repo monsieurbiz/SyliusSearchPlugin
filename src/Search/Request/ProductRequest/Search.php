@@ -50,7 +50,9 @@ final class Search implements RequestInterface
         SorterRegistryInterface $sorterRegistry,
         FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
-        $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
+        /** @var DocumentableInterface $documentable */
+        $documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
+        $this->documentable = $documentable;
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
         $this->aggregationBuilder = $aggregationBuilder;
@@ -101,8 +103,10 @@ final class Search implements RequestInterface
             $sorter->apply($query, $this->configuration);
         }
 
+        /** @var Query\AbstractQuery $queryObject */
+        $queryObject = $query->getQuery();
         $functionScore = $qb->query()->function_score()
-            ->setQuery($query->getQuery())
+            ->setQuery($queryObject)
             ->setBoostMode(Query\FunctionScore::BOOST_MODE_MULTIPLY)
             ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
         ;

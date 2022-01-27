@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
 use Elastica\ResultSet;
+use JoliCode\Elastically\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use Pagerfanta\Adapter\AdapterInterface;
@@ -24,6 +25,9 @@ class Response implements ResponseInterface
     private RequestConfiguration $requestConfiguration;
     private AdapterInterface $adapter;
     private DocumentableInterface $documentable;
+    /**
+     * @var Pagerfanta<Result>|null
+     */
     private ?Pagerfanta $paginator = null;
     private array $filters = [];
     private iterable $filterBuilders;

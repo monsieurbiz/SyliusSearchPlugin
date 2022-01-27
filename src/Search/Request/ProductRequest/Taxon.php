@@ -25,6 +25,7 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterRegistr
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterRegistryInterface;
+use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
@@ -52,7 +53,9 @@ final class Taxon implements RequestInterface
         SorterRegistryInterface $sorterRegistry,
         FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
-        $this->documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
+        /** @var DocumentableInterface $documentable */
+        $documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
+        $this->documentable = $documentable;
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
         $this->channelContext = $channelContext;
@@ -95,8 +98,10 @@ final class Taxon implements RequestInterface
             $sorter->apply($query, $this->configuration);
         }
 
+        /** @var Query\AbstractQuery $queryObject */
+        $queryObject = $query->getQuery();
         $functionScore = $qb->query()->function_score()
-            ->setQuery($query->getQuery())
+            ->setQuery($queryObject)
             ->setBoostMode(Query\FunctionScore::BOOST_MODE_MULTIPLY)
             ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
         ;
@@ -121,6 +126,9 @@ final class Taxon implements RequestInterface
 
     private function addAggregations(Query $query, Query\BoolQuery $postFilter): void
     {
+        if (null === $this->configuration) {
+            throw new RuntimeException('Missing request configuration');
+        }
         $aggregations = $this->aggregationBuilder->buildAggregations(
             [
                 ['taxons' => $this->configuration->getTaxon()],

@@ -62,10 +62,12 @@ class SearchController extends AbstractController
     // TODO add an optional parameter $documentType (nullable => get the default document type)
     public function searchAction(Request $request, string $query): Response
     {
+        /** @var DocumentableInterface $documentable */
+        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::SEARCH_TYPE,
-            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $documentable,
             $this->searchSettings,
             $this->channelContext
         );
@@ -85,7 +87,8 @@ class SearchController extends AbstractController
      */
     public function postAction(Request $request): RedirectResponse
     {
-        $query = $request->request->get('monsieurbiz_searchplugin_search')['query'] ?? '';
+        $query = (array) $request->request->get('monsieurbiz_searchplugin_search') ?? [];
+        $query = $query['query'] ?? '';
 
         return $this->redirect(
             $this->generateUrl(
@@ -128,10 +131,12 @@ class SearchController extends AbstractController
 
     public function taxonAction(Request $request): Response
     {
+        /** @var DocumentableInterface $documentable */
+        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::TAXON_TYPE,
-            $this->documentableRegistry->get('search.documentable.monsieurbiz_product'),
+            $documentable,
             $this->searchSettings,
             $this->channelContext,
             new Parameters($this->parametersParser->parseRequestValues($request->attributes->get('_sylius', []), $request))

@@ -15,7 +15,6 @@ namespace MonsieurBiz\SyliusSearchPlugin\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon;
@@ -28,6 +27,7 @@ use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductTranslationInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
+use Sylius\Component\Product\Model\ProductInterface as ModelProductInterface;
 use Sylius\Component\Product\Model\ProductVariantInterface;
 use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -37,7 +37,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
     use LoggerAwareTrait;
 
     /**
-     * @var ProductInterface[]
+     * @var ModelProductInterface[]
      */
     private array $productsToReindex = [];
     private array $productsToBeDelete = [];
@@ -63,7 +63,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
 
         $collections = array_merge($unitOfWork->getScheduledCollectionUpdates(), $unitOfWork->getScheduledCollectionDeletions());
         foreach ($collections as $collection) {
-            if ($collection->getOwner() instanceof ProductInterface) {
+            if (method_exists($collection, 'getOwner') && $collection->getOwner() instanceof ProductInterface) {
                 $this->productsToReindex[] = $collection->getOwner();
             }
         }
@@ -89,7 +89,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         // todo reindex all data when: change/create/remove attribute/option, add/remove channel, add/remove locale
     }
 
-    public function postFlush(PostFlushEventArgs $eventArgs): void
+    public function postFlush(): void
     {
         $productReindexFormIdsMessage = new ProductReindexFromIds();
 
@@ -102,7 +102,6 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         $this->productsToReindex = [];
 
         if (0 !== \count($productReindexFormIdsMessage->getProductIds())) {
-            $this->logger->info('Schedule reindex for: ' . implode(', ', $productReindexFormIdsMessage->getProductIds()), ['monsieurbiz.search']);
             $this->messageBus->dispatch($productReindexFormIdsMessage);
         }
     }
@@ -114,7 +113,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
                 $this->productsToBeDelete[] = $entity;
                 continue;
             }
-            if ($entity instanceof ProductTaxonInterface) {
+            if ($entity instanceof ProductTaxonInterface && null !== $entity->getTaxon()) {
                 $this->messageBus->dispatch(new ProductReindexFromTaxon($entity->getTaxon()->getId()));
                 continue;
             }
@@ -125,10 +124,8 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         }
     }
 
-    private function getProduct($entity): ?\Sylius\Component\Product\Model\ProductInterface
+    private function getProduct(object $entity): ?ModelProductInterface
     {
-        $this->logger->info(\get_class($entity) . ': ' . implode(', ', class_implements($entity) ?? []), ['monsieurbiz.search']);
-
         switch (true) {
             case $entity instanceof ProductInterface:
                 return $entity;
@@ -137,15 +134,27 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
             case $entity instanceof ProductTaxonInterface:
                 return $entity->getProduct();
             case $entity instanceof ProductTranslationInterface && $entity->getTranslatable() instanceof ProductInterface:
-                return $entity->getTranslatable();
+                /** @var ProductInterface $product */
+                $product = $entity->getTranslatable();
+
+                return $product;
             case $entity instanceof ProductAttributeValueInterface:
                 return $entity->getProduct();
             case $entity instanceof ProductImageInterface && $entity->getOwner() instanceof ProductInterface:
-                return $entity->getOwner();
+                /** @var ProductInterface $product */
+                $product = $entity->getOwner();
+
+                return $product;
             case $entity instanceof ChannelPricingInterface && $entity->getProductVariant() instanceof ProductVariantInterface:
-                return $entity->getProductVariant()->getProduct();
+                /** @var ProductVariantInterface $productVariant */
+                $productVariant = $entity->getProductVariant();
+
+                return $productVariant->getProduct();
             case $entity instanceof ProductVariantTranslationInterface && $entity->getTranslatable() instanceof ProductVariantInterface:
-                return $entity->getTranslatable()->getProduct();
+                /** @var ProductVariantInterface $productVariant */
+                $productVariant = $entity->getTranslatable();
+
+                return $productVariant->getProduct();
         }
 
         return null;

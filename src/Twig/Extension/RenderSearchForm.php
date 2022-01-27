@@ -23,14 +23,11 @@ use Twig\TwigFunction;
 
 class RenderSearchForm extends AbstractExtension
 {
-    /** @var FormFactoryInterface */
-    private $formFactory;
+    private FormFactoryInterface $formFactory;
 
-    /** @var Environment */
-    private $templatingEngine;
+    private Environment $templatingEngine;
 
-    /** @var RequestStack */
-    private $requestStack;
+    private RequestStack $requestStack;
 
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -49,13 +46,15 @@ class RenderSearchForm extends AbstractExtension
         ];
     }
 
-    public function createForm($template = null)
+    public function createForm(?string $template = null): Markup
     {
+        $request = $this->requestStack->getCurrentRequest();
         $template = $template ?? '@MonsieurBizSyliusSearchPlugin/Search/_form.html.twig';
+        $query = null !== $request ? $request->get('query', '') : '';
 
         return new Markup($this->templatingEngine->render($template, [
             'form' => $this->formFactory->create(SearchType::class)->createView(),
-            'query' => urldecode($this->requestStack->getCurrentRequest()->get('query') ?? ''),
+            'query' => urldecode($query),
         ]), 'UTF-8');
     }
 }

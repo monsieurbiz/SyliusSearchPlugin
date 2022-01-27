@@ -25,7 +25,7 @@ final class Configuration
         $this->sourceClasses[$identifier] = $className;
     }
 
-    public function getSourceClass($identifier): string
+    public function getSourceClass(string $identifier): string
     {
         if (!\array_key_exists($identifier, $this->sourceClasses)) {
             throw new RuntimeException('Unknown source class for: ' . $identifier);
@@ -39,7 +39,7 @@ final class Configuration
         $this->targetClasses[$identifier] = $className;
     }
 
-    public function getTargetClass($identifier): string
+    public function getTargetClass(string $identifier): string
     {
         if (!\array_key_exists($identifier, $this->targetClasses)) {
             throw new RuntimeException('Unknown target class for: ' . $identifier);

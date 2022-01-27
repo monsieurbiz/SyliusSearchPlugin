@@ -28,7 +28,7 @@ final class MainTaxonPostFilter implements PostFilterInterface
             $mainTaxonQuery = $qb->query()
                 ->bool()
             ;
-            $values = array_filter($values);
+            $values = array_filter($values) ?? [];
             foreach ($values as $value) {
                 $mainTaxonQuery->addShould(
                     $qb->query()

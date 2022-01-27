@@ -18,9 +18,9 @@ use Elastica\Aggregation\AbstractAggregation;
 interface AggregationBuilderInterface
 {
     /**
-     * @param string|array $aggregation
+     * @param string|array|object $aggregation
      *
-     * @return AbstractAggregation|bool|null
+     * @return AbstractAggregation|false|null
      */
     public function build($aggregation, array $filters);
 }

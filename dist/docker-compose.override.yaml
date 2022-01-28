@@ -19,7 +19,8 @@ services:
                 soft: -1
                 hard: -1
         ports:
-            - 92
+            - "9200:9200"
+            - "9300:9300"
 
     cerebro:
         image: lmenezes/cerebro

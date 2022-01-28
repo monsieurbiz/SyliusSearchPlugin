@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -15,12 +15,12 @@ namespace MonsieurBiz\SyliusSearchPlugin\Helper;
 
 class SlugHelper
 {
-    public static function toSlug($label): string
+    public static function toSlug(string $label): string
     {
         return urlencode($label);
     }
 
-    public static function toLabel($slug): string
+    public static function toLabel(string $slug): string
     {
         return urldecode($slug);
     }

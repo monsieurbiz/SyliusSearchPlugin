@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -14,24 +14,23 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType as SymfonySearchType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Required;
 
 class SearchType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('query', TextType::class, [
+            ->add('query', SymfonySearchType::class, [
                 'required' => true,
                 'label' => 'monsieurbiz_searchplugin.form.query',
+                'attr' => [
+                    'placeholder' => 'monsieurbiz_searchplugin.form.query_placeholder',
+                ],
                 'constraints' => [
                     new NotBlank(),
                     new Required(),
@@ -45,7 +44,7 @@ class SearchType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBlockPrefix()
     {

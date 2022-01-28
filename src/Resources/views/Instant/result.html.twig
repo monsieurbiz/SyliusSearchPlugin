@@ -1,9 +1,21 @@
 {% block content %}
-    {% if resultSet.totalHits == 0 %}
-        {{ 'monsieurbiz_searchplugin.instant.result.no_result'|trans }}
-    {% else %}
-        {% for result in resultSet.results %}
-            {% include '@MonsieurBizSyliusSearchPlugin/Instant/_box.html.twig' with {'result': result} %}
-        {% endfor %}
+    {% set noResult = true %}
+    {% for result in results %}
+        {% if result.count != 0 %}
+            {% set noResult = false %}
+            <div class="category">
+                <div class="name">{{ ('monsieurbiz_searchplugin.instant.result.' ~ result.documentable.indexCode)|trans }}</div>
+                <div class="results">
+                    {% for item in result %}
+                            {% include result.documentable.template('instant') with {'item': item.model} %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+    {% if noResult %}
+        <div class="result">
+            <div class="content">{{ 'monsieurbiz_searchplugin.instant.result.no_result'|trans }}</div>
+        </div>
     {% endif %}
 {% endblock %}

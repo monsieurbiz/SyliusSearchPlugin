@@ -10,6 +10,7 @@ monsieurbiz_searchplugin:
         filterable: Filtrabile
   form:
     query: 'Cerca'
+    query_placeholder: 'Cerca…'
     submit: 'Cerca'
   search:
     result:

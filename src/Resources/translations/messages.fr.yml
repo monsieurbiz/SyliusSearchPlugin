@@ -4,12 +4,19 @@ monsieurbiz_searchplugin:
       form:
         title: Recherche
         filterable: Filtrable
+        searchable: Recherchable
+        search_weight: Pondération dans la recherche
     product_option:
       form:
         title: Recherche
         filterable: Filtrable
+    setting_form:
+      instant_search_enabled_monsieurbiz_product: 'Produit: Activer la recherche instantanée'
+      limit_search_monsieurbiz_product: 'Produit: Limites disponibles pour la recherche'
+      limit_instant_search_monsieurbiz_product: 'Produit: Limites disponibles pour la recherche instantanée'
   form:
     query: 'Recherche'
+    query_placeholder: 'Rechercher…'
     submit: 'Lancer la recherche'
   search:
     result:

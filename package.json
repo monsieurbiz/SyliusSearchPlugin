@@ -1,0 +1,25 @@
+{
+  "name": "monsieurbiz-sylius-search-plugin",
+  "version": "0.0.1",
+  "description": "Add instant search on the search form",
+  "main": "webpack.config.js",
+  "scripts": {
+    "build": "encore production",
+    "watch": "encore dev --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monsieurbiz/SyliusSearchPlugin.git"
+  },
+  "author": "Monsieur Biz <hello@monsieurbiz.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/monsieurbiz/SyliusSearchPlugin/issues"
+  },
+  "homepage": "https://github.com/monsieurbiz/SyliusSearchPlugin#readme",
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.28.1"
+  },
+  "dependencies": {
+  }
+}

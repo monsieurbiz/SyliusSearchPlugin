@@ -1,0 +1,12 @@
+monsieurbiz_sylius_settings:
+  plugins:
+    monsieurbiz.search:
+      vendor_name: Monsieur Biz
+      vendor_url:
+      plugin_name: Search
+      description: Search configuration
+      icon: search
+      use_locales: false
+      classes:
+        form: MonsieurBiz\SyliusSearchPlugin\Form\Type\Settings\SettingsSearchType
+      default_values: # default values are defined in MonsieurBiz\SyliusSearchPlugin\DependencyInjection\DocumentableRegistryPass

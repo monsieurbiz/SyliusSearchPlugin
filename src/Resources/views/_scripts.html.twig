@@ -1,0 +1,12 @@
+<script type="text/javascript">
+    var monsieurbizSearchPlugin = {
+        instantEnabled: true,
+        instantUrl: '{{ path('monsieurbiz_search_instant') | escape('js') }}', // URL for instant search
+        searchInputSelector: '.autocomplete-search input[type=search]', // Selector for search input text field
+        resultClosestSelector: '.autocomplete-search', // Selector used to display results, take the closest parent of searchInputSelector
+        resultFindSelector: '.autocomplete-results', // Selector used to display results, take the closest parent of searchInputSelector
+        keyUpTimeOut: 500, // Time in millisecond to wait to be sure the user ended typing
+        minQueryLength: 3, // Number of characters minimum to call instant search
+    };
+</script>
+{% include '@SyliusUi/_javascripts.html.twig' with {'path': 'bundles/monsieurbizsyliussearchplugin/js/monsieurbiz-search.js'} %}

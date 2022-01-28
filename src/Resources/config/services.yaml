@@ -1,88 +1,207 @@
+parameters:
+  monsieurbiz.search.model.documentable.interface: MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface
+  monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface
+  monsieurbiz.search.product_attribute_analyzer: 'search_standard'
+  monsieurbiz.search.product.enable_stock_filter: false
+  monsieurbiz.search.product.is_in_stock_scoring_boost: 0 # The value is used to multiply the document score (0 to disable the scoring boost)
+  monsieurbiz.search.product.apply_is_in_stock_scoring_boost_on:
+      - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::SEARCH_TYPE
+      - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::TAXON_TYPE
+      - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::INSTANT_TYPE
+
 services:
 
   _defaults:
     autowire: true
     autoconfigure: true
     public: false
+    bind:
+      Sylius\Bundle\ResourceBundle\Controller\ParametersParserInterface: '@sylius.resource_controller.parameters_parser'
+      $localeProvider: '@sylius.translation_locale_provider'
+      $productVariantResolver: '@MonsieurBiz\SyliusSearchPlugin\Resolver\CheapestProductVariantResolver'
+      $documentableRegistry: '@monsieurbiz.search.registry.documentable'
+      $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
+      $enableStockFilter: '%monsieurbiz.search.product.enable_stock_filter%'
 
   _instanceof:
-    MonsieurBiz\SyliusSearchPlugin\Fixture\FilterableFixtureInterface:
-      tags: ['sylius_fixtures.fixture']
+    MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\ReaderInterface:
+      tags: [ 'monsieurbiz.search.automapper.product_attribute_value_reader' ]
 
   MonsieurBiz\SyliusSearchPlugin\:
     resource: '../../*'
     exclude: '../../{Entity,Migrations,Tests,Kernel.php}'
-
-  MonsieurBiz\SyliusSearchPlugin\Controller\:
-    resource: '../../Controller'
-    tags: ['controller.service_arguments']
 
   MonsieurBiz\SyliusSearchPlugin\Form\Extension\:
     resource: '../../Form/Extension'
     tags:
       - { name: form.type_extension }
 
-  # Client configuration.
-  JoliCode\Elastically\Client:
+  MonsieurBiz\SyliusSearchPlugin\Generated\:
+    resource: '../../../generated'
+
+  # ES Client configuration
+  MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory:
     arguments:
       $config:
         host: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
         port: '%env(MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
-        elastically_mappings_directory: '%kernel.project_dir%/vendor/monsieurbiz/sylius-search-plugin/src/Resources/config/elasticsearch/mappings'
-        elastically_index_class_mapping:
-          # @TODO Add it in config
-          documents-it_it: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-fr_fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-fr: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-en: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-          documents-en_us: \MonsieurBiz\SyliusSearchPlugin\Model\Document\Result
-        elastically_bulk_size: 100
 
-  # Add JS for plugin
-  monsieurbiz_sylius_search.block_event_listener.layout.javascripts:
-    class: Sylius\Bundle\UiBundle\Block\BlockEventListener
+  MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepository:
     arguments:
-      - '@@MonsieurBizSyliusSearchPlugin/js.html.twig'
-    tags:
-      - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.javascripts, method: onBlockEvent }
+      $attributeRepository: '@sylius.repository.product_attribute'
 
-  # Add form search in header
-  monsieurbiz_sylius_search.block_event_listener.layout.header:
-    class: Sylius\Bundle\UiBundle\Block\BlockEventListener
+  # Define our mapping provider
+  JoliCode\Elastically\Mapping\YamlProvider:
     arguments:
-      - '@@MonsieurBizSyliusSearchPlugin/Header/form.html.twig'
-    tags:
-      - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.header, method: onBlockEvent }
-
-  # Event when a product is added / modified / deleted
-  monsieurbiz_sylius_search.event_listener.document_listener:
-    class: MonsieurBiz\SyliusSearchPlugin\EventListener\DocumentListener
+      $configurationDirectory: '@=service("file_locator").locate("@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch")'
+  MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider:
+    decorates: JoliCode\Elastically\Mapping\YamlProvider
     arguments:
-      - '@MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Indexer'
-    tags:
-      - { name: kernel.event_listener, event: sylius.product.post_create, method: saveDocument }
-      - { name: kernel.event_listener, event: sylius.product.post_update, method: saveDocument }
-      - { name: kernel.event_listener, event: sylius.product.pre_delete, method: deleteDocument }
+      $decorated: '@.inner'
 
-  MonsieurBiz\SyliusSearchPlugin\Provider\SearchQueryProvider:
+  # Defines our registries
+  monsieurbiz.search.registry.documentable:
+    class: Sylius\Component\Registry\ServiceRegistry
     arguments:
-      $files: '%monsieurbiz_sylius_search.files%'
+      $className: '%monsieurbiz.search.model.documentable.interface%'
+      $context: 'documentable'
 
-  # Provider to retrieve repositories to index
-  MonsieurBiz\SyliusSearchPlugin\Provider\DocumentRepositoryProvider:
+  monsieurbiz.search.registry.search_request:
+    class: Sylius\Component\Registry\ServiceRegistry
     arguments:
-      $documentableClasses: '%monsieurbiz_sylius_search.documentable_classes%'
+      $className: '%monsieurbiz.search.request.interface%'
+      $context: 'documentable'
 
-  MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig:
+  # Define product attribute value readers
+  MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueConfiguration:
     arguments:
-      $config: '%monsieurbiz_sylius_search.grid%'
+      $productAttributeValueReaders: !tagged_iterator { tag: 'monsieurbiz.search.automapper.product_attribute_value_reader', default_index_method: 'getReaderCode' }
 
-  # Helpers
-  MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper: ~
-
-  # Twig extensions
-  MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderDocumentUrl:
+  #
+  MonsieurBiz\SyliusSearchPlugin\EventSubscriber\AppendProductAttributeMappingSubscriber:
     arguments:
-      $helper: '@MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper'
-    tags:
-      - { name: twig.extension }
+      $fieldAnalyzer: '%monsieurbiz.search.product_attribute_analyzer%'
+
+  # Define aggregation builders
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\MainTaxonAggregation:
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\TaxonsAggregation:
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\PriceAggregation:
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\ProductAttributesAggregation:
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Aggregation\ProductOptionsAggregation:
+    tags: { name: 'monsieurbiz.search.aggregation_builder' }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder:
+    arguments: [ !tagged_iterator { tag: 'monsieurbiz.search.aggregation_builder' } ]
+
+  # Define query filters
+  monsieurbiz.search.request.query_filter.product_search.search_term_filter:
+    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
+    arguments:
+      $fieldsToSearch:
+        - 'name^5'
+        - 'description'
+
+  monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
+    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
+    arguments:
+      $fieldsToSearch:
+        - 'name^5'
+        - 'description'
+        - 'name.autocomplete'
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry:
+    arguments:
+      - [
+          '@monsieurbiz.search.request.query_filter.product_search.search_term_filter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
+      ]
+
+  monsieurbiz.search.request.query_filter.product_instant_search_registry:
+    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry
+    arguments:
+      - [
+          '@monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
+      ]
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry:
+    arguments:
+      - [
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\TaxonFilter',
+          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
+      ]
+
+  # Define post filters
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry:
+    arguments:
+      - [
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\AttributesPostFilter',
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\MainTaxonPostFilter',
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\OptionsPostFilter',
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\PricePostFilter',
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\ProductTaxonPostFilter',
+      ]
+
+  # Define sorters
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry:
+    arguments:
+      - [
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PositionSorter',
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PriceSorter',
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\NameSorter',
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\CreatedAtSorter',
+      ]
+
+  # Functions score
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\Product\InStockWeightFunction:
+    arguments:
+      $inStockWeight: '%monsieurbiz.search.product.is_in_stock_scoring_boost%'
+      $applyOnRequestTypes: '%monsieurbiz.search.product.apply_is_in_stock_scoring_boost_on%'
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\ProductFunctionScoreRegistry:
+    arguments:
+      - [
+        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\Product\InStockWeightFunction'
+      ]
+
+  # Define the product queries
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Search:
+    arguments:
+      $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry'
+      $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
+      $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\InstantSearch:
+    arguments:
+      $queryFilterRegistry: '@monsieurbiz.search.request.query_filter.product_instant_search_registry'
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Taxon:
+    arguments:
+      $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry'
+      $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
+      $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
+
+  # Define the filter builders
+  MonsieurBiz\SyliusSearchPlugin\Search\ResponseFactory:
+    arguments:
+      $filterBuilders: {
+        product_main_taxon: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\MainTaxonFilterBuilder',
+        product_taxons: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\TaxonsFilterBuilder',
+        product_price: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\PriceFilterBuilder',
+        product_attribute: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\AttributeFilterBuilder',
+        product_option: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\OptionFilterBuilder'
+      }

@@ -18,7 +18,6 @@ use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\Product\SearchableTrait;
 use Sylius\Component\Attribute\Model\AttributeTranslationInterface;
 use Sylius\Component\Product\Model\ProductAttribute as BaseProductAttribute;
-use Sylius\Component\Product\Model\ProductAttributeTranslation;
 
 /**
  * @ORM\Entity

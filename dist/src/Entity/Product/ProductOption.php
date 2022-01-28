@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\Product\SearchableTrait;
 use Sylius\Component\Product\Model\ProductOption as BaseProductOption;
+use Sylius\Component\Product\Model\ProductOptionTranslationInterface;
 
 /**
  * @ORM\Entity
@@ -25,4 +26,9 @@ use Sylius\Component\Product\Model\ProductOption as BaseProductOption;
 class ProductOption extends BaseProductOption implements SearchableInterface
 {
     use SearchableTrait;
+
+    protected function createTranslation(): ProductOptionTranslationInterface
+    {
+        return new ProductOptionTranslation();
+    }
 }

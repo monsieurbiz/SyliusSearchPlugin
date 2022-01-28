@@ -1,3 +1,0 @@
-monsieurbiz_sylius_settings_admin:
-  resource: "@MonsieurBizSyliusSettingsPlugin/Resources/config/routes/admin.yaml"
-  prefix: /%sylius_admin.path_name%

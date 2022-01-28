@@ -21,7 +21,7 @@ A search plugin for Sylius using [Elastically](https://github.com/jolicode/elast
 
 Require the plugin :
 ```
-composer require monsieurbiz/sylius-search-plugin="2.0.x-dev@dev"
+composer require monsieurbiz/sylius-search-plugin="^2.0@RC"
 ```
 
 If you are using Symfony Flex, the recipe will automatically do some actions.

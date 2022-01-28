@@ -5,7 +5,7 @@ monsieurbiz_searchplugin:
         title: Search
         filterable: Filterable
         searchable: Searchable
-        search_weight: Search Weight test
+        search_weight: Search Weight
     product_option:
       form:
         title: Search

@@ -92,6 +92,9 @@ apply_dist:
 		(cd ${APP_DIR} && mkdir -p $$FOLDER_PATH); \
 		(cd ${APP_DIR} && ln -s $$ROOT_DIR/dist/$$FILE_PATH $$FILE_PATH); \
     done
+## Specific because symlink is not used correctly in Github Actions
+	rm ${APP_DIR}/docker/elasticsearch/Dockerfile
+	cp dist/docker/elasticsearch/Dockerfile ${APP_DIR}/docker/elasticsearch/
 
 ###
 ### TESTS

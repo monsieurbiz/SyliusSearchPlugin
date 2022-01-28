@@ -6,8 +6,13 @@
     "license": "MIT",
     "require": {
         "php": "~7.4|~8.0",
+        "babdev/pagerfanta-bundle": "^2.5",
+        "jacquesbh/eater": "^2.0",
+        "jane-php/automapper-bundle": "^7.1",
+        "jolicode/elastically": "^1.4.0",
+        "monsieurbiz/sylius-settings-plugin": "^1.0",
         "sylius/sylius": ">=1.8 <1.11",
-        "jolicode/elastically": "^1.0.0"
+        "symfony/messenger": "^4.4 || ^5.2"
     },
     "require-dev": {
         "behat/behat": "^3.6.1",
@@ -50,7 +55,8 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "MonsieurBiz\\SyliusSearchPlugin\\": "src/"
+            "MonsieurBiz\\SyliusSearchPlugin\\": "src/",
+            "MonsieurBiz\\SyliusSearchPlugin\\Generated\\": "generated/"
         }
     },
     "scripts": {
@@ -59,6 +65,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "phpcs": "php-cs-fixer fix --using-cache=false",
+        "jane-generate": "jane generate --config-file=src/Resources/config/jane/jane-configuration.php",
         "phpstan": "phpstan analyse -c phpstan.neon src/",
         "phpmd": "phpmd --exclude Migrations/* src/ ansi phpmd.xml",
         "phpunit": "phpunit",

@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -44,6 +44,7 @@ class RangeFilter implements FilterInterface
     private $max;
 
     private array $values = [];
+
     private RequestConfiguration $requestConfiguration;
 
     /**
@@ -62,17 +63,11 @@ class RangeFilter implements FilterInterface
         $this->addValue($maxLabel, 0, (string) $max);
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return $this->label;
@@ -100,7 +95,7 @@ class RangeFilter implements FilterInterface
 
     public function getAppliedValues(): array
     {
-        return array_filter($this->values, function(FilterValue $filterValue): bool {
+        return array_filter($this->values, function (FilterValue $filterValue): bool {
             return $filterValue->isApplied();
         });
     }

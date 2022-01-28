@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -23,7 +23,9 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 class ProductToDeleteFromIdsHandler implements MessageHandlerInterface
 {
     private ProductRepositoryInterface $productRepository;
+
     private Indexer $indexer;
+
     private ServiceRegistryInterface $documentableRegistry;
 
     public function __construct(

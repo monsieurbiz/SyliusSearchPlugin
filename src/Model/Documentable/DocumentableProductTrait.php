@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -21,33 +21,22 @@ use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Core\Model\Image;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductVariant;
+use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Currency\Model\CurrencyInterface;
-use Sylius\Component\Core\Model\ProductVariantInterface;
 
 trait DocumentableProductTrait
 {
-    /**
-     * @return string
-     */
     public function getDocumentType(): string
     {
         return 'product';
     }
 
-    /**
-     * @return ResultInterface
-     */
     public function createResult(): ResultInterface
     {
         return new Result();
     }
 
-    /**
-     * @param string $locale
-     *
-     * @return ResultInterface
-     */
     public function convertToDocument(string $locale): ResultInterface
     {
         $document = $this->createResult();
@@ -75,11 +64,6 @@ trait DocumentableProductTrait
         return $this->addOptionsInDocument($document, $locale);
     }
 
-    /**
-     * @param ResultInterface $document
-     *
-     * @return ResultInterface
-     */
     protected function addImagesInDocument(ResultInterface $document): ResultInterface
     {
         /** @var Image $image */
@@ -90,11 +74,6 @@ trait DocumentableProductTrait
         return $document;
     }
 
-    /**
-     * @param ResultInterface $document
-     *
-     * @return ResultInterface
-     */
     protected function addChannelsInDocument(ResultInterface $document): ResultInterface
     {
         /** @var Channel $channel */
@@ -105,11 +84,6 @@ trait DocumentableProductTrait
         return $document;
     }
 
-    /**
-     * @param ResultInterface $document
-     *
-     * @return ResultInterface
-     */
     protected function addPricesInDocument(ResultInterface $document): ResultInterface
     {
         /** @var Channel $channel */
@@ -131,12 +105,6 @@ trait DocumentableProductTrait
         return $document;
     }
 
-    /**
-     * @param ResultInterface $document
-     * @param string $locale
-     *
-     * @return ResultInterface
-     */
     protected function addTaxonsInDocument(ResultInterface $document, string $locale): ResultInterface
     {
         /** @var TaxonInterface $mainTaxon */
@@ -165,12 +133,6 @@ trait DocumentableProductTrait
         return $document;
     }
 
-    /**
-     * @param ResultInterface $document
-     * @param string $locale
-     *
-     * @return ResultInterface
-     */
     protected function addAttributesInDocument(ResultInterface $document, string $locale): ResultInterface
     {
         /** @var AttributeValueInterface $attribute */
@@ -191,7 +153,6 @@ trait DocumentableProductTrait
 
     /**
      * @param Result $document
-     * @param string $locale
      *
      * @return Result
      */
@@ -220,8 +181,6 @@ trait DocumentableProductTrait
 
     /**
      * @param $channel
-     *
-     * @return null
      */
     private function getCheapestVariantForChannel($channel)
     {
@@ -248,6 +207,7 @@ trait DocumentableProductTrait
                 return true;
             }
         }
+
         return false;
     }
 }

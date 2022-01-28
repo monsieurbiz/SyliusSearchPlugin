@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -25,9 +25,13 @@ use Symfony\Component\Yaml\Parser;
 class YamlWithLocaleProvider implements MappingProviderInterface
 {
     private YamlProvider $decorated;
+
     private string $configurationDirectory;
+
     private Parser $parser;
+
     private ProductAttributeRepositoryInterface $attributeRepository;
+
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
@@ -66,6 +70,7 @@ class YamlWithLocaleProvider implements MappingProviderInterface
     {
         foreach ($this->getLocaleCode($locale) as $localeCode) {
             $analyzerFilePath = $this->configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers_' . $localeCode . '.yaml';
+
             try {
                 $analyzer = $this->parser->parseFile($analyzerFilePath) ?? [];
                 $mapping['settings']['analysis'] = array_merge_recursive($mapping['settings']['analysis'] ?? [], $analyzer);

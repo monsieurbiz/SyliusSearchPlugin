@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -21,6 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PopulateCommand extends Command
 {
     protected static $defaultName = 'monsieurbiz:search:populate';
+
     private Indexer $indexer;
 
     public function __construct(Indexer $indexer, $name = null)

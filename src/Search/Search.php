@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -22,8 +22,11 @@ use Sylius\Component\Locale\Context\LocaleContextInterface;
 class Search implements SearchInterface
 {
     private LocaleContextInterface $localeContext;
+
     private RequestHandler $requestHandler;
+
     private ClientFactory $clientFactory;
+
     private ResponseFactory $responseFactory;
 
     public function __construct(

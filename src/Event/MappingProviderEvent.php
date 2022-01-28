@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -28,7 +28,6 @@ class MappingProviderEvent extends Event
     private ?ArrayObject $mapping;
 
     /**
-     * @param string $indexCode
      * @param ArrayObject<string, array>|null $mapping
      */
     public function __construct(string $indexCode, ?ArrayObject $mapping)

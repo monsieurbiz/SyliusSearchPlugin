@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -27,7 +27,7 @@ final class ProductAttributeAggregation implements AggregationBuilderInterface
         }
 
         $qb = new QueryBuilder();
-        $filters = array_filter($filters, function($filter) use ($aggregation): bool {
+        $filters = array_filter($filters, function ($filter) use ($aggregation): bool {
             return !$filter->hasParam('path') || (
                 false !== strpos($filter->getParam('path'), 'attributes.')
                 && 'attributes.' . $aggregation->getCode() !== $filter->getParam('path')

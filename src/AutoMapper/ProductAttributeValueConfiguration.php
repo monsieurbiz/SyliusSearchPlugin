@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -19,7 +19,6 @@ use Jane\Component\AutoMapper\MapperMetadata;
 use MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\ReaderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
@@ -29,6 +28,7 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
     use LoggerAwareTrait;
 
     private Configuration $configuration;
+
     /**
      * @var ReaderInterface[]
      */
@@ -52,7 +52,7 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
             throw new RuntimeException('Undefined product attribute value reader');
         }
 
-        $metadata->forMember('value', function(ProductAttributeValueInterface $productAttributeValue) {
+        $metadata->forMember('value', function (ProductAttributeValueInterface $productAttributeValue) {
             if (null === $productAttributeValue->getType()) {
                 return null;
             }

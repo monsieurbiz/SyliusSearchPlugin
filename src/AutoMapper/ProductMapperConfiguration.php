@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -33,9 +33,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
     private Configuration $configuration;
+
     private AutoMapperInterface $autoMapper;
+
     private ProductVariantResolverInterface $productVariantResolver;
+
     private RequestStack $requestStack;
+
     private AvailabilityCheckerInterface $availabilityChecker;
 
     public function __construct(
@@ -58,35 +62,35 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return;
         }
 
-        $metadata->forMember('id', function(ProductInterface $product): int {
+        $metadata->forMember('id', function (ProductInterface $product): int {
             return $product->getId();
         });
 
-        $metadata->forMember('code', function(ProductInterface $product): ?string {
+        $metadata->forMember('code', function (ProductInterface $product): ?string {
             return $product->getCode();
         });
 
-        $metadata->forMember('enabled', function(ProductInterface $product): bool {
+        $metadata->forMember('enabled', function (ProductInterface $product): bool {
             return $product->isEnabled();
         });
 
-        $metadata->forMember('slug', function(ProductInterface $product): ?string {
+        $metadata->forMember('slug', function (ProductInterface $product): ?string {
             return $product->getSlug();
         });
 
-        $metadata->forMember('name', function(ProductInterface $product): ?string {
+        $metadata->forMember('name', function (ProductInterface $product): ?string {
             return $product->getName();
         });
 
-        $metadata->forMember('description', function(ProductInterface $product): ?string {
+        $metadata->forMember('description', function (ProductInterface $product): ?string {
             return $product->getDescription();
         });
 
-        $metadata->forMember('created_at', function(ProductInterface $product): ?DateTimeInterface {
+        $metadata->forMember('created_at', function (ProductInterface $product): ?DateTimeInterface {
             return $product->getCreatedAt();
         });
 
-        $metadata->forMember('images', function(ProductInterface $product): array {
+        $metadata->forMember('images', function (ProductInterface $product): array {
             $images = [];
             $imageDTOClass = $this->configuration->getTargetClass('image');
             foreach ($product->getImages() as $image) {
@@ -96,26 +100,26 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $images;
         });
 
-        $metadata->forMember('mainTaxon', function(ProductInterface $product) {
+        $metadata->forMember('mainTaxon', function (ProductInterface $product) {
             return null !== $product->getMainTaxon()
                 ? $this->autoMapper->map($product->getMainTaxon(), $this->configuration->getTargetClass('taxon'))
                 : null;
         });
 
-        $metadata->forMember('product_taxons', function(ProductInterface $product): array {
-            return array_map(function(ProductTaxonInterface $productTaxon) {
+        $metadata->forMember('product_taxons', function (ProductInterface $product): array {
+            return array_map(function (ProductTaxonInterface $productTaxon) {
                 // todo add parent taxon in Taxon object with automapper
                 return $this->autoMapper->map($productTaxon, $this->configuration->getTargetClass('product_taxon'));
             }, $product->getProductTaxons()->toArray());
         });
 
-        $metadata->forMember('channels', function(ProductInterface $product): array {
-            return array_map(function(ChannelInterface $channel) {
+        $metadata->forMember('channels', function (ProductInterface $product): array {
+            return array_map(function (ChannelInterface $channel) {
                 return $this->autoMapper->map($channel, $this->configuration->getTargetClass('channel'));
             }, $product->getChannels()->toArray());
         });
 
-        $metadata->forMember('attributes', function(ProductInterface $product): array {
+        $metadata->forMember('attributes', function (ProductInterface $product): array {
             $attributes = [];
             $currentLocale = $product->getTranslation()->getLocale();
             if (null === $currentLocale) {
@@ -136,7 +140,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $attributes;
         });
 
-        $metadata->forMember('options', function(ProductInterface $product): array {
+        $metadata->forMember('options', function (ProductInterface $product): array {
             $options = [];
             $currentLocale = $product->getTranslation()->getLocale();
             foreach ($product->getVariants() as $variant) {
@@ -170,7 +174,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $options;
         });
 
-        $metadata->forMember('variants', function(ProductInterface $product): array {
+        $metadata->forMember('variants', function (ProductInterface $product): array {
             $variants = [];
             $productVariantDTOClass = $this->configuration->getTargetClass('product_variant');
             foreach ($product->getEnabledVariants() as $variant) {
@@ -180,7 +184,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             return $variants;
         });
 
-        $metadata->forMember('prices', function(ProductInterface $product): array {
+        $metadata->forMember('prices', function (ProductInterface $product): array {
             $prices = [];
             foreach ($product->getChannels() as $channel) {
                 /** @var ChannelInterface $channel */
@@ -192,6 +196,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
                     || null === ($channelPricing = $variant->getChannelPricingForChannel($channel))
                 ) {
                     $this->requestStack->pop();
+
                     continue;
                 }
                 $this->requestStack->pop();

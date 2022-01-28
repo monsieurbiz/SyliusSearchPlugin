@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -34,7 +34,7 @@ final class PriceAggregation implements AggregationBuilderInterface
         $qb = new QueryBuilder();
         $channelCode = $this->channelContext->getChannel()->getCode() ?? '';
 
-        $filters = array_filter($filters, function($filter): bool {
+        $filters = array_filter($filters, function ($filter): bool {
             return !$filter->hasParam('path') || 'prices' !== $filter->getParam('path');
         });
 

@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -23,6 +23,7 @@ use Sylius\Component\Product\Model\ProductVariantInterface;
 final class VariantMapperConfiguration implements MapperConfigurationInterface
 {
     private Configuration $configuration;
+
     private AvailabilityCheckerInterface $availabilityChecker;
 
     public function __construct(Configuration $configuration, AvailabilityCheckerInterface $availabilityChecker)
@@ -37,7 +38,7 @@ final class VariantMapperConfiguration implements MapperConfigurationInterface
             return;
         }
 
-        $metadata->forMember('is_in_stock', function(ProductVariantInterface $productVariant): bool {
+        $metadata->forMember('is_in_stock', function (ProductVariantInterface $productVariant): bool {
             if (!$productVariant instanceof StockableInterface) {
                 return true;
             }

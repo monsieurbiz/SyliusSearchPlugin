@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -40,7 +40,9 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
      * @var ModelProductInterface[]
      */
     private array $productsToReindex = [];
+
     private array $productsToBeDelete = [];
+
     private MessageBusInterface $messageBus;
 
     public function __construct(MessageBusInterface $messageBus)
@@ -74,7 +76,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
 
         if (0 !== \count($this->productsToBeDelete)) {
             $productToDeleteMessage = new ProductToDeleteFromIds();
-            array_map(function(ProductInterface $product) use ($productToDeleteMessage): void {
+            array_map(function (ProductInterface $product) use ($productToDeleteMessage): void {
                 foreach ($this->productsToReindex as $key => $productsToReindex) {
                     if ($productsToReindex->getId() === $product->getId()) {
                         unset($this->productsToReindex[$key]);
@@ -111,10 +113,12 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         foreach ($entities as $entity) {
             if ($entity instanceof ProductInterface && 'deletions' === $type) {
                 $this->productsToBeDelete[] = $entity;
+
                 continue;
             }
             if ($entity instanceof ProductTaxonInterface && null !== $entity->getTaxon()) {
                 $this->messageBus->dispatch(new ProductReindexFromTaxon($entity->getTaxon()->getId()));
+
                 continue;
             }
             $product = $this->getProduct($entity);

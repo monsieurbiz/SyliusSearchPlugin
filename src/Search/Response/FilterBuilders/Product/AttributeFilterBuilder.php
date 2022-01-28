@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -52,7 +52,7 @@ class AttributeFilterBuilder implements FilterBuilderInterface
                     if (0 === $attributeValueBucket['doc_count']) {
                         continue;
                     }
-                    if (isset($attributeValueBucket['key']) && isset($attributeValueBucket['doc_count'])) {
+                    if (isset($attributeValueBucket['key'], $attributeValueBucket['doc_count'])) {
                         $filter->addValue($attributeValueBucket['key'], $attributeValueBucket['doc_count']);
                     }
                 }

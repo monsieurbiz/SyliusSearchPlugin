@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -40,6 +40,7 @@ class Filter implements FilterInterface
     private $count;
 
     private string $type;
+
     private RequestConfiguration $requestConfiguration;
 
     /**
@@ -54,17 +55,11 @@ class Filter implements FilterInterface
         $this->requestConfiguration = $requestConfiguration;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return $this->label;
@@ -88,25 +83,16 @@ class Filter implements FilterInterface
         );
     }
 
-    /**
-     * @return int
-     */
     public function getCount(): int
     {
         return $this->count;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     */
     public function setType(string $type): void
     {
         $this->type = $type;
@@ -114,7 +100,7 @@ class Filter implements FilterInterface
 
     public function getAppliedValues(): array
     {
-        return array_filter($this->getValues(), function(FilterValue $filterValue): bool {
+        return array_filter($this->getValues(), function (FilterValue $filterValue): bool {
             return $filterValue->isApplied();
         });
     }

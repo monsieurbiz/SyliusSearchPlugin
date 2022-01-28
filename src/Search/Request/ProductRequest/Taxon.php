@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -32,14 +32,23 @@ use Sylius\Component\Registry\ServiceRegistryInterface;
 final class Taxon implements RequestInterface
 {
     private DocumentableInterface $documentable;
+
     private ProductAttributeRepositoryInterface $productAttributeRepository;
+
     private ProductOptionRepositoryInterface $productOptionRepository;
+
     private ChannelContextInterface $channelContext;
+
     private AggregationBuilder $aggregationBuilder;
+
     private ?RequestConfiguration $configuration;
+
     private QueryFilterRegistryInterface $queryFilterRegistry;
+
     private PostFilterRegistryInterface $postFilterRegistry;
+
     private SorterRegistryInterface $sorterRegistry;
+
     private FunctionScoreRegistryInterface $functionScoreRegistry;
 
     public function __construct(

@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -26,8 +26,11 @@ use Sylius\Component\Registry\ServiceRegistryInterface;
 final class InstantSearch implements RequestInterface
 {
     private DocumentableInterface $documentable;
+
     private ?RequestConfiguration $configuration;
+
     private QueryFilterRegistryInterface $queryFilterRegistry;
+
     private FunctionScoreRegistryInterface $functionScoreRegistry;
 
     public function __construct(

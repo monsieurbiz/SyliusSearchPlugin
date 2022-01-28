@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -27,10 +27,15 @@ final class RequestConfiguration
     public const FALLBACK_LIMIT = 9;
 
     private Request $request;
+
     private string $type;
+
     private DocumentableInterface $documentable;
+
     private SettingsInterface $searchSettings;
+
     private ChannelContextInterface $channelContext;
+
     private Parameters $parameters;
 
     public function __construct(
@@ -57,7 +62,7 @@ final class RequestConfiguration
     public function getAppliedFilters(string $type = null): array
     {
         $requestQuery = $this->request->query->all();
-        $requestQuery = array_map(function($query) {
+        $requestQuery = array_map(function ($query) {
             return \is_array($query) ? array_filter($query) : $query;
         }, $requestQuery);
 

@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -18,14 +18,20 @@ use Sylius\Component\Resource\Model\TranslatableInterface;
 class Documentable implements DocumentableInterface
 {
     use DocumentableDatasourceTrait;
+
     use DocumentableMappingProviderTrait;
+
     private string $indexCode;
+
     private string $sourceClass;
+
     private string $targetClass;
+
     /**
      * @var array<string, string>
      */
     private array $templates;
+
     private array $limits;
 
     public function __construct(

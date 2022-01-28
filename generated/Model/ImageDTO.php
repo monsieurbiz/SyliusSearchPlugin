@@ -1,34 +1,34 @@
 <?php
 
+/*
+ * This file is part of Monsieur Biz' Search plugin for Sylius.
+ *
+ * (c) Monsieur Biz <sylius@monsieurbiz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE.txt
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
 class ImageDTO
 {
     /**
-     * 
-     *
-     * @var null|string
+     * @var string|null
      */
     protected $path;
-    /**
-     * 
-     *
-     * @return null|string
-     */
-    public function getPath() : ?string
+
+    public function getPath(): ?string
     {
         return $this->path;
     }
-    /**
-     * 
-     *
-     * @param null|string $path
-     *
-     * @return self
-     */
-    public function setPath(?string $path) : self
+
+    public function setPath(?string $path): self
     {
         $this->path = $path;
+
         return $this;
     }
 }

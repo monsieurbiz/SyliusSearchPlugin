@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -18,15 +18,15 @@ use MonsieurBiz\SyliusSearchPlugin\Helper\SlugHelper;
 class FilterValue
 {
     private string $label;
+
     private int $count;
+
     private string $value;
+
     private bool $isApplied;
 
     /**
      * Filter constructor.
-     *
-     * @param string $label
-     * @param int $count
      */
     public function __construct(string $label, int $count, string $value = null, bool $isApplied = false)
     {
@@ -36,25 +36,16 @@ class FilterValue
         $this->isApplied = $isApplied;
     }
 
-    /**
-     * @return string
-     */
     public function getSlug(): string
     {
         return SlugHelper::toSlug($this->value);
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return $this->label;
     }
 
-    /**
-     * @return int
-     */
     public function getCount(): int
     {
         return $this->count;

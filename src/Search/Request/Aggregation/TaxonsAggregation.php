@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -27,7 +27,7 @@ final class TaxonsAggregation implements AggregationBuilderInterface
         $currentTaxon = $aggregation['taxons']; /** @phpstan-ignore-line */
         $qb = new QueryBuilder();
 
-        $filters = array_filter($filters, function($filter): bool {
+        $filters = array_filter($filters, function ($filter): bool {
             return !$filter->hasParam('path') || 'product_taxons' !== $filter->getParam('path');
         });
 

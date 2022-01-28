@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -23,13 +23,18 @@ use Pagerfanta\Pagerfanta;
 class Response implements ResponseInterface
 {
     private RequestConfiguration $requestConfiguration;
+
     private AdapterInterface $adapter;
+
     private DocumentableInterface $documentable;
+
     /**
      * @var Pagerfanta<Result>|null
      */
     private ?Pagerfanta $paginator = null;
+
     private array $filters = [];
+
     private iterable $filterBuilders;
 
     public function __construct(
@@ -86,7 +91,7 @@ class Response implements ResponseInterface
             return;
         }
 
-        array_map(function($aggregationCode, $aggregationData): void {
+        array_map(function ($aggregationCode, $aggregationData): void {
             foreach ($this->filterBuilders as $filterBuilder) {
                 if (null !== $filter = $filterBuilder->build($this->getDocumentable(), $this->requestConfiguration, $aggregationCode, $aggregationData)) {
                     $this->filters[$filterBuilder->getPosition()][] = $filter;

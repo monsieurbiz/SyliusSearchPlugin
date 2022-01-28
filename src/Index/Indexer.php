@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -26,10 +26,15 @@ use Sylius\Component\Resource\Repository\RepositoryInterface;
 final class Indexer
 {
     private ServiceRegistryInterface $documentableRegistry;
+
     private RepositoryInterface $localeRepository;
+
     private array $locales = [];
+
     private EntityManagerInterface $entityManager;
+
     private AutoMapperInterface $autoMapper;
+
     private ClientFactory $clientFactory;
 
     public function __construct(
@@ -54,7 +59,7 @@ final class Indexer
         if (0 === \count($this->locales)) {
             $locales = $this->localeRepository->findAll();
             $this->locales = array_filter(array_map(
-                function(LocaleInterface $locale): string {
+                function (LocaleInterface $locale): string {
                     return $locale->getCode() ?? '';
                 },
                 $locales
@@ -96,7 +101,7 @@ final class Indexer
                 $document->setCurrentLocale($locale);
             }
             $dto = $this->autoMapper->map($document, $documentable->getTargetClass());
-            /* @phpstan-ignore-next-line */
+            // @phpstan-ignore-next-line
             $indexer->scheduleIndex($indexName, new Document((string) $document->getId(), $dto));
         }
     }
@@ -148,7 +153,7 @@ final class Indexer
                 $item->setCurrentLocale($locale);
             }
             $dto = $this->autoMapper->map($item, $documentable->getTargetClass());
-            /* @phpstan-ignore-next-line */
+            // @phpstan-ignore-next-line
             $indexer->scheduleIndex($newIndex, new Document((string) $item->getId(), $dto));
         }
         $indexer->flush();

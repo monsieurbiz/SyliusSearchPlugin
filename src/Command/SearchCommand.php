@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -34,10 +34,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class SearchCommand extends Command
 {
     protected static $defaultName = 'monsieurbiz:search:search';
+
     private Search $search;
+
     private RequestStack $requestStack;
+
     private ChannelContextInterface $channelContext;
+
     private SettingsInterface $searchSettings;
+
     private ServiceRegistryInterface $documentableRegistry;
 
     public function __construct(

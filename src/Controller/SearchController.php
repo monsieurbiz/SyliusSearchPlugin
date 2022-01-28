@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -34,11 +34,17 @@ use Symfony\Component\Intl\Currencies;
 class SearchController extends AbstractController
 {
     private Search $search;
+
     private CurrencyContextInterface $currencyContext;
+
     private LocaleContextInterface $localeContext;
+
     private ChannelContextInterface $channelContext;
+
     private SettingsInterface $searchSettings;
+
     private ServiceRegistryInterface $documentableRegistry;
+
     private ParametersParserInterface $parametersParser;
 
     public function __construct(
@@ -117,6 +123,7 @@ class SearchController extends AbstractController
                 $this->searchSettings,
                 $this->channelContext
             );
+
             try {
                 $results[] = $this->search->search($requestConfiguration);
             } catch (UnknownRequestTypeException $e) {

@@ -5,7 +5,7 @@
  *
  * (c) Monsieur Biz <sylius@monsieurbiz.com>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  */
 
@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 final class ProductDTONormalizer extends ObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
+
     use NormalizerAwareTrait;
 
     private Configuration $automapperConfiguration;

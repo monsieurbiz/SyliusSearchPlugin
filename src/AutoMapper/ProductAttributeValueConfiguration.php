@@ -34,11 +34,6 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
      */
     private array $productAttributeValueReaders;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
     public function __construct(Configuration $configuration, iterable $productAttributeValueReaders)
     {
         $this->logger = new NullLogger();

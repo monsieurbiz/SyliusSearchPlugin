@@ -21,13 +21,14 @@ up: docker.up server.start ## Up the project (start docker, start symfony server
 stop: server.stop docker.stop ## Stop the project (stop docker, stop symfony server)
 down: server.stop docker.down ## Down the project (removes docker containers, stop symfony server)
 
-reset: docker.down ## Stop docker and remove dependencies
+reset: ## Stop docker and remove dependencies
+	${MAKE} docker.down || true
 	rm -rf ${APP_DIR}/node_modules ${APP_DIR}/yarn.lock
 	rm -rf ${APP_DIR}
 	rm -rf vendor composer.lock
 .PHONY: reset
 
-dependencies: vendor node_modules ## Setup the dependencies
+dependencies: composer.lock node_modules ## Setup the dependencies
 .PHONY: dependencies
 
 .php-version: .php-version.dist
@@ -36,19 +37,8 @@ dependencies: vendor node_modules ## Setup the dependencies
 php.ini: php.ini.dist
 	cp php.ini.dist php.ini
 
-vendor: composer.lock ## Install the PHP dependencies using composer
-ifdef GITHUB_ACTIONS
-	${COMPOSER} install --prefer-dist
-else
-	${COMPOSER} install --prefer-source
-endif
-
 composer.lock: composer.json
-ifdef GITHUB_ACTIONS
-	${COMPOSER} update --prefer-dist
-else
-	${COMPOSER} update --prefer-source
-endif
+	${COMPOSER} install --no-scripts --no-plugins
 
 yarn.install: ${APP_DIR}/yarn.lock
 
@@ -75,10 +65,9 @@ setup_application:
 	rm -f ${APP_DIR}/yarn.lock
 	(cd ${APP_DIR} && ${COMPOSER} config repositories.plugin '{"type": "path", "url": "../../"}')
 	(cd ${APP_DIR} && ${COMPOSER} config extra.symfony.allow-contrib true)
+	(cd ${APP_DIR} && ${COMPOSER} config minimum-stability dev)
 	(cd ${APP_DIR} && ${COMPOSER} require --no-scripts --no-progress --no-install --no-update monsieurbiz/${PLUGIN_NAME}="*@dev")
-	$(MAKE) apply_dist
-	$(MAKE) ${APP_DIR}/.php-version
-	$(MAKE) ${APP_DIR}/php.ini
+	$(MAKE) apply_dist ${APP_DIR}/.php-version ${APP_DIR}/php.ini
 	(cd ${APP_DIR} && ${COMPOSER} install)
 
 ${APP_DIR}/docker-compose.yaml:
@@ -94,8 +83,15 @@ ${APP_DIR}/php.ini: php.ini
 	(cd ${APP_DIR} && ln -sf ../../php.ini)
 
 apply_dist:
-	cp -Rv dist/* ${APP_DIR}
-	cp -Rv dist/.env.local ${APP_DIR}/.env.local
+	ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST)))); \
+	for i in `cd dist && find . -type f`; do \
+		FILE_PATH=`echo $$i | sed 's|./||'`; \
+		FOLDER_PATH=`dirname $$FILE_PATH`; \
+		echo $$FILE_PATH; \
+		(cd ${APP_DIR} && rm -f $$FILE_PATH); \
+		(cd ${APP_DIR} && mkdir -p $$FOLDER_PATH); \
+		(cd ${APP_DIR} && ln -s $$ROOT_DIR/dist/$$FILE_PATH $$FILE_PATH); \
+    done
 
 ###
 ### TESTS
@@ -107,10 +103,10 @@ test.composer: ## Validate composer.json
 	${COMPOSER} validate --strict
 
 test.phpstan: ## Run PHPStan
-	${COMPOSER} phpstan || true
+	${COMPOSER} phpstan
 
 test.phpmd: ## Run PHPMD
-	${COMPOSER} phpmd || true
+	${COMPOSER} phpmd
 
 test.phpunit: ## Run PHPUnit
 	${COMPOSER} phpunit

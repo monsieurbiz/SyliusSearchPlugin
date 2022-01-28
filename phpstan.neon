@@ -12,3 +12,6 @@ parameters:
 
         # Test dependencies
         - 'tests/Application/**/*'
+        
+        # Generated files
+        - 'generated/**/*'

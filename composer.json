@@ -48,6 +48,9 @@
         "vimeo/psalm": "4.7.1",
         "jane-php/json-schema": "^7.1"
     },
+    "conflict": {
+        "doctrine/dbal": "^3"
+    },
     "prefer-stable": true,
     "autoload": {
         "psr-4": {

@@ -13,11 +13,29 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
-use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
+use JoliCode\Elastically\Mapping\MappingProviderInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Datasource\DatasourceInterface;
 
 interface DocumentableInterface
 {
-    public function getDocumentType(): string;
+    public function getIndexCode(): string;
 
-    public function convertToDocument(string $locale): ResultInterface;
+    // TODO move it in CustomMappingProviderInterface
+    public function setMappingProvider(MappingProviderInterface $mapping): void;
+
+    public function getMappingProvider(): MappingProviderInterface;
+
+    public function getSourceClass(): string;
+
+    public function getTargetClass(): string;
+
+    public function setDatasource(DatasourceInterface $datasource): void;
+
+    public function getDatasource(): DatasourceInterface;
+
+    public function isTranslatable(): bool;
+
+    public function getTemplate(string $type): ?string;
+
+    public function getLimits(?string $queryType): array;
 }

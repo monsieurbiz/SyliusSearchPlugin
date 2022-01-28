@@ -1,1 +1,2 @@
-../../../../recipe/dev/config/packages/monsieurbiz_sylius_search_plugin.yaml
+imports:
+  - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }

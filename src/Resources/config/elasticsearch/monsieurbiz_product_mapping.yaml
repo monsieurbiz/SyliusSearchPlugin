@@ -1,0 +1,79 @@
+mappings:
+  dynamic: false
+  properties:
+    # attributes mapping is managed dynamically
+    # options mapping is managed dynamically
+    code:
+      type: keyword
+    enabled:
+      type: boolean
+    channels:
+      type: nested
+      properties:
+        code:
+          type: keyword
+    name:
+      type: text
+      fields:
+        keyword:
+          type: keyword
+        autocomplete:
+          type: text
+          analyzer: search_autocomplete
+          search_analyzer: standard
+    created_at:
+      type: date
+    description:
+      type: text
+    images:
+      type: nested
+      properties:
+        path:
+          type: keyword
+    main_taxon:
+      type: nested
+      properties:
+        code:
+          type: keyword
+        name:
+          type: keyword
+        position:
+          type: integer
+        level:
+          type: integer
+    product_taxons:
+      type: nested
+      properties:
+        taxon:
+          type: nested
+          properties:
+            code:
+              type: keyword
+            name:
+              type: keyword
+            position:
+              type: integer
+            level:
+              type: integer
+        position:
+          type: integer
+    prices:
+      type: nested
+      properties:
+        channel_code:
+          type: keyword
+        price:
+          type: integer
+        original_price:
+          type: integer
+        is_price_reduced:
+          type: boolean
+    variants:
+      type: nested
+      properties:
+        code:
+          type: keyword
+        enabled:
+          type: boolean
+        is_in_stock:
+          type: boolean

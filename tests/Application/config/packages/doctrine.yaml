@@ -8,17 +8,18 @@ parameters:
 doctrine:
     dbal:
         driver: 'pdo_mysql'
-        server_version: '5.7'
-        charset: UTF8
+        charset: utf8mb4
 
         url: '%env(resolve:DATABASE_URL)%'
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
-        auto_mapping: true
-        mappings:
-            Tests\MonsieurBiz\SyliusSearchPlugin\App:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity'
-                alias: Tests\MonsieurBiz\SyliusSearchPlugin\App
+        entity_managers:
+            default:
+                auto_mapping: true
+                mappings:
+                    App:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App

@@ -1,0 +1,7 @@
+filter:
+  stemmer:
+    type: stemmer
+    language: english
+analyzer:
+  search_standard:
+    filter:    [ 'stemmer' ]

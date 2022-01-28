@@ -1,0 +1,31 @@
+monsieurbiz_sylius_search:
+  documents:
+    monsieurbiz_product:
+      #document_class: '…' # by default MonsieurBiz\SyliusSearchPlugin\Model\Documentable\Documentable
+      instant_search_enabled: true # by default false
+      limits:
+        search: [9, 18, 27]
+        taxon: [9, 18, 27]
+        instant_search: [5]
+      source: 'Sylius\Component\Core\Model\ProductInterface'
+      target: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO'
+      templates:
+        item: '@MonsieurBizSyliusSearchPlugin/Search/product/_box.html.twig'
+        instant: '@MonsieurBizSyliusSearchPlugin/Instant/Product/_box.html.twig'
+      #mapping_provider: '...' # by default monsieurbiz.search.mapper_provider
+      #dataprovider: '...' # by default MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource
+  automapper_classes:
+    sources:
+      product: '%sylius.model.product.class%'
+      product_variant: '%sylius.model.product_variant.class%'
+      product_attribute_value: '%sylius.model.product_attribute_value.class%'
+    targets:
+      product: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO'
+      image: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO'
+      taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\TaxonDTO'
+      product_taxon: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO'
+      channel: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ChannelDTO'
+      product_attribute: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO'
+      product_variant: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO'
+      pricing: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO'
+

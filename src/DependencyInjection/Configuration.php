@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
+use MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider;
+use MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\Documentable;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -24,84 +27,64 @@ final class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('monsieur_biz_sylius_search');
-        if (method_exists($treeBuilder, 'getRootNode')) {
-            $rootNode = $treeBuilder->getRootNode();
-        } else {
-            // BC layer for symfony/config 4.1 and older
-            $rootNode = $treeBuilder->root('monsieur_biz_sylius_search');
-        }
-
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->children()
-            // Files
-            ->arrayNode('files')
-                ->children()
-                    ->scalarNode('search')->isRequired()->end()
-                    ->scalarNode('taxon')->isRequired()->end()
-                    ->scalarNode('instant')->isRequired()->end()
+                ->arrayNode('documents')
+                    ->useAttributeAsKey('code', false)
+                    ->defaultValue([])
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('document_class')->defaultValue(Documentable::class)->end()
+                            ->scalarNode('instant_search_enabled')->defaultValue(false)->end()
+                            ->scalarNode('source')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('target')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('mapping_provider')->defaultValue(YamlWithLocaleProvider::class)->end()
+                            ->scalarNode('datasource')->defaultValue(RepositoryDatasource::class)->end()
+                            ->arrayNode('templates')
+                                ->addDefaultsIfNotSet()
+                                ->children()
+                                    ->scalarNode('item')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('instant')->isRequired()->cannotBeEmpty()->end()
+                                ->end()
+                            ->end()
+
+                            // Limits
+                            ->arrayNode('limits')
+                                ->children()
+                                    ->arrayNode('search')
+                                        ->performNoDeepMerging()
+                                        ->integerPrototype()->end()
+                                        ->defaultValue([9, 18, 27])
+                                    ->end()
+                                    ->arrayNode('taxon')
+                                        ->performNoDeepMerging()
+                                        ->integerPrototype()->end()
+                                        ->defaultValue([9, 18, 27])
+                                    ->end()
+                                    ->arrayNode('instant_search')
+                                        ->performNoDeepMerging()
+                                        ->integerPrototype()->end()
+                                        ->defaultValue([10])
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
-            ->end()
-
-            // Documentable classes
-            ->variableNode('documentable_classes')->end()
-
-            // Grid
-            ->arrayNode('grid')
-                ->children()
-
-                    // Limits
-                    ->arrayNode('limits')
-                        ->children()
-                            ->arrayNode('taxon')
-                                ->performNoDeepMerging()
-                                ->integerPrototype()->end()
-                                ->isRequired()
-                                ->defaultValue([10, 25, 50])
-                            ->end()
-                            ->arrayNode('search')
-                                ->performNoDeepMerging()
-                                ->integerPrototype()->end()
-                                ->isRequired()
-                                ->defaultValue([10, 25, 50])
-                            ->end()
+                ->arrayNode('automapper_classes')
+                    ->children()
+                        ->arrayNode('sources')
+                            ->useAttributeAsKey('code', false)
+                            ->defaultValue([])
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('targets')
+                            ->useAttributeAsKey('code', false)
+                            ->defaultValue([])
+                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
-
-                    // Default limit
-                    ->arrayNode('default_limit')
-                        ->children()
-                            ->integerNode('taxon')->isRequired()->defaultValue(10)->end()
-                            ->integerNode('search')->isRequired()->defaultValue(10)->end()
-                            ->integerNode('instant')->isRequired()->defaultValue(10)->end()
-                        ->end()
-                    ->end()
-
-                    // Sorting
-                    ->arrayNode('sorting')
-                        ->children()
-                            ->arrayNode('taxon')
-                                ->performNoDeepMerging()
-                                ->scalarPrototype()->end()
-                                ->isRequired()
-                                ->defaultValue(['name'])
-                            ->end()
-                            ->arrayNode('search')
-                                ->performNoDeepMerging()
-                                ->scalarPrototype()->end()
-                                ->isRequired()
-                                ->defaultValue(['name'])
-                            ->end()
-                        ->end()
-                    ->end()
-
-                    // Filters
-                    ->arrayNode('filters')
-                        ->children()
-                            ->booleanNode('apply_manually')->isRequired()->defaultValue(false)->end()
-                            ->booleanNode('use_main_taxon')->isRequired()->defaultValue(false)->end()
-                        ->end()
-                    ->end()
-
                 ->end()
             ->end()
         ;

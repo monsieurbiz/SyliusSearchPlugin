@@ -1,0 +1,21 @@
+{% import "@SyliusShop/Common/Macro/money.html.twig" as money %}
+
+<div class="result">
+    <a href="{{ path('sylius_shop_product_show', {'slug': item.slug, '_locale': sylius.localeCode}) }}" class="ui tiny image">
+        {% if item.images|first %}
+            {% set path = item.images|first.path|imagine_filter(filter|default('sylius_shop_product_thumbnail')) %}
+        {% else %}
+            {% set path = '//placehold.it/200x200' %}
+        {% endif %}
+
+        <img src="{{ path }}" alt="{{ item.name }}"/>
+    </a>
+    <div class="content">
+        <a href="{{ path('sylius_shop_product_show', {'slug': item.slug, '_locale': sylius.localeCode}) }}" class="header sylius-product-name">{{ item.name }}</a>
+
+        {% if item.prices is not empty %}
+            {% set pricing = item.prices|filter(price => price.channelCode == sylius.channel.code)|first %}
+            <div class="sylius-product-price">{{ money.convertAndFormat(pricing.price) }}</div>
+        {% endif %}
+    </div>
+</div>

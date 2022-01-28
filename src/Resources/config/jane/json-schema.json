@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/2019-09/schema#",
+  "definitions": {
+    "ImageDTO": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "ChannelDTO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "ProductTaxonDTO": {
+      "type": "object",
+      "properties": {
+        "taxon": {
+          "$ref": "#/definitions/TaxonDTO"
+        },
+        "position": {
+          "type": [
+            "null",
+            "integer"
+          ]
+        }
+      }
+    },
+    "TaxonDTO": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "position": {
+          "type": "integer"
+        },
+        "level": {
+          "type": "integer"
+        }
+      }
+    },
+    "ProductAttributeDTO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": ["null", "mixed"]
+        }
+      }
+    },
+    "PricingDTO": {
+      "type": "object",
+      "properties": {
+        "channel_code": {
+          "type": "string"
+        },
+        "price": {
+          "type": ["null", "integer"]
+        },
+        "original_price": {
+          "type": ["null", "integer"]
+        },
+        "price_reduced": {
+          "type": ["boolean"]
+        }
+      }
+    }
+  }
+}

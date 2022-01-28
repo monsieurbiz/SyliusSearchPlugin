@@ -2,29 +2,33 @@ imports:
     - { resource: "@SyliusCoreBundle/Resources/config/app/config.yml" }
 
     - { resource: "@SyliusAdminBundle/Resources/config/app/config.yml" }
-    - { resource: "@SyliusAdminApiBundle/Resources/config/app/config.yml" }
 
     - { resource: "@SyliusShopBundle/Resources/config/app/config.yml" }
+
+    - { resource: "@SyliusApiBundle/Resources/config/app/config.yaml" }
 
 parameters:
     sylius_core.public_dir: '%kernel.project_dir%/public'
 
+sylius_api:
+    enabled: false
+
 sylius_shop:
     product_grid:
         include_all_descendants: true
-
-sylius_product:
-    resources:
-        product:
-            classes:
-                model: Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product\Product
-        product_option:
-            classes:
-                model: Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product\ProductOption
 
 sylius_attribute:
     resources:
         product:
             attribute:
                 classes:
-                    model: Tests\MonsieurBiz\SyliusSearchPlugin\App\Entity\Product\ProductAttribute
+                    model: App\Entity\Product\ProductAttribute
+
+sylius_product:
+    resources:
+        product:
+            classes:
+                model: App\Entity\Product\Product
+        product_option:
+            classes:
+                model: App\Entity\Product\ProductOption

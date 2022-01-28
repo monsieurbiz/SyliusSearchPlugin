@@ -16,16 +16,28 @@ namespace MonsieurBiz\SyliusSearchPlugin\Form\Extension;
 use Sylius\Bundle\ProductBundle\Form\Type\ProductOptionType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 final class ProductOptionTypeExtension extends AbstractTypeExtension
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $searchWeightValues = range(1, 10);
+
         $builder
-            ->add('filterable', CheckboxType::class, [
-                'label' => 'monsieurbiz_searchplugin.admin.product_option.form.filterable',
+            ->add('searchable', CheckboxType::class, [
+                'label' => 'monsieurbiz_searchplugin.admin.product_attribute.form.searchable',
                 'required' => true,
+            ])
+            ->add('filterable', CheckboxType::class, [
+                'label' => 'monsieurbiz_searchplugin.admin.product_attribute.form.filterable',
+                'required' => true,
+            ])
+            ->add('search_weight', ChoiceType::class, [
+                'label' => 'monsieurbiz_searchplugin.admin.product_attribute.form.search_weight',
+                'required' => true,
+                'choices' => array_combine($searchWeightValues, $searchWeightValues),
             ])
         ;
     }

@@ -13,186 +13,140 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
-use MonsieurBiz\SyliusSearchPlugin\Context\TaxonContextInterface;
-use MonsieurBiz\SyliusSearchPlugin\Exception\MissingLocaleException;
-use MonsieurBiz\SyliusSearchPlugin\Exception\NotSupportedTypeException;
-use MonsieurBiz\SyliusSearchPlugin\Helper\RenderDocumentUrlHelper;
-use MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig;
-use MonsieurBiz\SyliusSearchPlugin\Model\Document\Index\Search;
-use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
-use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultSet;
+use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Search;
+use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
+use Sylius\Bundle\ResourceBundle\Controller\Parameters;
+use Sylius\Bundle\ResourceBundle\Controller\ParametersParserInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
+use Sylius\Component\Locale\Context\LocaleContextInterface;
+use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment;
+use Symfony\Component\Intl\Currencies;
 
 class SearchController extends AbstractController
 {
-    public const SORT_ASC = 'asc';
-    public const SORT_DESC = 'desc';
-
-    /** @var Environment */
-    private $templatingEngine;
-
-    /** @var Search */
-    private $documentSearch;
-
-    /** @var ChannelContextInterface */
-    private $channelContext;
-
-    /** @var CurrencyContextInterface */
-    private $currencyContext;
-
-    /** @var TaxonContextInterface */
-    private $taxonContext;
-
-    /** @var GridConfig */
-    private $gridConfig;
-
-    /** @var RenderDocumentUrlHelper */
-    private $renderDocumentUrlHelper;
+    private Search $search;
+    private CurrencyContextInterface $currencyContext;
+    private LocaleContextInterface $localeContext;
+    private ChannelContextInterface $channelContext;
+    private SettingsInterface $searchSettings;
+    private ServiceRegistryInterface $documentableRegistry;
+    private ParametersParserInterface $parametersParser;
 
     public function __construct(
-        Environment $templatingEngine,
-        Search $documentSearch,
-        ChannelContextInterface $channelContext,
+        Search $search,
         CurrencyContextInterface $currencyContext,
-        TaxonContextInterface $taxonContext,
-        GridConfig $gridConfig,
-        RenderDocumentUrlHelper $renderDocumentUrlHelper
+        LocaleContextInterface $localeContext,
+        ChannelContextInterface $channelContext,
+        SettingsInterface $searchSettings,
+        ServiceRegistryInterface $documentableRegistry,
+        ParametersParserInterface $parametersParser
     ) {
-        $this->templatingEngine = $templatingEngine;
-        $this->documentSearch = $documentSearch;
-        $this->channelContext = $channelContext;
+        $this->search = $search;
         $this->currencyContext = $currencyContext;
-        $this->taxonContext = $taxonContext;
-        $this->gridConfig = $gridConfig;
-        $this->renderDocumentUrlHelper = $renderDocumentUrlHelper;
+        $this->localeContext = $localeContext;
+        $this->channelContext = $channelContext;
+        $this->searchSettings = $searchSettings;
+        $this->documentableRegistry = $documentableRegistry;
+        $this->parametersParser = $parametersParser;
+    }
+
+    // TODO add an optional parameter $documentType (nullable => get the default document type)
+    public function searchAction(Request $request, string $query): Response
+    {
+        /** @var DocumentableInterface $documentable */
+        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
+        $requestConfiguration = new RequestConfiguration(
+            $request,
+            RequestInterface::SEARCH_TYPE,
+            $documentable,
+            $this->searchSettings,
+            $this->channelContext
+        );
+        $result = $this->search->search($requestConfiguration);
+
+        return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
+            'documentable' => $result->getDocumentable(),
+            'requestConfiguration' => $requestConfiguration,
+            'query' => urldecode($query),
+            'result' => $result,
+            'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
+        ]);
     }
 
     /**
      * Post search.
-     *
-     * @param Request $request
-     *
-     * @return RedirectResponse
      */
-    public function postAction(Request $request)
+    public function postAction(Request $request): RedirectResponse
     {
-        $query = $request->request->get('monsieurbiz_searchplugin_search')['query'] ?? null;
+        $query = (array) $request->request->get('monsieurbiz_searchplugin_search') ?? [];
+        $query = $query['query'] ?? '';
 
-        return new RedirectResponse(
-            $this->generateUrl('monsieurbiz_sylius_search_search',
-                ['query' => urlencode($query)])
+        return $this->redirect(
+            $this->generateUrl(
+                'monsieurbiz_search_search',
+                ['query' => urlencode($query)]
+            )
         );
     }
 
     /**
-     * Perform the search action & display results. User can add page, limit or sorting.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
-    public function searchAction(Request $request): Response
-    {
-        // Init grid config depending on request
-        $this->gridConfig->init(GridConfig::SEARCH_TYPE, $request);
-
-        // Perform search
-        /** @var ResultSet $resultSet */
-        $resultSet = $this->documentSearch->search($this->gridConfig);
-
-        // Redirect to document if only one result and no filter applied
-        $appliedFilters = $this->gridConfig->getAppliedFilters();
-        if (1 === $resultSet->getTotalHits() && empty($appliedFilters)) {
-            /** @var Result $document */
-            $document = current($resultSet->getResults());
-            try {
-                $urlParams = $this->renderDocumentUrlHelper->getUrlParams($document);
-
-                return new RedirectResponse($this->generateUrl($urlParams->getPath(), $urlParams->getParams()));
-            } catch (NotSupportedTypeException $e) {
-                // Return list of results if cannot redirect, so ignore Exception
-            } catch (MissingLocaleException $e) {
-                // Return list of results if locale is missing
-            }
-        }
-
-        // Get number formatter for currency
-        $currencyCode = $this->currencyContext->getCurrencyCode();
-        $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
-
-        // Display result list
-        return new Response($this->templatingEngine->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
-            'query' => $this->gridConfig->getQuery(),
-            'limits' => $this->gridConfig->getLimits(),
-            'resultSet' => $resultSet,
-            'channel' => $this->channelContext->getChannel(),
-            'currencyCode' => $this->currencyContext->getCurrencyCode(),
-            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL),
-            'gridConfig' => $this->gridConfig,
-        ]));
-    }
-
-    /**
      * Perform the instant search action & display results.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function instantAction(Request $request): Response
     {
-        // Init grid config depending on request
-        $this->gridConfig->init(GridConfig::INSTANT_TYPE, $request);
+        $results = [];
+        /** @var DocumentableInterface $documentable */
+        foreach ($this->documentableRegistry->all() as $documentable) {
+            if (!(bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'instant_search_enabled__' . $documentable->getIndexCode())) {
+                continue;
+            }
 
-        // Perform instant search
-        /** @var ResultSet $resultSet */
-        $resultSet = $this->documentSearch->instant($this->gridConfig);
+            $requestConfiguration = new RequestConfiguration(
+                $request,
+                RequestInterface::INSTANT_TYPE,
+                $documentable,
+                $this->searchSettings,
+                $this->channelContext
+            );
+            try {
+                $results[] = $this->search->search($requestConfiguration);
+            } catch (UnknownRequestTypeException $e) {
+                continue;
+            }
+        }
 
-        // Display instant result list
-        return new Response($this->templatingEngine->render('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
-            'query' => $this->gridConfig->getQuery(),
-            'resultSet' => $resultSet,
-            'channel' => $this->channelContext->getChannel(),
-            'currencyCode' => $this->currencyContext->getCurrencyCode(),
-            'gridConfig' => $this->gridConfig,
-        ]));
+        return $this->render('@MonsieurBizSyliusSearchPlugin/Instant/result.html.twig', [
+            'results' => $results,
+        ]);
     }
 
-    /**
-     * Perform the taxon action & display results.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
     public function taxonAction(Request $request): Response
     {
-        // Init grid config depending on request
-        $this->gridConfig->init(GridConfig::TAXON_TYPE, $request, $this->taxonContext->getTaxon());
+        /** @var DocumentableInterface $documentable */
+        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
+        $requestConfiguration = new RequestConfiguration(
+            $request,
+            RequestInterface::TAXON_TYPE,
+            $documentable,
+            $this->searchSettings,
+            $this->channelContext,
+            new Parameters($this->parametersParser->parseRequestValues($request->attributes->get('_sylius', []), $request))
+        );
+        $result = $this->search->search($requestConfiguration);
 
-        // Perform search
-        /** @var ResultSet $resultSet */
-        $resultSet = $this->documentSearch->taxon($this->gridConfig);
-
-        // Get number formatter for currency
-        $currencyCode = $this->currencyContext->getCurrencyCode();
-        $formatter = new \NumberFormatter($request->getLocale() . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
-
-        // Display result list
-        return new Response($this->templatingEngine->render('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
-            'taxon' => $this->gridConfig->getTaxon(),
-            'limits' => $this->gridConfig->getLimits(),
-            'resultSet' => $resultSet,
-            'channel' => $this->channelContext->getChannel(),
-            'currencyCode' => $this->currencyContext->getCurrencyCode(),
-            'moneySymbol' => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL),
-            'gridConfig' => $this->gridConfig,
-        ]));
+        return $this->render('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
+            'requestConfiguration' => $requestConfiguration,
+            'result' => $result,
+            'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
+        ]);
     }
 }

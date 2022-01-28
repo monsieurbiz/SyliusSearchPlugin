@@ -1,0 +1,7 @@
+{% include [
+    '@MonsieurBizSyliusSearchPlugin/Search/Filter/'~filter.type~'.html.twig',
+    '@MonsieurBizSyliusSearchPlugin/Search/Filter/default.html.twig'
+    ] with {
+    'filter': filter,
+    'currencySymbol': currencySymbol
+} %}

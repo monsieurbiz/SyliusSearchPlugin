@@ -1,3 +1,0 @@
-twig:
-    globals:
-        monsieur_biz_sylius_search_grid_config: '@MonsieurBiz\SyliusSearchPlugin\Model\Config\GridConfig'

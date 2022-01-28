@@ -4,12 +4,19 @@ monsieurbiz_searchplugin:
       form:
         title: Search
         filterable: Filterable
+        searchable: Searchable
+        search_weight: Search Weight test
     product_option:
       form:
         title: Search
         filterable: Filterable
+    setting_form:
+      instant_search_enabled_monsieurbiz_product: 'Product: Instant search enabled'
+      limit_search_monsieurbiz_product: 'Product: Available limits for search'
+      limit_instant_search_monsieurbiz_product: 'Product: Available limits for instant search'
   form:
     query: 'Search'
+    query_placeholder: 'Search…'
     submit: 'Submit search'
   search:
     result:
@@ -19,6 +26,7 @@ monsieurbiz_searchplugin:
     result:
       search_result: 'Search results for "%query%" (%count%)'
       no_result: 'No result.'
+      monsieurbiz_product: 'Products'
   filters:
       filter_results: 'Filter results'
       apply_filters: 'Apply filters'

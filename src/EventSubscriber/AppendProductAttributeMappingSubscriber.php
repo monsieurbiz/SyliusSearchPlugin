@@ -40,11 +40,11 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
     public static function getSubscribedEvents()
     {
         return [
-            MappingProviderEvent::EVENT_NAME => 'omMappingProvider',
+            MappingProviderEvent::EVENT_NAME => 'onMappingProvider',
         ];
     }
 
-    public function omMappingProvider(MappingProviderEvent $event): void
+    public function onMappingProvider(MappingProviderEvent $event): void
     {
         if ('monsieurbiz_product' !== $event->getIndexCode()) {
             return;

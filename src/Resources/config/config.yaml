@@ -2,5 +2,6 @@ imports:
   - { resource: "services.yaml" }
   - { resource: "monsieurbiz_search.yaml" }
   - { resource: "sylius/ui.yaml" }
+  - { resource: "sylius/fixtures.yaml" }
   - { resource: "monsieurbiz/settings.yaml" }
   - { resource: "messenger.yaml" }

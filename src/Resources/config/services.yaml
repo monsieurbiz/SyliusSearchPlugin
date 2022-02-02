@@ -26,6 +26,8 @@ services:
   _instanceof:
     MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader\ReaderInterface:
       tags: [ 'monsieurbiz.search.automapper.product_attribute_value_reader' ]
+    MonsieurBiz\SyliusSearchPlugin\Fixture\SearchableFixtureInterface:
+      tags: ['sylius_fixtures.fixture']
 
   MonsieurBiz\SyliusSearchPlugin\:
     resource: '../../*'

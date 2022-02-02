@@ -18,9 +18,9 @@ use Doctrine\ORM\Mapping as ORM;
 trait SearchableTrait
 {
     /**
-     * @ORM\Column(name="searchable", type="boolean", nullable=false, options={"default"=true})
+     * @ORM\Column(name="searchable", type="boolean", nullable=false, options={"default"=false})
      */
-    protected bool $searchable = true;
+    protected bool $searchable = false;
 
     /**
      * @ORM\Column(name="filterable", type="boolean", nullable=false, options={"default"=false})

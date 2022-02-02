@@ -190,6 +190,12 @@ server.stop: ## Stop the local webserver
 es.reindex: ## Reindex elasticsearch
 	${CONSOLE} monsieurbiz:search:populate
 
+doctrine.diff: ## Doctrine diff
+	${CONSOLE} doctrine:migration:diff
+
+doctrine.migrate: ## Doctrine diff
+	${CONSOLE} doctrine:migration:migrate
+
 ###
 ### HELP
 ### ¯¯¯¯

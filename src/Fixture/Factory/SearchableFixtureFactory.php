@@ -63,8 +63,8 @@ class SearchableFixtureFactory extends AbstractExampleFactory implements Searcha
             ->setDefault('option', null)
                 ->setAllowedTypes('option', ['null', 'string', ProductOptionInterface::class])
                 ->setNormalizer('option', LazyOption::findOneBy($this->productOptionRepository, 'code'))
-            ->setDefault('filterable', true)
-            ->setDefault('searchable', true)
+            ->setDefault('filterable', false)
+            ->setDefault('searchable', false)
         ;
     }
 

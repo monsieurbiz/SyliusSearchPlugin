@@ -1,0 +1,23 @@
+sylius_fixtures:
+    suites:
+        default:
+            fixtures:
+                monsieurbiz_sylius_search:
+                    options:
+                        custom:
+                            cap_collection:
+                                attribute: 'cap_collection'
+                                filterable: true
+                                searchable: true
+                            dress_collection:
+                                attribute: 'dress_collection'
+                                filterable: true
+                                searchable: true
+                            dress_height:
+                                option: 'dress_height'
+                                filterable: true
+                                searchable: true
+                            dress_size:
+                                option: 'dress_size'
+                                filterable: true
+                                searchable: true

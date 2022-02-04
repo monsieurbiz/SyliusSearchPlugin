@@ -51,6 +51,11 @@ class AggregationBuilder
      */
     private function buildAggregation($aggregation, array $filters)
     {
+        // Don't build aggregation if the given one is empty
+        if (empty($aggregation)) {
+            return false;
+        }
+
         foreach ($this->aggregationBuilders as $aggregationBuilder) {
             $aggregationQuery = $aggregationBuilder->build($aggregation, $filters);
             if (null !== $aggregationQuery) {

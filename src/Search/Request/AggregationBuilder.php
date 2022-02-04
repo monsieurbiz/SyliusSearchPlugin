@@ -63,6 +63,6 @@ class AggregationBuilder
             }
         }
 
-        throw new RuntimeException('Aggregation can be build'); // it's throw an exception if we have not filtreable attribute
+        throw new RuntimeException('Aggregation cannot be build'); // it's throw an exception if we have not filtreable attribute
     }
 }

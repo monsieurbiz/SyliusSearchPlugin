@@ -33,15 +33,13 @@ class RepositoryDatasource implements DatasourceInterface
         $repository = $this->entityManager->getRepository($sourceClass);
         if ($repository instanceof RepositoryInterface && ($paginator = $repository->createPaginator()) instanceof Pagerfanta) {
             $page = 1;
-            while ($paginator->hasNextPage()) {
+            do {
                 $paginator->setCurrentPage($page);
                 foreach ($paginator as $item) {
                     yield $item;
                 }
-                if ($paginator->hasNextPage()) {
-                    $page = $paginator->getNextPage();
-                }
-            }
+                $page = $paginator->hasNextPage() ? $paginator->getNextPage() : 1;
+            } while ($paginator->hasNextPage());
 
             return null;
         }

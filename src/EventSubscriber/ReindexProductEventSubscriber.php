@@ -15,7 +15,9 @@ namespace MonsieurBiz\SyliusSearchPlugin\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\UnitOfWork;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductToDeleteFromIds;
@@ -45,6 +47,8 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
 
     private MessageBusInterface $messageBus;
 
+    private bool $dispatched = false;
+
     public function __construct(MessageBusInterface $messageBus)
     {
         $this->messageBus = $messageBus;
@@ -62,49 +66,27 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
     {
         $eventArgs->getEntityManager()->getEventManager()->removeEventListener(Events::onFlush, $this);
         $unitOfWork = $eventArgs->getEntityManager()->getUnitOfWork();
-
-        $collections = array_merge($unitOfWork->getScheduledCollectionUpdates(), $unitOfWork->getScheduledCollectionDeletions());
-        foreach ($collections as $collection) {
-            if (method_exists($collection, 'getOwner') && $collection->getOwner() instanceof ProductInterface) {
-                $this->productsToReindex[] = $collection->getOwner();
-            }
-        }
-
-        $entities = array_merge($unitOfWork->getScheduledEntityInsertions(), $unitOfWork->getScheduledEntityUpdates());
-        $this->onFlushEntities($entities);
-        $this->onFlushEntities($unitOfWork->getScheduledEntityDeletions(), 'deletions');
-
-        if (0 !== \count($this->productsToBeDelete)) {
-            $productToDeleteMessage = new ProductToDeleteFromIds();
-            array_map(function (ProductInterface $product) use ($productToDeleteMessage): void {
-                foreach ($this->productsToReindex as $key => $productsToReindex) {
-                    if ($productsToReindex->getId() === $product->getId()) {
-                        unset($this->productsToReindex[$key]);
-                    }
-                }
-                $productToDeleteMessage->addProductId($product->getId());
-            }, $this->productsToBeDelete);
-            $this->messageBus->dispatch($productToDeleteMessage);
-        }
-
-        // in other event subscriber ...
-        // todo reindex all data when: change/create/remove attribute/option, add/remove channel, add/remove locale
+        $this->manageUnitOfWork($unitOfWork);
     }
 
-    public function postFlush(): void
+    public function postFlush(PostFlushEventArgs $args): void
     {
-        $productReindexFormIdsMessage = new ProductReindexFromIds();
+        $unitOfWork = $args->getEntityManager()->getUnitOfWork();
+        $this->manageUnitOfWork($unitOfWork);
+
+        $productReindexFromIdsMessage = new ProductReindexFromIds();
 
         foreach ($this->productsToReindex as $productsToReindex) {
             if (null === $productsToReindex->getId()) {
                 continue;
             }
-            $productReindexFormIdsMessage->addProductId($productsToReindex->getId());
+            $productReindexFromIdsMessage->addProductId($productsToReindex->getId());
         }
         $this->productsToReindex = [];
 
-        if (0 !== \count($productReindexFormIdsMessage->getProductIds())) {
-            $this->messageBus->dispatch($productReindexFormIdsMessage);
+        if (0 !== \count($productReindexFromIdsMessage->getProductIds()) && false === $this->dispatched) {
+            $this->dispatched = true; // Needed to set before dispatch to avoid infinite calls by message flush containing product
+            $this->messageBus->dispatch($productReindexFromIdsMessage);
         }
     }
 
@@ -112,7 +94,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
     {
         foreach ($entities as $entity) {
             if ($entity instanceof ProductInterface && 'deletions' === $type) {
-                $this->productsToBeDelete[] = $entity;
+                $this->productsToBeDelete[$entity->getId()] = $entity;
 
                 continue;
             }
@@ -123,7 +105,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
             }
             $product = $this->getProduct($entity);
             if (null !== $product) {
-                $this->productsToReindex[] = $product;
+                $this->productsToReindex[$product->getId()] = $product;
             }
         }
     }
@@ -162,5 +144,36 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         }
 
         return null;
+    }
+
+    private function manageUnitOfWork(UnitOfWork $unitOfWork): void
+    {
+        $collections = array_merge($unitOfWork->getScheduledCollectionUpdates(), $unitOfWork->getScheduledCollectionDeletions());
+        foreach ($collections as $collection) {
+            if (method_exists($collection, 'getOwner') && $collection->getOwner() instanceof ProductInterface) {
+                $product = $collection->getOwner();
+                $this->productsToReindex[$product->getId()] = $product;
+            }
+        }
+
+        $entities = array_merge($unitOfWork->getScheduledEntityInsertions(), $unitOfWork->getScheduledEntityUpdates());
+        $this->onFlushEntities($entities);
+        $this->onFlushEntities($unitOfWork->getScheduledEntityDeletions(), 'deletions');
+
+        if (0 !== \count($this->productsToBeDelete)) {
+            $productToDeleteMessage = new ProductToDeleteFromIds();
+            array_map(function (ProductInterface $product) use ($productToDeleteMessage): void {
+                foreach ($this->productsToReindex as $key => $productsToReindex) {
+                    if ($productsToReindex->getId() === $product->getId()) {
+                        unset($this->productsToReindex[$key]);
+                    }
+                }
+                $productToDeleteMessage->addProductId($product->getId());
+            }, $this->productsToBeDelete);
+            $this->messageBus->dispatch($productToDeleteMessage);
+        }
+
+        // in other event subscriber ...
+        // todo reindex all data when: change/create/remove attribute/option, add/remove channel, add/remove locale
     }
 }

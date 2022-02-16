@@ -84,7 +84,7 @@ final class RequestConfiguration
         $limit = (int) $this->request->get('limit', self::FALLBACK_LIMIT);
         $availableLimits = $this->getAvailableLimits();
 
-        if (!\in_array($limit, $availableLimits, true)) {
+        if (0 < \count($availableLimits) && !\in_array($limit, $availableLimits, true)) {
             $limit = reset($availableLimits);
         }
 

@@ -124,4 +124,9 @@ final class RequestConfiguration
 
         return $this->parameters->get('taxon');
     }
+
+    public function getParameters(): Parameters
+    {
+        return $this->parameters;
+    }
 }

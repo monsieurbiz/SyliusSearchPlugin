@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 SHELL=/bin/bash
 APP_DIR=tests/Application
-SYLIUS_VERSION=1.10
+SYLIUS_VERSION=1.10.0
 SYMFONY=cd ${APP_DIR} && symfony
 COMPOSER=symfony composer
 CONSOLE=${SYMFONY} console
@@ -32,10 +32,12 @@ dependencies: composer.lock node_modules ## Setup the dependencies
 .PHONY: dependencies
 
 .php-version: .php-version.dist
-	cp .php-version.dist .php-version
+	rm -f .php-version
+	ln -s .php-version.dist .php-version
 
 php.ini: php.ini.dist
-	cp php.ini.dist php.ini
+	rm -f php.ini
+	ln -s php.ini.dist php.ini
 
 composer.lock: composer.json
 	${COMPOSER} install --no-scripts --no-plugins
@@ -59,21 +61,24 @@ ${APP_DIR}/node_modules: yarn.install
 application: .php-version php.ini ${APP_DIR} setup_application ${APP_DIR}/docker-compose.yaml
 
 ${APP_DIR}:
-	(${COMPOSER} create-project --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_VERSION}" ${APP_DIR})
+	(${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="~${SYLIUS_VERSION}" ${APP_DIR})
 
 setup_application:
 	rm -f ${APP_DIR}/yarn.lock
 	(cd ${APP_DIR} && ${COMPOSER} config repositories.plugin '{"type": "path", "url": "../../"}')
 	(cd ${APP_DIR} && ${COMPOSER} config extra.symfony.allow-contrib true)
 	(cd ${APP_DIR} && ${COMPOSER} config minimum-stability dev)
-	(cd ${APP_DIR} && ${COMPOSER} require --no-scripts --no-progress --no-install --no-update monsieurbiz/${PLUGIN_NAME}="*@dev")
-	$(MAKE) apply_dist ${APP_DIR}/.php-version ${APP_DIR}/php.ini
-	(cd ${APP_DIR} && ${COMPOSER} install)
+	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}") # Make sure to install the required version of sylius because the sylius-standard has a soft constraint
+	$(MAKE) ${APP_DIR}/.php-version ${APP_DIR}/php.ini
+	(cd ${APP_DIR} && ${COMPOSER} install --no-interaction)
+	$(MAKE) apply_dist
+	(cd ${APP_DIR} && ${COMPOSER} require --no-progress monsieurbiz/${PLUGIN_NAME}="*@dev")
+	rm -rf ${APP_DIR}/var/cache
 
 ${APP_DIR}/docker-compose.yaml:
 	rm -f ${APP_DIR}/docker-compose.yml
 	rm -f ${APP_DIR}/docker-compose.yaml
-	cp docker-compose.yaml.dist ${APP_DIR}/docker-compose.yaml
+	ln -s ../../docker-compose.yaml.dist ${APP_DIR}/docker-compose.yaml
 .PHONY: ${APP_DIR}/docker-compose.yaml
 
 ${APP_DIR}/.php-version: .php-version
@@ -180,6 +185,11 @@ docker.down: ## Stop and remove the docker containers
 docker.logs: ## Logs the docker containers
 	cd ${APP_DIR} && ${COMPOSE} logs -f
 .PHONY: docker.logs
+
+docker.dc: ARGS=ps
+docker.dc: ## Run docker-compose command. Use ARGS="" to pass parameters to docker-compose.
+	cd ${APP_DIR} && ${COMPOSE} ${ARGS}
+.PHONY: docker.dc
 
 server.start: ## Run the local webserver using Symfony
 	${SYMFONY} local:server:start -d

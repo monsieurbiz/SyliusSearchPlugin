@@ -61,7 +61,7 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
-        "phpcs": "php-cs-fixer fix --using-cache=false",
+        "phpcs": "php-cs-fixer fix --using-cache=no",
         "jane-generate": "jane generate --config-file=src/Resources/config/jane/jane-configuration.php",
         "phpstan": "phpstan analyse -c phpstan.neon src/",
         "phpmd": "phpmd --exclude Migrations/* src/ ansi phpmd.xml",

@@ -11,7 +11,7 @@
         "jane-php/automapper-bundle": "^7.1",
         "jolicode/elastically": "^1.4.0",
         "monsieurbiz/sylius-settings-plugin": "^1.0",
-        "sylius/sylius": ">=1.9 <1.11",
+        "sylius/sylius": ">=1.9 <1.12",
         "symfony/messenger": "^4.4 || ^5.2"
     },
     "require-dev": {
@@ -74,6 +74,14 @@
         },
         "branch-alias": {
             "dev-master": "2.0-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/thanks": true,
+            "ergebnis/composer-normalize": true,
+            "symfony/flex": true
         }
     }
 }

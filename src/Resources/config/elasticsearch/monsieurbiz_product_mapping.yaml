@@ -23,6 +23,7 @@ mappings:
           search_analyzer: standard
     created_at:
       type: date
+      format: yyyy-MM-dd HH:mm:ss
     description:
       type: text
     images:

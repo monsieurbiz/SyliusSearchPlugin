@@ -63,6 +63,12 @@ jobs:
         run: |
           composer create-project --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard sylius "${{ matrix.sylius }}"
 
+      # Because the sylius-standard has a soft constraint
+      - name: Make sure to install the required version of Sylius
+        working-directory: ./sylius
+        run: |
+            composer require --no-install --no-scripts --no-progress sylius/sylius="${{ matrix.sylius }}"
+
       - name: Setup some requirements
         working-directory: ./sylius
         run: |

@@ -83,6 +83,7 @@ class SearchController extends AbstractController
             'documentable' => $result->getDocumentable(),
             'requestConfiguration' => $requestConfiguration,
             'query' => urldecode($query),
+            'query_url' => $query,
             'result' => $result,
             'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
         ]);

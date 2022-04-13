@@ -23,7 +23,7 @@ mappings:
           search_analyzer: standard
     created_at:
       type: date
-      format: yyyy-MM-dd HH:mm:ss
+      format: yyyy-MM-dd HH:mm:ss||strict_date_optional_time||epoch_second
     description:
       type: text
     images:

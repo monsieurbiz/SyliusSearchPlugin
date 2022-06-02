@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Index;
 
+use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\EntityManagerInterface;
 use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
@@ -149,6 +150,7 @@ final class Indexer
 
         $indexer = $this->clientFactory->getIndexer($documentable, $locale);
         foreach ($documentable->getDatasource()->getItems($documentable->getSourceClass()) as $item) {
+            $item = $this->getRealEntity($item);
             if (null !== $locale && $item instanceof TranslatableInterface) {
                 $item->setCurrentLocale($locale);
             }
@@ -166,5 +168,27 @@ final class Indexer
     private function getIndexName(DocumentableInterface $documentable, ?string $locale = null): string
     {
         return $documentable->getIndexCode() . strtolower(null !== $locale ? '_' . $locale : '');
+    }
+
+    /**
+     * Convert proxies classes to the entity one
+     * 
+     * This avoid to retrieve the incorrect Mapper and have errors like :
+     * `index: /<INDEX_NAME>/_doc/<ID> caused failed to parse`
+     * 
+     * @return mixed
+     */
+    private function getRealEntity($entity)
+    {
+        if (!$entity instanceof Proxy || !method_exists($entity, 'getId')) {
+            return $entity;
+        }
+
+        // Clear the entity manager to detach the proxy object
+        $this->entityManager->clear(get_class($entity));
+        // Retrieve the original class name
+        $entityClassName = $this->entityManager->getClassMetadata(get_class($entity))->rootEntityName;
+        // Find the object in repository from the ID
+        return $this->entityManager->find($entityClassName, $entity->getId());
     }
 }

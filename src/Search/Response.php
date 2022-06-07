@@ -69,8 +69,8 @@ class Response implements ResponseInterface
     {
         if (null === $this->paginator) {
             $this->paginator = new Pagerfanta($this->adapter);
-            $this->paginator->setCurrentPage($this->requestConfiguration->getPage());
             $this->paginator->setMaxPerPage($this->requestConfiguration->getLimit());
+            $this->paginator->setCurrentPage($this->requestConfiguration->getPage());
         }
 
         return $this->paginator;

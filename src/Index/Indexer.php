@@ -171,11 +171,13 @@ final class Indexer
     }
 
     /**
-     * Convert proxies classes to the entity one
-     * 
+     * Convert proxies classes to the entity one.
+     *
      * This avoid to retrieve the incorrect Mapper and have errors like :
      * `index: /<INDEX_NAME>/_doc/<ID> caused failed to parse`
-     * 
+     *
+     * @param mixed $entity
+     *
      * @return mixed
      */
     private function getRealEntity($entity)
@@ -185,9 +187,9 @@ final class Indexer
         }
 
         // Clear the entity manager to detach the proxy object
-        $this->entityManager->clear(get_class($entity));
+        $this->entityManager->clear(\get_class($entity));
         // Retrieve the original class name
-        $entityClassName = $this->entityManager->getClassMetadata(get_class($entity))->rootEntityName;
+        $entityClassName = $this->entityManager->getClassMetadata(\get_class($entity))->rootEntityName;
         // Find the object in repository from the ID
         return $this->entityManager->find($entityClassName, $entity->getId());
     }

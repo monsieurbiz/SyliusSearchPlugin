@@ -27,17 +27,42 @@ final class Version20220406160423 extends AbstractMigration
     {
         if ($schema->hasTable('messenger_messages')) {
             $this->addSql('ALTER TABLE messenger_messages CHANGE queue_name queue_name VARCHAR(190) NOT NULL');
-            $this->addSql('CREATE INDEX IDX_75EA56E0FB7336F0 ON messenger_messages (queue_name)');
-            $this->addSql('CREATE INDEX IDX_75EA56E0E3BD61CE ON messenger_messages (available_at)');
+            if (!$this->tableHasIndexOnColumns('messenger_messages', ['queue_name'])) {
+                $this->addSql('CREATE INDEX IDX_75EA56E0FB7336F0 ON messenger_messages (queue_name)');
+            }
+            if (!$this->tableHasIndexOnColumns('messenger_messages', ['available_at'])) {
+                $this->addSql('CREATE INDEX IDX_75EA56E0E3BD61CE ON messenger_messages (available_at)');
+            }
         }
     }
 
     public function down(Schema $schema): void
     {
         if ($schema->hasTable('messenger_messages')) {
-            $this->addSql('DROP INDEX IDX_75EA56E0FB7336F0 ON messenger_messages');
-            $this->addSql('DROP INDEX IDX_75EA56E0E3BD61CE ON messenger_messages');
+            if ($this->tableHasIndexOnColumns('messenger_messages', ['queue_name'])) {
+                $this->addSql('DROP INDEX IDX_75EA56E0FB7336F0 ON messenger_messages');
+            }
+            if ($this->tableHasIndexOnColumns('messenger_messages', ['available_at'])) {
+                $this->addSql('DROP INDEX IDX_75EA56E0E3BD61CE ON messenger_messages');
+            }
             $this->addSql('ALTER TABLE messenger_messages CHANGE queue_name queue_name VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`');
         }
+    }
+
+    private function tableHasIndexOnColumns(string $table, array $columns): bool
+    {
+        $indexes = $this->connection->getSchemaManager()->listTableIndexes($table);
+        foreach ($indexes as $index) {
+            foreach ($index->getColumns() as $column) {
+                // Another column exists in index
+                if (($key = array_search($column, $columns, true)) === false) {
+                    continue 2;
+                }
+                unset($columns[$key]);
+            }
+        }
+
+        // Table has all columns in index if the given array in empty at the end
+        return empty($columns);
     }
 }

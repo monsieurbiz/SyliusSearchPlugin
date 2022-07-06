@@ -25,12 +25,23 @@
                 }, monsieurbizSearchPlugin.keyUpTimeOut);
             });
 
-            // Hide results when user leave the search field
-            $(monsieurbizSearchPlugin.searchInputSelector).focusout(function () {
-                var resultElement = $(this).closest(monsieurbizSearchPlugin.resultClosestSelector).find(monsieurbizSearchPlugin.resultFindSelector);
-                setTimeout(function () {
-                    resultElement.hide();
-                }, 100); // Add timeout to keep the click on the result
+            // Hide results when user leave the autocomplete form
+            const searchForm = document.querySelector(monsieurbizSearchPlugin.searchInputSelector).closest(monsieurbizSearchPlugin.resultClosestSelector);
+            searchForm.addEventListener('focusout', function (e) {
+                // hide autocomplete results, only if click outside
+                if (e.relatedTarget === null || !searchForm.contains(e.relatedTarget)) {
+                    const resultElement = searchForm.querySelector(monsieurbizSearchPlugin.resultFindSelector);
+                    resultElement.style.display = 'none';
+                }
+            });
+
+            // Reopen the autocomplete result, if the query is not empty
+            document.querySelector(monsieurbizSearchPlugin.searchInputSelector).addEventListener('focus', function (e) {
+                var query = e.currentTarget.value;
+                if (query !== '') {
+                    const resultElement = searchForm.querySelector(monsieurbizSearchPlugin.resultFindSelector);
+                    resultElement.style.display = 'block';
+                }
             });
         },
         filterSearch: function () {

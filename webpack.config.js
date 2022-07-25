@@ -17,7 +17,7 @@ Encore
 
     // organise files
     .configureFilenames({
-        js: 'js/[name].js'
+        js: 'js/[name].[hash:8].js'
     })
 ;
 

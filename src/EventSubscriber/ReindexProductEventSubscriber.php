@@ -168,9 +168,14 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
                         unset($this->productsToReindex[$key]);
                     }
                 }
-                $productToDeleteMessage->addProductId($product->getId());
+                if (null !== $product->getId()) {
+                    $productToDeleteMessage->addProductId($product->getId());
+                }
             }, $this->productsToBeDelete);
-            $this->messageBus->dispatch($productToDeleteMessage);
+
+            if (!empty($productToDeleteMessage->getProductIds())) {
+                $this->messageBus->dispatch($productToDeleteMessage);
+            }
         }
 
         // in other event subscriber ...

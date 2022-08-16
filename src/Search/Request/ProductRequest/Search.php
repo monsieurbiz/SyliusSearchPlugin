@@ -25,7 +25,6 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterRegistr
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterRegistryInterface;
-use RuntimeException;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
 final class Search implements RequestInterface
@@ -87,10 +86,6 @@ final class Search implements RequestInterface
 
     public function getQuery(): Query
     {
-        if ('' === $this->configuration->getQueryText()) {
-            throw new RuntimeException('missing query text');
-        }
-
         $qb = new QueryBuilder();
 
         $boolQuery = $qb->query()->bool();

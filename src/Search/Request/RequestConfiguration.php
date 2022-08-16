@@ -56,7 +56,7 @@ final class RequestConfiguration
 
     public function getQueryText(): string
     {
-        return $this->request->get('query', '');
+        return trim($this->request->get('query', ''));
     }
 
     public function getAppliedFilters(string $type = null): array

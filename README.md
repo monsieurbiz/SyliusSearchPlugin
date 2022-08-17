@@ -165,6 +165,13 @@ monsieur_biz_sylius_search:
             use_main_taxon: true # Use main taxon for the taxon filter, else use the taxons
 ```
 
+If you use the same instance of ElasticSearch for multiples projects, you can avoid collision for index names by setting the `MONSIEURBIZ_SEARCHPLUGIN_ES_PREFIX` environment variable: 
+
+```ini
+# .env.local
+MONSIEURBIZ_SEARCHPLUGIN_ES_PREFIX=my-project
+```
+
 ## Documentable objects
 
 If you want to index an object in the search index, your entity have to implements `MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface` interface : 

@@ -57,8 +57,8 @@ final class InstantSearch implements RequestInterface
 
     public function getQuery(): Query
     {
-        if (null === $this->configuration || '' === $this->configuration->getQueryText()) {
-            throw new RuntimeException('missing query text');
+        if (null === $this->configuration) {
+            throw new RuntimeException('missing configuration');
         }
 
         $qb = new QueryBuilder();

@@ -26,7 +26,7 @@ class MainTaxonFilterBuilder implements FilterBuilderInterface
         string $aggregationCode,
         array $aggregationData
     ): ?array {
-        if ('monsieurbiz_product' !== $documentable->getIndexCode() || 'main_taxon' !== $aggregationCode) {
+        if (false === (bool) preg_match('/monsieurbiz_product$/', $documentable->getIndexCode()) || 'main_taxon' !== $aggregationCode) {
             return null;
         }
 

@@ -46,7 +46,7 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
 
     public function onMappingProvider(MappingProviderEvent $event): void
     {
-        if ('monsieurbiz_product' !== $event->getIndexCode()) {
+        if (false === (bool) preg_match('/monsieurbiz_product$/', $event->getIndexCode())) {
             return;
         }
         $mapping = $event->getMapping();

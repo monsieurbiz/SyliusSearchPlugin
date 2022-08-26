@@ -25,7 +25,7 @@ class TaxonsFilterBuilder
         string $aggregationCode,
         array $aggregationData
     ): ?array {
-        if ('monsieurbiz_product' !== $documentable->getIndexCode() || 'taxons' !== $aggregationCode) {
+        if (false === (bool) preg_match('/monsieurbiz_product$/', $documentable->getIndexCode()) || 'taxons' !== $aggregationCode) {
             return null;
         }
 

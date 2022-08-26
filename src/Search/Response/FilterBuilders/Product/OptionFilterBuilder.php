@@ -26,7 +26,7 @@ class OptionFilterBuilder implements FilterBuilderInterface
         string $aggregationCode,
         array $aggregationData
     ): ?array {
-        if ('monsieurbiz_product' !== $documentable->getIndexCode() || 'options' !== $aggregationCode) {
+        if (false === (bool) preg_match('/monsieurbiz_product$/', $documentable->getIndexCode()) || 'options' !== $aggregationCode) {
             return null;
         }
 

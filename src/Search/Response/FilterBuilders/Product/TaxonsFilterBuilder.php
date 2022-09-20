@@ -16,9 +16,15 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Filter\Filter;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\FilterBuilderInterface;
+use Sylius\Component\Taxonomy\Model\TaxonInterface;
 
-class TaxonsFilterBuilder
+class TaxonsFilterBuilder implements FilterBuilderInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function build(
         DocumentableInterface $documentable,
         RequestConfiguration $requestConfiguration,
@@ -27,6 +33,13 @@ class TaxonsFilterBuilder
     ): ?array {
         if (false === (bool) preg_match('/monsieurbiz_product$/', $documentable->getIndexCode()) || 'taxons' !== $aggregationCode) {
             return null;
+        }
+
+        $childTaxonCodes = null;
+        if (RequestInterface::TAXON_TYPE == $requestConfiguration->getType()) {
+            $childTaxonCodes = $requestConfiguration->getTaxon()->getChildren()->map(function (TaxonInterface $taxon): ?string {
+                return $taxon->getCode();
+            });
         }
 
         $taxonAggregation = $aggregationData['taxons']['taxons']['taxons'] ?? null;
@@ -40,6 +53,10 @@ class TaxonsFilterBuilder
                     continue;
                 }
                 $taxonCode = $taxonCodeBucket['key'];
+                // If we have a current taxon, add only the filter for the children of this taxon.
+                if (null !== $childTaxonCodes && !\in_array($taxonCode, $childTaxonCodes->toArray(), true)) {
+                    continue;
+                }
                 $taxonName = null;
                 $taxonNameBuckets = $taxonCodeBucket['names']['buckets'] ?? [];
                 foreach ($taxonNameBuckets as $taxonNameBucket) {

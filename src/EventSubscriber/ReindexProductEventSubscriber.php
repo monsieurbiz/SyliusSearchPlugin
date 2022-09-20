@@ -18,6 +18,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
+use MonsieurBiz\SyliusSearchPlugin\Manager\AutomaticReindexManagerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductToDeleteFromIds;
@@ -47,11 +48,14 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
 
     private MessageBusInterface $messageBus;
 
+    private AutomaticReindexManagerInterface $automaticReindexManager;
+
     private bool $dispatched = false;
 
-    public function __construct(MessageBusInterface $messageBus)
+    public function __construct(MessageBusInterface $messageBus, AutomaticReindexManagerInterface $automaticReindexManager)
     {
         $this->messageBus = $messageBus;
+        $this->automaticReindexManager = $automaticReindexManager;
     }
 
     public function getSubscribedEvents()
@@ -59,11 +63,16 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         return [
             Events::onFlush => 'onFlush',
             Events::postFlush => 'postFlush',
+            Events::onClear => 'onClear',
         ];
     }
 
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
+        if (!$this->automaticReindexManager->shouldBeAutomaticallyReindex()) {
+            return;
+        }
+
         $eventArgs->getEntityManager()->getEventManager()->removeEventListener(Events::onFlush, $this);
         $unitOfWork = $eventArgs->getEntityManager()->getUnitOfWork();
         $this->manageUnitOfWork($unitOfWork);
@@ -71,6 +80,10 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
 
     public function postFlush(PostFlushEventArgs $args): void
     {
+        if (!$this->automaticReindexManager->shouldBeAutomaticallyReindex()) {
+            return;
+        }
+
         $unitOfWork = $args->getEntityManager()->getUnitOfWork();
         $this->manageUnitOfWork($unitOfWork);
 
@@ -88,6 +101,11 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
             $this->dispatched = true; // Needed to set before dispatch to avoid infinite calls by message flush containing product
             $this->messageBus->dispatch($productReindexFromIdsMessage);
         }
+    }
+
+    public function onClear(): void
+    {
+        $this->dispatched = false;
     }
 
     private function onFlushEntities(array $entities, string $type = 'insertionsOrUpdate'): void

@@ -63,6 +63,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         return [
             Events::onFlush => 'onFlush',
             Events::postFlush => 'postFlush',
+            Events::onClear => 'onClear',
         ];
     }
 
@@ -82,7 +83,7 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         if (!$this->automaticProductReindexManager->shouldBeAutomaticallyReindex()) {
             return;
         }
-        
+
         $unitOfWork = $args->getEntityManager()->getUnitOfWork();
         $this->manageUnitOfWork($unitOfWork);
 
@@ -100,6 +101,11 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
             $this->dispatched = true; // Needed to set before dispatch to avoid infinite calls by message flush containing product
             $this->messageBus->dispatch($productReindexFromIdsMessage);
         }
+    }
+
+    public function onClear(): void
+    {
+        $this->dispatched = false;
     }
 
     private function onFlushEntities(array $entities, string $type = 'insertionsOrUpdate'): void

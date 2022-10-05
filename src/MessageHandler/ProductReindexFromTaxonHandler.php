@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\MessageHandler;
 
 use Doctrine\ORM\EntityRepository;
-use MonsieurBiz\SyliusSearchPlugin\Index\Indexer;
+use MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
@@ -25,13 +25,13 @@ class ProductReindexFromTaxonHandler implements MessageHandlerInterface
 {
     private ProductRepositoryInterface $productRepository;
 
-    private Indexer $indexer;
+    private IndexerInterface $indexer;
 
     private ServiceRegistryInterface $documentableRegistry;
 
     public function __construct(
         ProductRepositoryInterface $productRepository,
-        Indexer $indexer,
+        IndexerInterface $indexer,
         ServiceRegistryInterface $documentableRegistry
     ) {
         $this->productRepository = $productRepository;

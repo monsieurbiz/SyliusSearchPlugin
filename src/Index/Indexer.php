@@ -17,6 +17,7 @@ use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\EntityManagerInterface;
 use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
+use JoliCode\Elastically\Indexer as ElasticallyIndexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
 use Sylius\Component\Locale\Model\LocaleInterface;
@@ -24,7 +25,7 @@ use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
-final class Indexer
+final class Indexer implements IndexerInterface
 {
     private ServiceRegistryInterface $documentableRegistry;
 
@@ -53,24 +54,6 @@ final class Indexer
     }
 
     /**
-     * Retrieve all available locales.
-     */
-    public function getLocales(): array
-    {
-        if (0 === \count($this->locales)) {
-            $locales = $this->localeRepository->findAll();
-            $this->locales = array_filter(array_map(
-                function (LocaleInterface $locale): string {
-                    return $locale->getCode() ?? '';
-                },
-                $locales
-            ));
-        }
-
-        return $this->locales;
-    }
-
-    /**
      * Index all documentable object.
      */
     public function indexAll(): void
@@ -81,7 +64,7 @@ final class Indexer
         }
     }
 
-    public function indexByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?\JoliCode\Elastically\Indexer $indexer = null): void
+    public function indexByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void
     {
         if (null === $indexer) {
             $indexer = $this->clientFactory->getIndexer($documentable, $locale);
@@ -107,7 +90,7 @@ final class Indexer
         }
     }
 
-    public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?\JoliCode\Elastically\Indexer $indexer = null): void
+    public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void
     {
         if (null === $indexer) {
             $indexer = $this->clientFactory->getIndexer($documentable, $locale);
@@ -130,6 +113,24 @@ final class Indexer
             }
             $indexer->scheduleDelete($indexName, (string) $document->getId());
         }
+    }
+
+    /**
+     * Retrieve all available locales.
+     */
+    private function getLocales(): array
+    {
+        if (0 === \count($this->locales)) {
+            $locales = $this->localeRepository->findAll();
+            $this->locales = array_filter(array_map(
+                function (LocaleInterface $locale): string {
+                    return $locale->getCode() ?? '';
+                },
+                $locales
+            ));
+        }
+
+        return $this->locales;
     }
 
     private function indexDocumentable(DocumentableInterface $documentable, ?string $locale = null): void

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Command;
 
-use MonsieurBiz\SyliusSearchPlugin\Index\Indexer;
+use MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,9 +22,9 @@ class PopulateCommand extends Command
 {
     protected static $defaultName = 'monsieurbiz:search:populate';
 
-    private Indexer $indexer;
+    private IndexerInterface $indexer;
 
-    public function __construct(Indexer $indexer, $name = null)
+    public function __construct(IndexerInterface $indexer, $name = null)
     {
         parent::__construct($name);
         $this->indexer = $indexer;

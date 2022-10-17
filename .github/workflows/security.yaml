@@ -3,6 +3,8 @@ name: Security
 on:
   push:
   pull_request:
+  schedule:
+    - cron:  '0 0 * * 0'
 
 jobs:
 
@@ -33,9 +35,6 @@ jobs:
 
       - run: mkdir -p /home/runner/{.composer/cache,.config/composer}
 
-      - name: Composer v2
-        run: sudo composer self-update --2
-
       - name: Composer Github Auth
         run: composer config -g github-oauth.github.com ${{ github.token }}
 
@@ -44,4 +43,4 @@ jobs:
       - name: Install PHP dependencies
         run: composer update --prefer-dist
 
-      - uses: symfonycorp/security-checker-action@v2
+      - uses: symfonycorp/security-checker-action@v3

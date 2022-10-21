@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Datasource;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
@@ -31,19 +32,27 @@ class RepositoryDatasource implements DatasourceInterface
     {
         /** @phpstan-ignore-next-line */
         $repository = $this->entityManager->getRepository($sourceClass);
-        if ($repository instanceof RepositoryInterface && ($paginator = $repository->createPaginator()) instanceof Pagerfanta) {
-            $page = 1;
-            do {
-                $paginator->setCurrentPage($page);
-                foreach ($paginator as $item) {
-                    yield $item;
-                }
-                $page = $paginator->hasNextPage() ? $paginator->getNextPage() : 1;
-            } while ($paginator->hasNextPage());
+        $paginator = $this->getPaginator($repository);
 
-            return null;
+        $page = 1;
+        $paginator->setMaxPerPage(self::DEFAULT_MAX_PER_PAGE);
+        do {
+            $paginator->setCurrentPage($page);
+            foreach ($paginator as $item) {
+                yield $item;
+            }
+            $page = $paginator->hasNextPage() ? $paginator->getNextPage() : 1;
+        } while ($paginator->hasNextPage());
+
+        return null;
+    }
+
+    private function getPaginator(EntityRepository $repository): Pagerfanta
+    {
+        if ($repository instanceof RepositoryInterface && ($paginator = $repository->createPaginator()) instanceof Pagerfanta) {
+            return $paginator;
         }
 
-        return $repository instanceof EntityRepository ? $repository->createQueryBuilder('o')->getQuery()->toIterable() : null;
+        return new Pagerfanta(new QueryAdapter($repository->createQueryBuilder('o'), false, false));
     }
 }

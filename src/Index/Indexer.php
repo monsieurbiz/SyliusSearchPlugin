@@ -20,16 +20,17 @@ use Jane\Component\AutoMapper\AutoMapperInterface;
 use JoliCode\Elastically\Indexer as ElasticallyIndexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
+use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Model\TranslatableInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
 
 final class Indexer implements IndexerInterface
 {
     private ServiceRegistryInterface $documentableRegistry;
 
-    private RepositoryInterface $localeRepository;
+    private ChannelRepositoryInterface $channelRepository;
 
     private array $locales = [];
 
@@ -41,13 +42,13 @@ final class Indexer implements IndexerInterface
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
-        RepositoryInterface $localeRepository,
+        ChannelRepositoryInterface $channelRepository,
         EntityManagerInterface $entityManager,
         AutoMapperInterface $autoMapper,
         ClientFactory $clientFactory
     ) {
         $this->documentableRegistry = $documentableRegistry;
-        $this->localeRepository = $localeRepository;
+        $this->channelRepository = $channelRepository;
         $this->entityManager = $entityManager;
         $this->autoMapper = $autoMapper;
         $this->clientFactory = $clientFactory;
@@ -116,18 +117,20 @@ final class Indexer implements IndexerInterface
     }
 
     /**
-     * Retrieve all available locales.
+     * Retrieve all used locales.
      */
     private function getLocales(): array
     {
         if (0 === \count($this->locales)) {
-            $locales = $this->localeRepository->findAll();
-            $this->locales = array_filter(array_map(
-                function (LocaleInterface $locale): string {
-                    return $locale->getCode() ?? '';
-                },
-                $locales
-            ));
+            $enabledChannels = $this->channelRepository->findBy(['enabled' => true]);
+            /** @var ChannelInterface $channel */
+            foreach ($enabledChannels as $channel) {
+                $this->locales = array_merge(
+                    $this->locales,
+                    $channel->getLocales()->map(function (LocaleInterface $locale): string { return $locale->getCode() ?? ''; })->toArray()
+                );
+            }
+            $this->locales = array_filter($this->locales);
         }
 
         return $this->locales;

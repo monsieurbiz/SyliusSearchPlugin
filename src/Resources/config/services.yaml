@@ -207,3 +207,8 @@ services:
         product_attribute: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\AttributeFilterBuilder',
         product_option: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\OptionFilterBuilder'
       }
+
+  # Context
+  MonsieurBiz\SyliusSearchPlugin\Context\ChannelSimulationContext:
+    tags:
+      - { name: sylius.context.channel, priority: 128 }

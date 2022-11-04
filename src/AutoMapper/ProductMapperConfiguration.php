@@ -18,6 +18,7 @@ use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
 use Jane\Component\AutoMapper\MapperMetadata;
+use MonsieurBiz\SyliusSearchPlugin\Context\ChannelSimulationContext;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
@@ -27,8 +28,6 @@ use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Inventory\Model\StockableInterface;
 use Sylius\Component\Product\Model\ProductVariantInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
@@ -38,22 +37,22 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
 
     private ProductVariantResolverInterface $productVariantResolver;
 
-    private RequestStack $requestStack;
-
     private AvailabilityCheckerInterface $availabilityChecker;
+
+    private ChannelSimulationContext $channelSimulationContext;
 
     public function __construct(
         Configuration $configuration,
         AutoMapperInterface $autoMapper,
         ProductVariantResolverInterface $productVariantResolver,
-        RequestStack $requestStack,
-        AvailabilityCheckerInterface $availabilityChecker
+        AvailabilityCheckerInterface $availabilityChecker,
+        ChannelSimulationContext $channelSimulationContext
     ) {
         $this->configuration = $configuration;
         $this->autoMapper = $autoMapper;
         $this->productVariantResolver = $productVariantResolver;
-        $this->requestStack = $requestStack;
         $this->availabilityChecker = $availabilityChecker;
+        $this->channelSimulationContext = $channelSimulationContext;
     }
 
     public function process(MapperGeneratorMetadataInterface $metadata): void
@@ -188,18 +187,17 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             $prices = [];
             foreach ($product->getChannels() as $channel) {
                 /** @var ChannelInterface $channel */
-                $request = new Request(['_channel_code' => $channel->getCode()]);
-                $this->requestStack->push($request);
+                $this->channelSimulationContext->setChannel($channel);
                 if (
                     null === ($variant = $this->productVariantResolver->getVariant($product))
                     || !$variant instanceof ModelProductVariantInterface
                     || null === ($channelPricing = $variant->getChannelPricingForChannel($channel))
                 ) {
-                    $this->requestStack->pop();
+                    $this->channelSimulationContext->setChannel(null);
 
                     continue;
                 }
-                $this->requestStack->pop();
+                $this->channelSimulationContext->setChannel(null);
                 $prices[] = $this->autoMapper->map(
                     $channelPricing,
                     $this->configuration->getTargetClass('pricing')

@@ -74,6 +74,7 @@ setup_application:
 	(cd ${APP_DIR} && ${COMPOSER} install --no-interaction)
 	$(MAKE) apply_dist
 	(cd ${APP_DIR} && ${COMPOSER} require --no-progress --no-interaction monsieurbiz/${PLUGIN_NAME}="*@dev")
+	git restore dist/docker-compose.override.yaml # Restore dist file to prevent modification by flex recipes (symfony/mailer)
 	rm -rf ${APP_DIR}/var/cache
 
 ${APP_DIR}/docker-compose.yaml:

@@ -1,8 +1,8 @@
 parameters:
-  monsieurbiz.search.elasticsearch.host: '%env(default::MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
-  monsieurbiz.search.elasticsearch.port: '%env(default::MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
-  monsieurbiz.search.elasticsearch.fallback_url: 'http://%monsieurbiz.search.elasticsearch.host%:%monsieurbiz.search.elasticsearch.port%/'
-  monsieurbiz.search.elasticsearch.url: '%env(default:monsieurbiz.search.elasticsearch.fallback_url:MONSIEURBIZ_SEARCHPLUGIN_ES_URL)%'
+  monsieurbiz_search_elasticsearch_host: '%env(default::MONSIEURBIZ_SEARCHPLUGIN_ES_HOST)%'
+  monsieurbiz_search_elasticsearch_port: '%env(default::MONSIEURBIZ_SEARCHPLUGIN_ES_PORT)%'
+  monsieurbiz_search_elasticsearch_fallback_url: 'http://%monsieurbiz_search_elasticsearch_host%:%monsieurbiz_search_elasticsearch_port%/'
+  monsieurbiz_search_elasticsearch_url: '%env(default:monsieurbiz_search_elasticsearch_fallback_url:MONSIEURBIZ_SEARCHPLUGIN_ES_URL)%'
   monsieurbiz.search.model.documentable.interface: MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface
   monsieurbiz.search.request.interface: MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface
   monsieurbiz.search.product_attribute_analyzer: 'search_standard'
@@ -49,7 +49,7 @@ services:
   MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory:
     arguments:
       $config:
-        url: '%monsieurbiz.search.elasticsearch.url%'
+        url: '%monsieurbiz_search_elasticsearch_url%'
 
   MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepository:
     arguments:

@@ -28,9 +28,13 @@ jobs:
           node-version: '14'
 
       - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          ini-values: date.timezone=UTC
+
+      - name: Set project php-version
         run: |
-          sudo update-alternatives --set php /usr/bin/php${{ matrix.php }}
-          echo "date.timezone=UTC" | sudo tee /etc/php/${{ matrix.php }}/cli/conf.d/timezone.ini
           echo "${{ matrix.php }}" > .php-version
 
       - name: Install symfony CLI

@@ -15,42 +15,26 @@ namespace MonsieurBiz\SyliusSearchPlugin\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 use MonsieurBiz\SyliusSearchPlugin\Manager\AutomaticReindexManagerInterface;
-use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon;
-use MonsieurBiz\SyliusSearchPlugin\Message\ProductToDeleteFromIds;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Sylius\Component\Core\Model\ChannelPricingInterface;
-use Sylius\Component\Core\Model\ProductImageInterface;
-use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
-use Sylius\Component\Core\Model\ProductTranslationInterface;
-use Sylius\Component\Product\Model\ProductAttributeValueInterface;
-use Sylius\Component\Product\Model\ProductInterface as ModelProductInterface;
-use Sylius\Component\Product\Model\ProductVariantInterface;
-use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
+/**
+ * This event subscriber only manages product taxons modifications.
+ * For the other entities, we use the event listener and the event sylius (pre/post).
+ */
 class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /**
-     * @var ModelProductInterface[]
-     */
-    private array $productsToReindex = [];
-
-    private array $productsToBeDelete = [];
-
     private MessageBusInterface $messageBus;
 
     private AutomaticReindexManagerInterface $automaticReindexManager;
-
-    private bool $dispatched = false;
 
     public function __construct(MessageBusInterface $messageBus, AutomaticReindexManagerInterface $automaticReindexManager)
     {
@@ -62,8 +46,6 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
     {
         return [
             Events::onFlush => 'onFlush',
-            Events::postFlush => 'postFlush',
-            Events::onClear => 'onClear',
         ];
     }
 
@@ -78,125 +60,13 @@ class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerA
         $this->manageUnitOfWork($unitOfWork);
     }
 
-    public function postFlush(PostFlushEventArgs $args): void
-    {
-        if (!$this->automaticReindexManager->shouldBeAutomaticallyReindex()) {
-            return;
-        }
-
-        $unitOfWork = $args->getEntityManager()->getUnitOfWork();
-        $this->manageUnitOfWork($unitOfWork);
-
-        $productReindexFromIdsMessage = new ProductReindexFromIds();
-
-        foreach ($this->productsToReindex as $productsToReindex) {
-            if (null === $productsToReindex->getId()) {
-                continue;
-            }
-            $productReindexFromIdsMessage->addProductId($productsToReindex->getId());
-        }
-        $this->productsToReindex = [];
-
-        if (0 !== \count($productReindexFromIdsMessage->getProductIds()) && false === $this->dispatched) {
-            $this->dispatched = true; // Needed to set before dispatch to avoid infinite calls by message flush containing product
-            $this->messageBus->dispatch($productReindexFromIdsMessage);
-        }
-    }
-
-    public function onClear(): void
-    {
-        $this->dispatched = false;
-    }
-
-    private function onFlushEntities(array $entities, string $type = 'insertionsOrUpdate'): void
-    {
-        foreach ($entities as $entity) {
-            if ($entity instanceof ProductInterface && 'deletions' === $type) {
-                $this->productsToBeDelete[$entity->getId()] = $entity;
-
-                continue;
-            }
-            if ($entity instanceof ProductTaxonInterface && null !== $entity->getTaxon()) {
-                $this->messageBus->dispatch(new ProductReindexFromTaxon($entity->getTaxon()->getId()));
-
-                continue;
-            }
-            $product = $this->getProduct($entity);
-            if (null !== $product) {
-                $this->productsToReindex[$product->getId()] = $product;
-            }
-        }
-    }
-
-    private function getProduct(object $entity): ?ModelProductInterface
-    {
-        switch (true) {
-            case $entity instanceof ProductInterface:
-                return $entity;
-            case $entity instanceof ProductVariantInterface:
-                return $entity->getProduct();
-            case $entity instanceof ProductTaxonInterface:
-                return $entity->getProduct();
-            case $entity instanceof ProductTranslationInterface && $entity->getTranslatable() instanceof ProductInterface:
-                /** @var ProductInterface $product */
-                $product = $entity->getTranslatable();
-
-                return $product;
-            case $entity instanceof ProductAttributeValueInterface:
-                return $entity->getProduct();
-            case $entity instanceof ProductImageInterface && $entity->getOwner() instanceof ProductInterface:
-                /** @var ProductInterface $product */
-                $product = $entity->getOwner();
-
-                return $product;
-            case $entity instanceof ChannelPricingInterface && $entity->getProductVariant() instanceof ProductVariantInterface:
-                /** @var ProductVariantInterface $productVariant */
-                $productVariant = $entity->getProductVariant();
-
-                return $productVariant->getProduct();
-            case $entity instanceof ProductVariantTranslationInterface && $entity->getTranslatable() instanceof ProductVariantInterface:
-                /** @var ProductVariantInterface $productVariant */
-                $productVariant = $entity->getTranslatable();
-
-                return $productVariant->getProduct();
-        }
-
-        return null;
-    }
-
     private function manageUnitOfWork(UnitOfWork $unitOfWork): void
     {
-        $collections = array_merge($unitOfWork->getScheduledCollectionUpdates(), $unitOfWork->getScheduledCollectionDeletions());
-        foreach ($collections as $collection) {
-            if (method_exists($collection, 'getOwner') && $collection->getOwner() instanceof ProductInterface) {
-                $product = $collection->getOwner();
-                $this->productsToReindex[$product->getId()] = $product;
-            }
-        }
-
         $entities = array_merge($unitOfWork->getScheduledEntityInsertions(), $unitOfWork->getScheduledEntityUpdates());
-        $this->onFlushEntities($entities);
-        $this->onFlushEntities($unitOfWork->getScheduledEntityDeletions(), 'deletions');
-
-        if (0 !== \count($this->productsToBeDelete)) {
-            $productToDeleteMessage = new ProductToDeleteFromIds();
-            array_map(function (ProductInterface $product) use ($productToDeleteMessage): void {
-                foreach ($this->productsToReindex as $key => $productsToReindex) {
-                    if ($productsToReindex->getId() === $product->getId()) {
-                        unset($this->productsToReindex[$key]);
-                    }
-                }
-                if (null !== $product->getId()) {
-                    $productToDeleteMessage->addProductId($product->getId());
-                }
-            }, $this->productsToBeDelete);
-
-            if (!empty($productToDeleteMessage->getProductIds())) {
-                $this->messageBus->dispatch($productToDeleteMessage);
+        foreach ($entities as $entity) {
+            if ($entity instanceof ProductTaxonInterface && null !== $taxon = $entity->getTaxon()) {
+                $this->messageBus->dispatch(new ProductReindexFromTaxon($taxon->getId()));
             }
         }
-
-        // in other event subscriber ...
-        // todo reindex all data when: change/create/remove attribute/option, add/remove channel, add/remove locale
     }
 }

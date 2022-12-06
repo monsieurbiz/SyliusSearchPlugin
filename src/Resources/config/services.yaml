@@ -215,3 +215,18 @@ services:
   MonsieurBiz\SyliusSearchPlugin\Context\ChannelSimulationContext:
     tags:
       - { name: sylius.context.channel, priority: 128 }
+
+  # Event listeners
+  MonsieurBiz\SyliusSearchPlugin\EventListener\ProductEventListener:
+    tags:
+      - { name: kernel.event_listener, event: sylius.product.post_create, method: dispatchProductReindexMessage }
+      - { name: kernel.event_listener, event: sylius.product.post_update, method: dispatchProductReindexMessage }
+      - { name: kernel.event_listener, event: sylius.product.pre_delete, method: saveProductIdToDispatchReindexMessage }
+      - { name: kernel.event_listener, event: sylius.product.post_delete, method: dispatchDeleteProductReindexMessage }
+  
+  MonsieurBiz\SyliusSearchPlugin\EventListener\ProductVariantEventListener:
+    tags:
+      - { name: kernel.event_listener, event: sylius.product_variant.post_create, method: dispatchProductVariantReindexMessage }
+      - { name: kernel.event_listener, event: sylius.product_variant.post_update, method: dispatchProductVariantReindexMessage }
+      - { name: kernel.event_listener, event: sylius.product_variant.pre_delete, method: saveProductIdToDispatchReindexMessage }
+      - { name: kernel.event_listener, event: sylius.product_variant.post_delete, method: dispatchProductReindexMessage }

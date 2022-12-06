@@ -15,30 +15,18 @@ namespace MonsieurBiz\SyliusSearchPlugin\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 use MonsieurBiz\SyliusSearchPlugin\Manager\AutomaticReindexManagerInterface;
-use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductReindexFromTaxon;
-use MonsieurBiz\SyliusSearchPlugin\Message\ProductToDeleteFromIds;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Sylius\Component\Core\Model\ChannelPricingInterface;
-use Sylius\Component\Core\Model\ProductImageInterface;
-use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
-use Sylius\Component\Core\Model\ProductTranslationInterface;
-use Sylius\Component\Product\Model\ProductAssociationInterface;
-use Sylius\Component\Product\Model\ProductAttributeValueInterface;
-use Sylius\Component\Product\Model\ProductInterface as ModelProductInterface;
-use Sylius\Component\Product\Model\ProductVariantInterface;
-use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * This event subscriber only manages product taxons modifications.
- * For the other entities, we use the event listener and the event sylius (pre/post)
+ * For the other entities, we use the event listener and the event sylius (pre/post).
  */
 class ReindexProductEventSubscriber implements EventSubscriberInterface, LoggerAwareInterface
 {

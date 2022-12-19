@@ -130,7 +130,7 @@ final class Indexer implements IndexerInterface
                     $channel->getLocales()->map(function (LocaleInterface $locale): string { return $locale->getCode() ?? ''; })->toArray()
                 );
             }
-            $this->locales = array_filter($this->locales);
+            $this->locales = array_unique(array_filter($this->locales));
         }
 
         return $this->locales;

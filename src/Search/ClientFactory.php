@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search;
 
+use Elastica\Index;
 use JoliCode\Elastically\Client;
 use JoliCode\Elastically\Factory;
 use JoliCode\Elastically\IndexBuilder;
 use JoliCode\Elastically\Indexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\PrefixedDocumentableInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ClientFactory
@@ -58,9 +60,23 @@ class ClientFactory
         return $documentable->getIndexCode() . strtolower(null !== $locale ? '_' . $locale : '');
     }
 
-    private function getConfig(DocumentableInterface $documentable, ?string $localeCode): array
+    /**
+     * This method allows to find the name of the index with the prefix,
+     * because the methods of the JoliCode\ElasticallyIndexer class do not add
+     * it automatically.
+     */
+    public function getIndex(DocumentableInterface $documentable, ?string $locale): Index
     {
-        $indexName = $this->getIndexName($documentable, $localeCode);
+        $indexName = $this->getIndexName($documentable, $locale);
+        $factory = new Factory($this->getConfig($documentable, $locale, $indexName));
+        $client = $factory->buildClient();
+
+        return $client->getIndex($indexName);
+    }
+
+    private function getConfig(DocumentableInterface $documentable, ?string $localeCode, ?string $indexName = null): array
+    {
+        $indexName = $indexName ?? $this->getIndexName($documentable, $localeCode);
         $additionalConfig = [
             Factory::CONFIG_INDEX_CLASS_MAPPING => [
                 $indexName => $documentable->getTargetClass(),
@@ -68,6 +84,10 @@ class ClientFactory
             Factory::CONFIG_MAPPINGS_PROVIDER => $documentable->getMappingProvider(),
             Factory::CONFIG_SERIALIZER => $this->serializer,
         ];
+        $prefix = $documentable instanceof PrefixedDocumentableInterface ? trim($documentable->getPrefix()) : '';
+        if ('' !== $prefix) {
+            $additionalConfig[Factory::CONFIG_INDEX_PREFIX] = $prefix;
+        }
 
         return array_merge($this->config, $additionalConfig);
     }

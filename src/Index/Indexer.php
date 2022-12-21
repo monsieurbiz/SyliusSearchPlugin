@@ -80,14 +80,14 @@ final class Indexer implements IndexerInterface
 
             return;
         }
-        $indexName = $this->getIndexName($documentable, $locale);
+        $index = $this->clientFactory->getIndex($documentable, $locale);
         foreach ($documents as $document) {
             if (null !== $locale && $document instanceof TranslatableInterface) {
                 $document->setCurrentLocale($locale);
             }
             $dto = $this->autoMapper->map($document, $documentable->getTargetClass());
             // @phpstan-ignore-next-line
-            $indexer->scheduleIndex($indexName, new Document((string) $document->getId(), $dto));
+            $indexer->scheduleIndex($index, new Document((string) $document->getId(), $dto));
         }
     }
 
@@ -107,12 +107,12 @@ final class Indexer implements IndexerInterface
             return;
         }
 
-        $indexName = $this->getIndexName($documentable, $locale);
+        $index = $this->clientFactory->getIndex($documentable, $locale);
         foreach ($documents as $document) {
             if (null !== $locale && $document instanceof TranslatableInterface) {
                 $document->setCurrentLocale($locale);
             }
-            $indexer->scheduleDelete($indexName, (string) $document->getId());
+            $indexer->scheduleDelete($index, (string) $document->getId());
         }
     }
 
@@ -167,11 +167,6 @@ final class Indexer implements IndexerInterface
         $indexBuilder->markAsLive($newIndex, $indexName);
         $indexBuilder->speedUpRefresh($newIndex);
         $indexBuilder->purgeOldIndices($indexName);
-    }
-
-    private function getIndexName(DocumentableInterface $documentable, ?string $locale = null): string
-    {
-        return $documentable->getIndexCode() . strtolower(null !== $locale ? '_' . $locale : '');
     }
 
     /**

@@ -15,7 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
 use Sylius\Component\Resource\Model\TranslatableInterface;
 
-class Documentable implements DocumentableInterface
+class Documentable implements PrefixedDocumentableInterface
 {
     use DocumentableDatasourceTrait;
 
@@ -33,6 +33,8 @@ class Documentable implements DocumentableInterface
     private array $templates;
 
     private array $limits;
+
+    private ?string $prefix = null;
 
     public function __construct(
         string $indexCode,
@@ -82,5 +84,15 @@ class Documentable implements DocumentableInterface
         }
 
         return $this->limits[$queryType] ?? [];
+    }
+
+    public function getPrefix(): string
+    {
+        return $this->prefix ?? '';
+    }
+
+    public function setPrefix(string $prefix): void
+    {
+        $this->prefix = $prefix;
     }
 }

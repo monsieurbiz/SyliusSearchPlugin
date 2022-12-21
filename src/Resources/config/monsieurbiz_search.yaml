@@ -1,6 +1,7 @@
 monsieurbiz_sylius_search:
   documents:
     monsieurbiz_product:
+      #prefix: '…' # define a custom index prefix on index names and aliases
       #document_class: '…' # by default MonsieurBiz\SyliusSearchPlugin\Model\Documentable\Documentable
       instant_search_enabled: true # by default false
       limits:

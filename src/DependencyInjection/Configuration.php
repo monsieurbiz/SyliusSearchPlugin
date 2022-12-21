@@ -35,6 +35,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([])
                     ->arrayPrototype()
                         ->children()
+                            ->scalarNode('prefix')->defaultValue(null)->end()
                             ->scalarNode('document_class')->defaultValue(Documentable::class)->end()
                             ->scalarNode('instant_search_enabled')->defaultValue(false)->end()
                             ->scalarNode('source')->isRequired()->cannotBeEmpty()->end()

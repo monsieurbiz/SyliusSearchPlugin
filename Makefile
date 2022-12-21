@@ -202,6 +202,9 @@ server.stop: ## Stop the local webserver
 es.reindex: ## Reindex elasticsearch
 	${CONSOLE} monsieurbiz:search:populate
 
+consume.reindex: ## Consume reindex messages during 10min
+	${CONSOLE} messenger:consume async_search --time-limit=600 -vv
+
 doctrine.diff: ## Doctrine diff
 	${CONSOLE} doctrine:migration:diff
 

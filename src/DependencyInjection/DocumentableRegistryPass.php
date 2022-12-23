@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\DependencyInjection;
 
 use InvalidArgumentException;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\PrefixedDocumentableInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -56,6 +57,9 @@ class DocumentableRegistryPass implements CompilerPassInterface
             $documentableDefinition->addTag('monsieurbiz.search.documentable');
             $documentableDefinition->addMethodCall('setMappingProvider', [new Reference($documentableConfiguration['mapping_provider'])]);
             $documentableDefinition->addMethodCall('setDatasource', [new Reference($documentableConfiguration['datasource'])]);
+            if ($this->isPrefixedDocumentableClass($documentableClass) && isset($documentableConfiguration['prefix'])) {
+                $documentableDefinition->addMethodCall('setPrefix', [$documentableConfiguration['prefix']]);
+            }
 
             // Add documentable into registry
             $registry->addMethodCall('register', [$documentableServiceId, new Reference($documentableServiceId)]);
@@ -80,5 +84,12 @@ class DocumentableRegistryPass implements CompilerPassInterface
         if (!\in_array(DocumentableInterface::class, $interfaces, true)) {
             throw new InvalidArgumentException(sprintf('Class "%s" must implement "%s" to be registered as a Documentable.', $class, DocumentableInterface::class));
         }
+    }
+
+    private function isPrefixedDocumentableClass(string $class): bool
+    {
+        $interfaces = (array) (class_implements($class) ?? []);
+
+        return \in_array(PrefixedDocumentableInterface::class, $interfaces, true);
     }
 }

@@ -2,7 +2,7 @@ monsieurbiz_search_search:
   path: /search/{query}
   methods: [GET]
   defaults:
-    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:searchAction
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::searchAction
   requirements:
     query: .+
 
@@ -10,19 +10,19 @@ monsieurbiz_search_post:
   path: /search
   methods: [POST]
   defaults:
-    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:postAction
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::postAction
 
 monsieurbiz_search_instant:
   path: /instant
   methods: [POST]
   defaults:
-    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:instantAction
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::instantAction
 
 monsieurbiz_sylius_search_taxon:
   path: /taxons/{slug}
   methods: [GET]
   defaults:
-    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController:taxonAction
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::taxonAction
     _sylius:
       taxon: "expr:notFoundOnNull(service('sylius.repository.taxon').findOneBySlug($slug, service('sylius.context.locale').getLocaleCode()))"
   requirements:

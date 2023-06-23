@@ -5,3 +5,9 @@ imports:
   - { resource: "sylius/fixtures.yaml" }
   - { resource: "monsieurbiz/settings.yaml" }
   - { resource: "messenger.yaml" }
+
+framework:
+  assets:
+    packages:
+      monsieurbiz.sylius.search:
+        json_manifest_path: '%kernel.project_dir%/public/bundles/monsieurbizsyliussearchplugin/manifest.json'

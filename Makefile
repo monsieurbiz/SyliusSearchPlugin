@@ -70,6 +70,9 @@ setup_application:
 	(cd ${APP_DIR} && ${COMPOSER} config minimum-stability dev)
 	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins allow-plugins true)
 	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}") # Make sure to install the required version of sylius because the sylius-standard has a soft constraint
+	@if [ ${SYLIUS_VERSION} == '1.11.0' ]; then\
+		(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress php-http/message-factory)\
+	fi
 	$(MAKE) ${APP_DIR}/.php-version ${APP_DIR}/php.ini
 	(cd ${APP_DIR} && ${COMPOSER} install --no-interaction)
 	$(MAKE) apply_dist

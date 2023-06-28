@@ -2,7 +2,7 @@
   "entrypoints": {
     "monsieurbiz-search": {
       "js": [
-        "/public/js/monsieurbiz-search.js"
+        "/bundles/monsieurbizsyliussearchplugin/js/monsieurbiz-search.d29ecf2c.js"
       ]
     }
   }

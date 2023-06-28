@@ -4,7 +4,9 @@ Encore
     // directory where compiled assets will be stored
     .setOutputPath('src/Resources/public')
     // public path used by the web server to access the output path
-    .setPublicPath('/public')
+    .setPublicPath('/bundles/monsieurbizsyliussearchplugin/')
+    // change the key in the manifest.json
+    .setManifestKeyPrefix('bundles/monsieurbizsyliussearchplugin')
 
     // entries
     .addEntry('monsieurbiz-search', './assets/js/app.js')

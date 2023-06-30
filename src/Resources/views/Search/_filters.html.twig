@@ -16,7 +16,7 @@
             {% endfor %}
 
             {# Don't loose current sorting #}
-            {% set sorting = app.request.query.get('sorting') %}
+            {% set sorting = app.request.query.all()['sorting']|default() %}
             {% if sorting is not empty %}
                 {% for sort, order in sorting %}
                     <input type="hidden" name="sorting[{{ sort }}]" value="{{ order }}" />

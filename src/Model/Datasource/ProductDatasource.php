@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Datasource;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Sylius\Component\Core\Repository\ProductRepositoryInterface;
+use Webmozart\Assert\Assert;
 
-class RepositoryDatasource implements DatasourceInterface
+class ProductDatasource implements DatasourceInterface
 {
     private EntityManagerInterface $entityManager;
 
@@ -30,29 +30,28 @@ class RepositoryDatasource implements DatasourceInterface
 
     public function getItems(string $sourceClass): iterable
     {
-        /** @phpstan-ignore-next-line */
         $repository = $this->entityManager->getRepository($sourceClass);
-        $paginator = $this->getPaginator($repository);
+        /** @var ProductRepositoryInterface $repository */
+        Assert::isInstanceOf($repository, ProductRepositoryInterface::class);
 
-        $page = 1;
+        $queryBuilder = $repository->createQueryBuilder('o')
+            ->andWhere('o.channels IS NOT EMPTY')
+            ->andWhere('o.enabled = :enabled')
+            ->setParameter('enabled', true)
+        ;
+
+        $paginator = new Pagerfanta(new QueryAdapter($queryBuilder, false, false));
         $paginator->setMaxPerPage(self::DEFAULT_MAX_PER_PAGE);
+        $page = 1;
         do {
             $paginator->setCurrentPage($page);
-            foreach ($paginator as $item) {
+
+            foreach ($paginator->getIterator() as $item) {
                 yield $item;
             }
             $page = $paginator->hasNextPage() ? $paginator->getNextPage() : 1;
         } while ($paginator->hasNextPage());
 
         return null;
-    }
-
-    private function getPaginator(EntityRepository $repository): Pagerfanta
-    {
-        if ($repository instanceof RepositoryInterface && ($paginator = $repository->createPaginator()) instanceof Pagerfanta) {
-            return $paginator;
-        }
-
-        return new Pagerfanta(new QueryAdapter($repository->createQueryBuilder('o'), false, false));
     }
 }

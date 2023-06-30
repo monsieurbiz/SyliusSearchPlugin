@@ -15,5 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Datasource;
 
 interface DatasourceInterface
 {
+    public const DEFAULT_MAX_PER_PAGE = 100;
+
     public function getItems(string $sourceClass): iterable;
 }

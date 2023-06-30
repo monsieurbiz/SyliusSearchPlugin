@@ -16,6 +16,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 use MonsieurBiz\SyliusSearchPlugin\generated\Model\Taxon as DocumentTaxon;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\Result;
 use MonsieurBiz\SyliusSearchPlugin\Model\Document\ResultInterface;
+use Sylius\Component\Attribute\AttributeType\SelectAttributeType;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Core\Model\Image;
@@ -173,17 +174,27 @@ trait DocumentableProductTrait
      */
     protected function addAttributesInDocument(ResultInterface $document, string $locale): ResultInterface
     {
-        /** @var AttributeValueInterface $attribute */
-        foreach ($this->getAttributesByLocale($locale, $locale) as $attribute) {
-            $attributeValues = [];
-            if (isset($attribute->getAttribute()->getConfiguration()['choices'])) {
-                foreach ($attribute->getValue() as $value) {
-                    $attributeValues[] = $attribute->getAttribute()->getConfiguration()['choices'][$value][$locale];
+        /** @var AttributeValueInterface $attributeValue */
+        foreach ($this->getAttributesByLocale($locale, $locale) as $attributeValue) {
+            $productAttributeValues = [];
+            $attribute = $attributeValue->getAttribute();
+            if ($attribute === null) {
+                continue;
+            }
+            if ($attribute->getType() === SelectAttributeType::TYPE) {
+                // Add all the selected values in the current locale if it exists, otherwise use the current value
+                foreach ($attributeValue->getValue() as $value) {
+                    if (isset($attribute->getConfiguration()['choices'][$value][$locale])) {
+                        $productAttributeValues[] = $attribute->getConfiguration()['choices'][$value][$locale];
+
+                        continue;
+                    }
+                    $productAttributeValues[] = $value;
                 }
             } else {
-                $attributeValues[] = $attribute->getValue();
+                $productAttributeValues[] = $attributeValue->getValue();
             }
-            $document->addAttribute($attribute->getCode(), $attribute->getName(), $attributeValues, $attribute->getLocaleCode() ?? $locale, 1);
+            $document->addAttribute($attributeValue->getCode(), $attributeValue->getName(), $productAttributeValues, $attributeValue->getLocaleCode() ?? $locale, 1);
         }
 
         return $document;

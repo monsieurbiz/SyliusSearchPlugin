@@ -94,7 +94,7 @@ class SearchController extends AbstractController
      */
     public function postAction(Request $request): RedirectResponse
     {
-        $query = (array) $request->request->get('monsieurbiz_searchplugin_search') ?? [];
+        $query = (array) $request->request->all()['monsieurbiz_searchplugin_search'] ?? [];
         $query = $query['query'] ?? '';
 
         return $this->redirect(

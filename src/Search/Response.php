@@ -19,6 +19,7 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use Pagerfanta\Adapter\AdapterInterface;
 use Pagerfanta\Pagerfanta;
+use Traversable;
 
 class Response implements ResponseInterface
 {
@@ -50,12 +51,12 @@ class Response implements ResponseInterface
         $this->buildFilters();
     }
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->getPaginator();
     }
 
-    public function count()
+    public function count(): int
     {
         return $this->getPaginator()->getNbResults();
     }

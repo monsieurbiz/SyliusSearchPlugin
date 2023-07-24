@@ -1,5 +1,8 @@
 {
     "bundles": {
+        "Jane\\Bundle\\AutoMapperBundle\\JaneAutoMapperBundle": [
+            "all"
+        ],
         "MonsieurBiz\\SyliusSearchPlugin\\MonsieurBizSyliusSearchPlugin": [
             "all"
         ]

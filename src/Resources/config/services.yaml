@@ -152,25 +152,42 @@ services:
       - { name: monsieurbiz.search.request.product_taxon_filter }
 
   # Define post filters
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry:
-    arguments:
-      - [
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\AttributesPostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\MainTaxonPostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\OptionsPostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\PricePostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\ProductTaxonPostFilter',
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\AttributesPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\MainTaxonPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\OptionsPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\PricePostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\ProductTaxonPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
 
   # Define sorters
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry:
-    arguments:
-      - [
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PositionSorter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PriceSorter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\NameSorter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\CreatedAtSorter',
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PositionSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PriceSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\NameSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\CreatedAtSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
 
   # Functions score
   MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\Product\InStockWeightFunction:
@@ -188,8 +205,8 @@ services:
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Search:
     arguments:
       $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_search_filter' }
-      $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
-      $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
+      $postFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_post_filter' }
+      $sorters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_sorter' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\InstantSearch:
     arguments:
@@ -198,8 +215,8 @@ services:
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Taxon:
     arguments:
       $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_taxon_filter' }
-      $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
-      $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
+      $postFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_post_filter' }
+      $sorters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_sorter' }
 
   # Define the filter builders
   MonsieurBiz\SyliusSearchPlugin\Search\ResponseFactory:

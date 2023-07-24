@@ -29,6 +29,9 @@ final class InstantSearch implements RequestInterface
 
     private ?RequestConfiguration $configuration;
 
+    /**
+     * @var iterable<QueryFilterInterface>
+     */
     private iterable $queryFilters;
 
     private FunctionScoreRegistryInterface $functionScoreRegistry;
@@ -63,7 +66,6 @@ final class InstantSearch implements RequestInterface
 
         $qb = new QueryBuilder();
         $boolQuery = $qb->query()->bool();
-        /** @var QueryFilterInterface $queryFilter */
         foreach ($this->queryFilters as $queryFilter) {
             $queryFilter->apply($boolQuery, $this->configuration);
         }

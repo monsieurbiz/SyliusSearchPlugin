@@ -3,6 +3,8 @@
 - Remove `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_search_filter`
 - Remove `monsieurbiz.search.request.query_filter.product_instant_search_registry` service to use an iterator of services tagged `monsieurbiz.search.request.product_instant_search_filter`
 - Remove `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_taxon_filter`
+- Remove `MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_post_filter`
+- Remove `MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_sorter`
 
 # UPGRADE FROM v1.X.X TO v2.0.x
 

@@ -20,11 +20,11 @@ use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterfac
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterRegistryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterRegistryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
 final class Search implements RequestInterface
@@ -39,11 +39,20 @@ final class Search implements RequestInterface
 
     private AggregationBuilder $aggregationBuilder;
 
+    /**
+     * @var iterable<QueryFilterInterface>
+     */
     private iterable $queryFilters;
 
-    private PostFilterRegistryInterface $postFilterRegistry;
+    /**
+     * @var iterable<PostFilterInterface>
+     */
+    private iterable $postFilters;
 
-    private SorterRegistryInterface $sorterRegistry;
+    /**
+     * @var iterable<SorterInterface>
+     */
+    private iterable $sorters;
 
     private FunctionScoreRegistryInterface $functionScoreRegistry;
 
@@ -53,8 +62,8 @@ final class Search implements RequestInterface
         ProductOptionRepositoryInterface $productOptionRepository,
         AggregationBuilder $aggregationBuilder,
         iterable $queryFilters,
-        PostFilterRegistryInterface $postFilterRegistry,
-        SorterRegistryInterface $sorterRegistry,
+        iterable $postFilters,
+        iterable $sorters,
         FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
         /** @var DocumentableInterface $documentable */
@@ -64,8 +73,8 @@ final class Search implements RequestInterface
         $this->productOptionRepository = $productOptionRepository;
         $this->aggregationBuilder = $aggregationBuilder;
         $this->queryFilters = $queryFilters;
-        $this->postFilterRegistry = $postFilterRegistry;
-        $this->sorterRegistry = $sorterRegistry;
+        $this->postFilters = $postFilters;
+        $this->sorters = $sorters;
         $this->functionScoreRegistry = $functionScoreRegistry;
     }
 
@@ -89,21 +98,20 @@ final class Search implements RequestInterface
         $qb = new QueryBuilder();
 
         $boolQuery = $qb->query()->bool();
-        /** @var QueryFilterInterface $queryFilter */
         foreach ($this->queryFilters as $queryFilter) {
             $queryFilter->apply($boolQuery, $this->configuration);
         }
 
         $query = Query::create($boolQuery);
         $postFilter = new Query\BoolQuery();
-        foreach ($this->postFilterRegistry->all() as $postFilterApplier) {
+        foreach ($this->postFilters as $postFilterApplier) {
             $postFilterApplier->apply($postFilter, $this->configuration);
         }
         $query->setPostFilter($postFilter);
 
         $this->addAggregations($query, $postFilter);
 
-        foreach ($this->sorterRegistry->all() as $sorter) {
+        foreach ($this->sorters as $sorter) {
             $sorter->apply($query, $this->configuration);
         }
 

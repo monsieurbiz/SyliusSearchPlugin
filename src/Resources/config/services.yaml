@@ -206,13 +206,7 @@ services:
   # Define the filter builders
   MonsieurBiz\SyliusSearchPlugin\Search\ResponseFactory:
     arguments:
-      $filterBuilders: {
-        product_main_taxon: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\MainTaxonFilterBuilder',
-        product_taxons: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\TaxonsFilterBuilder',
-        product_price: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\PriceFilterBuilder',
-        product_attribute: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\AttributeFilterBuilder',
-        product_option: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\OptionFilterBuilder'
-      }
+      $filterBuilders: !tagged_iterator { tag: 'monsieurbiz.search.response.filter_builder' }
 
   # Context
   MonsieurBiz\SyliusSearchPlugin\Context\ChannelSimulationContext:

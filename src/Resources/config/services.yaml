@@ -64,6 +64,11 @@ services:
     arguments:
       $decorated: '@.inner'
 
+  # Automapper configuration
+  MonsieurBiz\SyliusSearchPlugin\AutoMapper\Configuration:
+    arguments:
+      $automapperClasses: '%monsieurbiz.search.config.automapper_classes%'
+
   # Defines our registries
   monsieurbiz.search.registry.documentable:
     class: Sylius\Component\Registry\ServiceRegistry
@@ -223,7 +228,7 @@ services:
       - { name: kernel.event_listener, event: sylius.product.post_update, method: dispatchProductReindexMessage }
       - { name: kernel.event_listener, event: sylius.product.pre_delete, method: saveProductIdToDispatchReindexMessage }
       - { name: kernel.event_listener, event: sylius.product.post_delete, method: dispatchDeleteProductReindexMessage }
-  
+
   MonsieurBiz\SyliusSearchPlugin\EventListener\ProductVariantEventListener:
     tags:
       - { name: kernel.event_listener, event: sylius.product_variant.post_create, method: dispatchProductVariantReindexMessage }

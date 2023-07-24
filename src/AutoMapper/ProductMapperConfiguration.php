@@ -31,7 +31,7 @@ use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 
 final class ProductMapperConfiguration implements MapperConfigurationInterface
 {
-    private Configuration $configuration;
+    private ConfigurationInterface $configuration;
 
     private AutoMapperInterface $autoMapper;
 
@@ -42,7 +42,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
     private ChannelSimulationContext $channelSimulationContext;
 
     public function __construct(
-        Configuration $configuration,
+        ConfigurationInterface $configuration,
         AutoMapperInterface $autoMapper,
         ProductVariantResolverInterface $productVariantResolver,
         AvailabilityCheckerInterface $availabilityChecker,

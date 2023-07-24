@@ -27,14 +27,14 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
 {
     use LoggerAwareTrait;
 
-    private Configuration $configuration;
+    private ConfigurationInterface $configuration;
 
     /**
      * @var ReaderInterface[]
      */
     private array $productAttributeValueReaders;
 
-    public function __construct(Configuration $configuration, iterable $productAttributeValueReaders)
+    public function __construct(ConfigurationInterface $configuration, iterable $productAttributeValueReaders)
     {
         $this->logger = new NullLogger();
         $this->configuration = $configuration;

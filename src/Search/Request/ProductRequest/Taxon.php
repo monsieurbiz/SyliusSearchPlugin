@@ -21,7 +21,7 @@ use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterRegistryInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterRegistryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterRegistryInterface;
@@ -43,7 +43,7 @@ final class Taxon implements RequestInterface
 
     private ?RequestConfiguration $configuration;
 
-    private QueryFilterRegistryInterface $queryFilterRegistry;
+    private iterable $queryFilters;
 
     private PostFilterRegistryInterface $postFilterRegistry;
 
@@ -57,7 +57,7 @@ final class Taxon implements RequestInterface
         ProductOptionRepositoryInterface $productOptionRepository,
         ChannelContextInterface $channelContext,
         AggregationBuilder $aggregationBuilder,
-        QueryFilterRegistryInterface $queryFilterRegistry,
+        iterable $queryFilters,
         PostFilterRegistryInterface $postFilterRegistry,
         SorterRegistryInterface $sorterRegistry,
         FunctionScoreRegistryInterface $functionScoreRegistry
@@ -69,7 +69,7 @@ final class Taxon implements RequestInterface
         $this->productOptionRepository = $productOptionRepository;
         $this->channelContext = $channelContext;
         $this->aggregationBuilder = $aggregationBuilder;
-        $this->queryFilterRegistry = $queryFilterRegistry;
+        $this->queryFilters = $queryFilters;
         $this->postFilterRegistry = $postFilterRegistry;
         $this->sorterRegistry = $sorterRegistry;
         $this->functionScoreRegistry = $functionScoreRegistry;
@@ -90,7 +90,8 @@ final class Taxon implements RequestInterface
         $qb = new QueryBuilder();
 
         $boolQuery = $qb->query()->bool();
-        foreach ($this->queryFilterRegistry->all() as $queryFilter) {
+        /** @var QueryFilterInterface $queryFilter */
+        foreach ($this->queryFilters as $queryFilter) {
             $queryFilter->apply($boolQuery, $this->configuration);
         }
         $query = Query::create($boolQuery);

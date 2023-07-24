@@ -116,6 +116,8 @@ services:
       $fieldsToSearch:
         - 'name^5'
         - 'description'
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
 
   monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
     class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
@@ -124,34 +126,30 @@ services:
         - 'name^5'
         - 'description'
         - 'name.autocomplete'
+    tags:
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
 
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry:
-    arguments:
-      - [
-          '@monsieurbiz.search.request.query_filter.product_search.search_term_filter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
+      - { name: monsieurbiz.search.request.product_taxon_filter }
 
-  monsieurbiz.search.request.query_filter.product_instant_search_registry:
-    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry
-    arguments:
-      - [
-          '@monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
+      - { name: monsieurbiz.search.request.product_taxon_filter }
 
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry:
-    arguments:
-      - [
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\TaxonFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
+      - { name: monsieurbiz.search.request.product_taxon_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\TaxonFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_taxon_filter }
 
   # Define post filters
   MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry:
@@ -189,17 +187,17 @@ services:
   # Define the product queries
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Search:
     arguments:
-      $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry'
+      $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_search_filter' }
       $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
       $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\InstantSearch:
     arguments:
-      $queryFilterRegistry: '@monsieurbiz.search.request.query_filter.product_instant_search_registry'
+      $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_instant_search_filter' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Taxon:
     arguments:
-      $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry'
+      $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_taxon_filter' }
       $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
       $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
 

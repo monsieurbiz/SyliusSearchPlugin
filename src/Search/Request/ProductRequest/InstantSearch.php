@@ -17,7 +17,7 @@ use Elastica\Query;
 use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterRegistryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use RuntimeException;
@@ -29,19 +29,19 @@ final class InstantSearch implements RequestInterface
 
     private ?RequestConfiguration $configuration;
 
-    private QueryFilterRegistryInterface $queryFilterRegistry;
+    private iterable $queryFilters;
 
     private FunctionScoreRegistryInterface $functionScoreRegistry;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
-        QueryFilterRegistryInterface $queryFilterRegistry,
+        iterable $queryFilters,
         FunctionScoreRegistryInterface $functionScoreRegistry
     ) {
         /** @var DocumentableInterface $documentable */
         $documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->documentable = $documentable;
-        $this->queryFilterRegistry = $queryFilterRegistry;
+        $this->queryFilters = $queryFilters;
         $this->functionScoreRegistry = $functionScoreRegistry;
     }
 
@@ -63,7 +63,8 @@ final class InstantSearch implements RequestInterface
 
         $qb = new QueryBuilder();
         $boolQuery = $qb->query()->bool();
-        foreach ($this->queryFilterRegistry->all() as $queryFilter) {
+        /** @var QueryFilterInterface $queryFilter */
+        foreach ($this->queryFilters as $queryFilter) {
             $queryFilter->apply($boolQuery, $this->configuration);
         }
 

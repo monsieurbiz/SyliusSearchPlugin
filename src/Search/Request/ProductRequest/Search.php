@@ -21,7 +21,7 @@ use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterRegistryInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterRegistryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterRegistryInterface;
@@ -39,7 +39,7 @@ final class Search implements RequestInterface
 
     private AggregationBuilder $aggregationBuilder;
 
-    private QueryFilterRegistryInterface $queryFilterRegistry;
+    private iterable $queryFilters;
 
     private PostFilterRegistryInterface $postFilterRegistry;
 
@@ -52,7 +52,7 @@ final class Search implements RequestInterface
         ProductAttributeRepositoryInterface $productAttributeRepository,
         ProductOptionRepositoryInterface $productOptionRepository,
         AggregationBuilder $aggregationBuilder,
-        QueryFilterRegistryInterface $queryFilterRegistry,
+        iterable $queryFilters,
         PostFilterRegistryInterface $postFilterRegistry,
         SorterRegistryInterface $sorterRegistry,
         FunctionScoreRegistryInterface $functionScoreRegistry
@@ -63,7 +63,7 @@ final class Search implements RequestInterface
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
         $this->aggregationBuilder = $aggregationBuilder;
-        $this->queryFilterRegistry = $queryFilterRegistry;
+        $this->queryFilters = $queryFilters;
         $this->postFilterRegistry = $postFilterRegistry;
         $this->sorterRegistry = $sorterRegistry;
         $this->functionScoreRegistry = $functionScoreRegistry;
@@ -89,7 +89,8 @@ final class Search implements RequestInterface
         $qb = new QueryBuilder();
 
         $boolQuery = $qb->query()->bool();
-        foreach ($this->queryFilterRegistry->all() as $queryFilter) {
+        /** @var QueryFilterInterface $queryFilter */
+        foreach ($this->queryFilters as $queryFilter) {
             $queryFilter->apply($boolQuery, $this->configuration);
         }
 

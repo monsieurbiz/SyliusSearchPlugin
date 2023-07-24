@@ -89,9 +89,11 @@ imports:
      {
 ```
 
-6. The `Product` entity doesn't need to implement the `DocumentableInterface` anymore. You can remove it.
+6. You need to run a diff of your doctrine's migrations: `console doctrine:migrations:diff`. Don't forget to run it! (`console doctrine:migrations:migrate`)
 
-7. The way to add some additionnal data changed.
+7. The `Product` entity doesn't need to implement the `DocumentableInterface` anymore. You can remove it.
+
+8. The way to add some additionnal data changed.
 
 Before we should have this in your Product entity for example : 
 
@@ -114,4 +116,19 @@ Before we should have this in your Product entity for example :
 
 Now please refer to the [Add custom value](docs/add_custom_values.md) documentation.
 
-@TODO - Templating part
+9. The templates inside the folder `@MonsieurBizSyliusSearchPlugin/Common` does not exist anymore.  
+
+The template architecture is
+- `@MonsieurBizSyliusSearchPlugin/Search` for the search page
+- `@MonsieurBizSyliusSearchPlugin/Instant` for the instant search
+- `@MonsieurBizSyliusSearchPlugin/Taxon` for the taxon page
+
+10. Analyzers are manage by locale, example with `src/Resources/config/elasticsearch/analyzers_fr.yaml`
+
+You can also have the full locale code if you need `src/Resources/config/elasticsearch/analyzers_fr_FR.yaml`
+
+11. Mapping is now global so the files `src/Resources/config/elasticsearch/mappings/documents-<locale_code>_mapping.yaml` were removed.
+
+12. Queries are managed differently so the files in `src/Resources/config/elasticsearch/queries` were removed.
+
+If you changed this part, have a look of [the documention](./docs/index.md) to know how to customize your indexed content and your results.

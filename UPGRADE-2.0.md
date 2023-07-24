@@ -87,3 +87,30 @@ imports:
      protected function createTranslation(): ProductOptionTranslationInterface
      {
 ```
+
+6. The `Product` entity doesn't need to implement the `DocumentableInterface` anymore. You can remove it.
+
+7. The way to add some additionnal data changed.
+
+Before we should have this in your Product entity for example : 
+
+```php
+     use DocumentableProductTrait {
+        convertToDocument as parentConvertToDocument;
+    }
+
+    public function convertToDocument(string $locale): Result
+    {
+        $document = $this->parentConvertToDocument($locale);
+
+        if ($this->getCustomValue()) {
+            $document->addAttribute('custom_value', 'Custom Value', [$this->getCustomValue()], $locale, 1);
+        }
+
+        return $document;
+    }
+```
+
+Now please refer to the [Add custom value](docs/add_custom_values.md) documentation.
+
+@TODO - Templating part

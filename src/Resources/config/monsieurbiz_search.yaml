@@ -11,7 +11,7 @@ monsieurbiz_sylius_search:
       source: 'Sylius\Component\Core\Model\ProductInterface'
       target: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO'
       templates:
-        item: '@MonsieurBizSyliusSearchPlugin/Search/product/_box.html.twig'
+        item: '@MonsieurBizSyliusSearchPlugin/Search/Product/_box.html.twig'
         instant: '@MonsieurBizSyliusSearchPlugin/Instant/Product/_box.html.twig'
       #mapping_provider: '...' # by default monsieurbiz.search.mapper_provider
       datasource: 'MonsieurBiz\SyliusSearchPlugin\Model\Datasource\ProductDatasource' # by default MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource

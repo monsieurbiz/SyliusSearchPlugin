@@ -1,0 +1,4 @@
+mappings:
+    properties:
+        short_description:
+            type: text

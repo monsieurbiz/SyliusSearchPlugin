@@ -30,3 +30,5 @@ monsieurbiz_sylius_search:
       product_variant: 'MonsieurBiz\SyliusSearchPlugin\Model\Product\VariantDTO'
       pricing: 'MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO'
 
+  elastically_configuration_paths:
+    - '@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch'

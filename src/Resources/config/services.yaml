@@ -55,13 +55,10 @@ services:
       $attributeRepository: '@sylius.repository.product_attribute'
 
   # Define our mapping provider
-  JoliCode\Elastically\Mapping\YamlProvider:
-    arguments:
-      $configurationDirectory: '@=service("file_locator").locate("@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch")'
   MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider:
-    decorates: JoliCode\Elastically\Mapping\YamlProvider
     arguments:
-      $decorated: '@.inner'
+      $fileLocator: '@file_locator'
+      $configurationDirectories: '%monsieurbiz.search.config.elastically_configuration_paths%'
 
   # Automapper configuration
   MonsieurBiz\SyliusSearchPlugin\AutoMapper\Configuration:

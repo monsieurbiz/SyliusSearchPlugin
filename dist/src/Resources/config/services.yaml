@@ -4,7 +4,26 @@ services:
         autoconfigure: true
         public: false
     
+    # Add short_description in indexed data with the logic to get the value
     App\Search\Automapper\DecorateProductMapperConfiguration:
         decorates: MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductMapperConfiguration
         arguments:
             - '@.inner'
+
+    # Add short_description in searchable fields
+    monsieurbiz.search.request.query_filter.product_search.search_term_filter:
+        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
+        arguments:
+            $fieldsToSearch:
+              - 'name^5'
+              - 'description'
+              - 'short_description' # We add our new value in search
+
+    monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
+        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
+        arguments:
+            $fieldsToSearch:
+              - 'name^5'
+              - 'description'
+              - 'name.autocomplete'
+              - 'short_description' # We add our new value in instant search

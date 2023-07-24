@@ -4,55 +4,17 @@
 
 In our example we will add the `short_description` product field to the indexed content.
 
-First, declares your services : 
+- [Use event listener to change the product mapping](../dist/src/Search/EventListener/AppendProductMappingSubscriber.php)
+- [Add a decorator for ProductMapperConfiguration](../dist/src/Resources/config/services.yaml)
+- [Create DecorateProductMapperConfiguration class](../dist/src/Search/Automapper/DecorateProductMapperConfiguration.php)
 
-```yaml
-    App\Search\EventListener\AppendProductMappingSubscriber:
-        autoconfigure: true
+You will have the `item.short_description` variable available in your templates.
 
-    App\Search\Automapper\DecorateProductMapperConfiguration:
-        autowire: true
-        decorates: MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductMapperConfiguration
-        arguments:
-            - '@.inner'
-```
+## Search on the custom value
 
-```php
-<?php
+With only the decorator, you will not be able to search in the content of the new field.
+You have to redeclare `monsieurbiz.search.request.query_filter.product_search.search_term_filter` 
+and `monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter` services 
+to add the `short_description` fields.
 
-declare(strict_types=1);
-
-namespace App\Search\EventListener;
-
-use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-final class AppendProductMappingSubscriber implements EventSubscriberInterface
-{
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MappingProviderEvent::EVENT_NAME => 'onMappingProvider',
-        ];
-    }
-
-    public function onMappingProvider(MappingProviderEvent $event): void
-    {
-        // We work on products, ignore the rest
-        if ('monsieurbiz_product' !== $event->getIndexCode()) {
-            return;
-        }
-
-        $mapping = $event->getMapping();
-        if (null === $mapping || !$mapping->offsetExists('mappings')) {
-            return;
-        }
-
-        $mappings['properties']['short_description'] = [
-            'type' => 'text',
-        ];
-
-        $mapping->offsetSet('mappings', $mappings);
-    }
-}
-```
+- [Add `short_description` in search term filter](../dist/src/Resources/config/services.yaml)

@@ -13,7 +13,9 @@
 <h1 align="center">Search</h1>
 
 [![Search Plugin license](https://img.shields.io/github/license/monsieurbiz/SyliusSearchPlugin?public)](https://github.com/monsieurbiz/SyliusSearchPlugin/blob/master/LICENSE.txt)
-[![Build Status](https://img.shields.io/github/workflow/status/monsieurbiz/SyliusSearchPlugin/PHP%20Composer)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions?query=workflow%3A%22PHP+Composer%22)
+[![Recipe](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/recipe.yaml/badge.svg?branch=master&event=push)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/recipe.yaml)
+[![Tests](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/tests.yaml/badge.svg?branch=master&event=push)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/tests.yaml)
+[![Security](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/security.yaml/badge.svg?branch=master&event=push)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/security.yaml)
 
 A search plugin for Sylius using [Elastically](https://github.com/jolicode/elastically) and [Jane](https://github.com/janephp/janephp).
 

@@ -17,7 +17,6 @@ use ArrayObject;
 use Elastica\Exception\InvalidException;
 use JoliCode\Elastically\Mapping\MappingProviderInterface;
 use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
-use MonsieurBiz\SyliusSearchPlugin\Factory\YamlProviderFactory;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -27,7 +26,6 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 {
     private EventDispatcherInterface $eventDispatcher;
 
-    private YamlProviderFactory $yamlProviderFactory;
 
     private FileLocatorInterface $fileLocator;
 
@@ -40,13 +38,11 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
-        YamlProviderFactory $yamlProviderFactory,
         FileLocatorInterface $fileLocator,
         iterable $configurationDirectories = [],
         ?Parser $parser = null
     ) {
         $this->eventDispatcher = $eventDispatcher;
-        $this->yamlProviderFactory = $yamlProviderFactory;
         $this->fileLocator = $fileLocator;
         $this->configurationDirectories = $configurationDirectories;
         $this->parser = $parser ?? new Parser();
@@ -81,11 +77,13 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
     private function appendMapping(string $configurationDirectory, array $mapping, string $indexName, array $context): array
     {
-        $yamlProvider = $this->yamlProviderFactory->create($configurationDirectory, $this->parser);
-
         try {
-            $mapping = array_merge_recursive($mapping, $yamlProvider->provideMapping($context['index_code'] ?? $indexName, $context) ?? []);
-        } catch (InvalidException $exception) {
+            $indexName = $context['index_code'] ?? $indexName;
+            $fileName = $context['filename'] ?? ($indexName . '_mapping.yaml');
+            $mappingFilePath = $configurationDirectory . \DIRECTORY_SEPARATOR . $fileName;
+
+            $mapping = array_merge_recursive($mapping, $this->parser->parseFile($mappingFilePath));
+        } catch (ParseException $exception) {
             // the mapping yaml file does not exist.
         }
 
@@ -98,15 +96,22 @@ class YamlWithLocaleProvider implements MappingProviderInterface
             return $mapping;
         }
 
-        foreach ($this->getLocaleCode($locale) as $localeCode) {
-            $analyzerFilePath = $configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers_' . $localeCode . '.yaml';
+        $mapping = $this->appendAnalyzers($configurationDirectory . DIRECTORY_SEPARATOR . 'analyzers.yaml', $mapping);
 
-            try {
-                $analyzer = $this->parser->parseFile($analyzerFilePath) ?? [];
-                $mapping['settings']['analysis'] = array_merge_recursive($mapping['settings']['analysis'] ?? [], $analyzer);
-            } catch (ParseException $exception) {
-                // the yaml file does not exist or does not exist.
-            }
+        foreach ($this->getLocaleCode($locale) as $localeCode) {
+            $mapping = $this->appendAnalyzers($configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers_' . $localeCode . '.yaml', $mapping);
+        }
+
+        return $mapping;
+    }
+
+    private function appendAnalyzers(string $analyzerFilePath, array $mapping): array
+    {
+        try {
+            $analyzer = $this->parser->parseFile($analyzerFilePath) ?? [];
+            $mapping['settings']['analysis'] = array_merge_recursive($mapping['settings']['analysis'] ?? [], $analyzer);
+        } catch (ParseException $exception) {
+            // the yaml file does not exist or does not exist.
         }
 
         return $mapping;

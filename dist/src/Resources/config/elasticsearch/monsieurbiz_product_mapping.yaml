@@ -2,3 +2,6 @@ mappings:
     properties:
         short_description:
             type: text
+            fields:
+                keyword: # add keyword field for sorting
+                    type: keyword

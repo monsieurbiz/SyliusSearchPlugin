@@ -14,15 +14,14 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
-use Sylius\Component\Registry\ServiceRegistryInterface;
 
 class RequestHandler
 {
-    private ServiceRegistryInterface $searchRequestsRegistry;
+    private iterable $searchRequests;
 
-    public function __construct(ServiceRegistryInterface $searchRequestsRegistry)
+    public function __construct(iterable $searchRequests)
     {
-        $this->searchRequestsRegistry = $searchRequestsRegistry;
+        $this->searchRequests = $searchRequests;
     }
 
     /**
@@ -31,7 +30,7 @@ class RequestHandler
     public function getRequest(RequestConfiguration $requestConfiguration): RequestInterface
     {
         /** @var RequestInterface $request */
-        foreach ($this->searchRequestsRegistry->all() as $request) {
+        foreach ($this->searchRequests as $request) {
             if ($request->supports($requestConfiguration->getType(), $requestConfiguration->getDocumentType())) {
                 $request->setConfiguration($requestConfiguration);
 

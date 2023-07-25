@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin;
 
-use MonsieurBiz\SyliusSearchPlugin\DependencyInjection\AutomapperConfigurationRegistryPass;
 use MonsieurBiz\SyliusSearchPlugin\DependencyInjection\AutowireMappingProviderParameterPass;
 use MonsieurBiz\SyliusSearchPlugin\DependencyInjection\DocumentableRegistryPass;
-use MonsieurBiz\SyliusSearchPlugin\DependencyInjection\RegisterSearchRequestPass;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -46,8 +44,6 @@ final class MonsieurBizSyliusSearchPlugin extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new DocumentableRegistryPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 50); // Run the compiler pass before \MonsieurBiz\SyliusSettingsPlugin\DependencyInjection\InstantiateSettingsPass
-        $container->addCompilerPass(new RegisterSearchRequestPass());
-        $container->addCompilerPass(new AutomapperConfigurationRegistryPass());
         $container->addCompilerPass(new AutowireMappingProviderParameterPass());
     }
 }

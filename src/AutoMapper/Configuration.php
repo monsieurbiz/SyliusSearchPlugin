@@ -15,12 +15,22 @@ namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper;
 
 use RuntimeException;
 
-final class Configuration
+final class Configuration implements ConfigurationInterface
 {
-    private array $sourceClasses = [];
+    private array $sourceClasses;
 
-    private array $targetClasses = [];
+    private array $targetClasses;
 
+    public function __construct(
+        array $automapperClasses
+    ) {
+        $this->sourceClasses = $automapperClasses['sources'] ?? [];
+        $this->targetClasses = $automapperClasses['targets'] ?? [];
+    }
+
+    /**
+     * @deprecated you should not be able to define any mapping outside the config. If necessary, define your own configuration class
+     */
     public function addSourceClass(string $identifier, string $className): void
     {
         $this->sourceClasses[$identifier] = $className;
@@ -35,6 +45,9 @@ final class Configuration
         return $this->sourceClasses[$identifier];
     }
 
+    /**
+     * @deprecated you should not be able to define any mapping outside the config. If necessary, define your own configuration class
+     */
     public function addTargetClass(string $identifier, string $className): void
     {
         $this->targetClasses[$identifier] = $className;

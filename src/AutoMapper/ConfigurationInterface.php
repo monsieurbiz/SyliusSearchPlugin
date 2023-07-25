@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting;
+namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper;
 
-use Sylius\Component\Registry\ServiceRegistryInterface;
-
-interface SorterRegistryInterface extends ServiceRegistryInterface
+interface ConfigurationInterface
 {
+    public function getSourceClass(string $identifier): string;
+
+    public function getTargetClass(string $identifier): string;
 }

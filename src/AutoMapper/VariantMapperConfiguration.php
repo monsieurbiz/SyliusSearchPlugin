@@ -22,11 +22,11 @@ use Sylius\Component\Product\Model\ProductVariantInterface;
 
 final class VariantMapperConfiguration implements MapperConfigurationInterface
 {
-    private Configuration $configuration;
+    private ConfigurationInterface $configuration;
 
     private AvailabilityCheckerInterface $availabilityChecker;
 
-    public function __construct(Configuration $configuration, AvailabilityCheckerInterface $availabilityChecker)
+    public function __construct(ConfigurationInterface $configuration, AvailabilityCheckerInterface $availabilityChecker)
     {
         $this->configuration = $configuration;
         $this->availabilityChecker = $availabilityChecker;

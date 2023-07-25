@@ -24,7 +24,6 @@ services:
       $localeProvider: '@sylius.translation_locale_provider'
       $productVariantResolver: '@MonsieurBiz\SyliusSearchPlugin\Resolver\CheapestProductVariantResolver'
       $documentableRegistry: '@monsieurbiz.search.registry.documentable'
-      $searchRequestsRegistry: '@monsieurbiz.search.registry.search_request'
       $enableStockFilter: '%monsieurbiz.search.product.enable_stock_filter%'
 
   _instanceof:
@@ -64,6 +63,11 @@ services:
     arguments:
       $decorated: '@.inner'
 
+  # Automapper configuration
+  MonsieurBiz\SyliusSearchPlugin\AutoMapper\Configuration:
+    arguments:
+      $automapperClasses: '%monsieurbiz.search.config.automapper_classes%'
+
   # Defines our registries
   monsieurbiz.search.registry.documentable:
     class: Sylius\Component\Registry\ServiceRegistry
@@ -71,11 +75,10 @@ services:
       $className: '%monsieurbiz.search.model.documentable.interface%'
       $context: 'documentable'
 
-  monsieurbiz.search.registry.search_request:
-    class: Sylius\Component\Registry\ServiceRegistry
+  # Search request handler
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestHandler:
     arguments:
-      $className: '%monsieurbiz.search.request.interface%'
-      $context: 'documentable'
+      $searchRequests: !tagged_iterator { tag: 'monsieurbiz.search.request' }
 
   # Define product attribute value readers
   MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueConfiguration:
@@ -113,6 +116,8 @@ services:
       $fieldsToSearch:
         - 'name^5'
         - 'description'
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
 
   monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
     class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
@@ -121,55 +126,68 @@ services:
         - 'name^5'
         - 'description'
         - 'name.autocomplete'
+    tags:
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
 
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry:
-    arguments:
-      - [
-          '@monsieurbiz.search.request.query_filter.product_search.search_term_filter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
+      - { name: monsieurbiz.search.request.product_taxon_filter }
 
-  monsieurbiz.search.request.query_filter.product_instant_search_registry:
-    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry
-    arguments:
-      - [
-          '@monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
+      - { name: monsieurbiz.search.request.product_taxon_filter }
 
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry:
-    arguments:
-      - [
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\TaxonFilter',
-          '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter'
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\IsInStockFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_search_filter }
+      - { name: monsieurbiz.search.request.product_instant_search_filter }
+      - { name: monsieurbiz.search.request.product_taxon_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\TaxonFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_taxon_filter }
 
   # Define post filters
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry:
-    arguments:
-      - [
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\AttributesPostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\MainTaxonPostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\OptionsPostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\PricePostFilter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\ProductTaxonPostFilter',
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\AttributesPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\MainTaxonPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\OptionsPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\PricePostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\Product\ProductTaxonPostFilter:
+    tags:
+      - { name: monsieurbiz.search.request.product_post_filter }
 
   # Define sorters
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry:
-    arguments:
-      - [
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PositionSorter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PriceSorter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\NameSorter',
-        '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\CreatedAtSorter',
-      ]
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PositionSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\PriceSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\NameSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\Product\CreatedAtSorter:
+    tags:
+      - { name: monsieurbiz.search.request.product_sorter }
 
   # Functions score
   MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\Product\InStockWeightFunction:
@@ -186,30 +204,24 @@ services:
   # Define the product queries
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Search:
     arguments:
-      $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductSearchRegistry'
-      $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
-      $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
+      $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_search_filter' }
+      $postFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_post_filter' }
+      $sorters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_sorter' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\InstantSearch:
     arguments:
-      $queryFilterRegistry: '@monsieurbiz.search.request.query_filter.product_instant_search_registry'
+      $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_instant_search_filter' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Taxon:
     arguments:
-      $queryFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ProductTaxonRegistry'
-      $postFilterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry'
-      $sorterRegistry: '@MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry'
+      $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_taxon_filter' }
+      $postFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_post_filter' }
+      $sorters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_sorter' }
 
   # Define the filter builders
   MonsieurBiz\SyliusSearchPlugin\Search\ResponseFactory:
     arguments:
-      $filterBuilders: {
-        product_main_taxon: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\MainTaxonFilterBuilder',
-        product_taxons: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\TaxonsFilterBuilder',
-        product_price: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\PriceFilterBuilder',
-        product_attribute: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\AttributeFilterBuilder',
-        product_option: '@MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\Product\OptionFilterBuilder'
-      }
+      $filterBuilders: !tagged_iterator { tag: 'monsieurbiz.search.response.filter_builder' }
 
   # Context
   MonsieurBiz\SyliusSearchPlugin\Context\ChannelSimulationContext:
@@ -223,7 +235,7 @@ services:
       - { name: kernel.event_listener, event: sylius.product.post_update, method: dispatchProductReindexMessage }
       - { name: kernel.event_listener, event: sylius.product.pre_delete, method: saveProductIdToDispatchReindexMessage }
       - { name: kernel.event_listener, event: sylius.product.post_delete, method: dispatchDeleteProductReindexMessage }
-  
+
   MonsieurBiz\SyliusSearchPlugin\EventListener\ProductVariantEventListener:
     tags:
       - { name: kernel.event_listener, event: sylius.product_variant.post_create, method: dispatchProductVariantReindexMessage }

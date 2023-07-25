@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Search\Automapper;
 
+use App\Search\Model\Taxon\TaxonDTO;
 use DateTimeInterface;
 use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\AutoMapperInterface;
@@ -69,23 +70,23 @@ final class TaxonMapperConfiguration implements MapperConfigurationInterface
             return $taxon->getCreatedAt();
         });
 
-        $metadata->forMember('position', function (TaxonInterface $taxon): ?DateTimeInterface {
+        $metadata->forMember('position', function (TaxonInterface $taxon): ?int {
             return $taxon->getPosition();
         });
 
-        $metadata->forMember('level', function (TaxonInterface $taxon): ?DateTimeInterface {
+        $metadata->forMember('level', function (TaxonInterface $taxon): ?int {
             return $taxon->getLevel();
         });
 
-        $metadata->forMember('left', function (TaxonInterface $taxon): ?DateTimeInterface {
+        $metadata->forMember('left', function (TaxonInterface $taxon): ?int {
             return $taxon->getLeft();
         });
 
-        $metadata->forMember('right', function (TaxonInterface $taxon): ?DateTimeInterface {
+        $metadata->forMember('right', function (TaxonInterface $taxon): ?int {
             return $taxon->getRight();
         });
 
-        $metadata->forMember('parent_taxon', function (TaxonInterface $taxon) {
+        $metadata->forMember('parent_taxon', function (TaxonInterface $taxon): ?TaxonDTO {
             return null !== $taxon->getParent()
                 ? $this->autoMapper->map($taxon->getParent(), $this->configuration->getTargetClass('app_taxon'))
                 : null;

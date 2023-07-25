@@ -39,3 +39,8 @@ services:
               - 'description'
               - 'name.autocomplete'
               - 'short_description' # We add our new value in instant search
+
+    # Define sorters
+    App\Search\Request\Sorting\Product\ShortDescriptionSorter:
+        tags:
+            - { name: monsieurbiz.search.request.product_sorter }

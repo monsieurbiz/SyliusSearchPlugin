@@ -1,2 +1,5 @@
+parameters:
+    monsieurbiz.search.product.is_in_stock_scoring_boost: 200 # Enable the boost for in stock products
+
 imports:
     - { resource: "services.yaml" }

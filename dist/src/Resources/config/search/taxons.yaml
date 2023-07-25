@@ -1,0 +1,22 @@
+monsieurbiz_sylius_search:
+  documents:
+    app_taxon:
+      #prefix: '…' # define a custom index prefix on index names and aliases
+      #document_class: '…' # by default MonsieurBiz\SyliusSearchPlugin\Model\Documentable\Documentable
+      instant_search_enabled: true # by default false
+      limits:
+        search: [9, 18, 27]
+        taxon: [9, 18, 27]
+        instant_search: [5]
+      source: 'Sylius\Component\Core\Model\TaxonInterface'
+      target: 'App\Search\Model\Taxon\TaxonDTO'
+      templates:
+        item: '@MonsieurBizSyliusSearchPlugin/Search/Taxon/_box.html.twig'
+        instant: '@MonsieurBizSyliusSearchPlugin/Instant/Taxon/_box.html.twig'
+      #mapping_provider: '...' # by default monsieurbiz.search.mapper_provider
+      datasource: 'App\Search\Model\Datasource\TaxonDatasource' # by default MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource
+  automapper_classes:
+    sources:
+      taxon: '%sylius.model.taxon.class%'
+    targets:
+      app_taxon: 'App\Search\Model\Taxon\TaxonDTO'

@@ -3,3 +3,4 @@ parameters:
 
 imports:
     - { resource: "services.yaml" }
+    - { resource: "search/taxons.yaml" }

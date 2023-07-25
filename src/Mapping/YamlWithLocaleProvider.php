@@ -14,47 +14,55 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Mapping;
 
 use ArrayObject;
+use Elastica\Exception\InvalidException;
 use JoliCode\Elastically\Mapping\MappingProviderInterface;
-use JoliCode\Elastically\Mapping\YamlProvider;
 use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
-use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Factory\YamlProviderFactory;
+use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
 class YamlWithLocaleProvider implements MappingProviderInterface
 {
-    private YamlProvider $decorated;
+    private EventDispatcherInterface $eventDispatcher;
 
-    private string $configurationDirectory;
+    private YamlProviderFactory $yamlProviderFactory;
+
+    private FileLocatorInterface $fileLocator;
+
+    /**
+     * @var array<string>
+     */
+    private iterable $configurationDirectories;
 
     private Parser $parser;
 
-    private ProductAttributeRepositoryInterface $attributeRepository;
-
-    private EventDispatcherInterface $eventDispatcher;
-
     public function __construct(
-        YamlProvider $decorated,
-        string $configurationDirectory,
         EventDispatcherInterface $eventDispatcher,
-        ProductAttributeRepositoryInterface $attributeRepository,
+        YamlProviderFactory $yamlProviderFactory,
+        FileLocatorInterface $fileLocator,
+        iterable $configurationDirectories = [],
         ?Parser $parser = null
     ) {
-        $this->decorated = $decorated;
-        $this->configurationDirectory = $configurationDirectory;
-        $this->parser = $parser ?? new Parser();
-        $this->attributeRepository = $attributeRepository;
         $this->eventDispatcher = $eventDispatcher;
+        $this->yamlProviderFactory = $yamlProviderFactory;
+        $this->fileLocator = $fileLocator;
+        $this->configurationDirectories = $configurationDirectories;
+        $this->parser = $parser ?? new Parser();
     }
 
     public function provideMapping(string $indexName, array $context = []): ?array
     {
-        $mapping = $this->decorated->provideMapping($context['index_code'] ?? $indexName, $context) ?? [];
-
+        $mapping = [];
         $locale = $context['locale'] ?? null;
-        if (null !== $locale) {
-            $mapping = $this->appendLocaleAnalyzers($mapping, $locale);
+        foreach ($this->configurationDirectories as $configurationDirectory) {
+            $configurationDirectory = $this->fileLocator->locate($configurationDirectory);
+            if (!\is_string($configurationDirectory)) {
+                continue;
+            }
+            $mapping = $this->appendMapping($configurationDirectory, $mapping, $indexName, $context);
+            $mapping = $this->appendLocaleAnalyzers($configurationDirectory, $mapping, $locale);
         }
 
         $mappingProviderEvent = new MappingProviderEvent($context['index_code'] ?? $indexName, new ArrayObject($mapping));
@@ -63,13 +71,35 @@ class YamlWithLocaleProvider implements MappingProviderInterface
             MappingProviderEvent::EVENT_NAME
         );
 
-        return (array) $mappingProviderEvent->getMapping();
+        $mapping = (array) $mappingProviderEvent->getMapping();
+        if (empty($mapping['mappings'] ?? [])) {
+            throw new InvalidException(sprintf('Mapping no found for "%s" not found. Please check your configuration.', $indexName));
+        }
+
+        return $mapping;
     }
 
-    private function appendLocaleAnalyzers(array $mapping, string $locale): array
+    private function appendMapping(string $configurationDirectory, array $mapping, string $indexName, array $context): array
     {
+        $yamlProvider = $this->yamlProviderFactory->create($configurationDirectory, $this->parser);
+
+        try {
+            $mapping = array_merge_recursive($mapping, $yamlProvider->provideMapping($context['index_code'] ?? $indexName, $context) ?? []);
+        } catch (InvalidException $exception) {
+            // the mapping yaml file does not exist.
+        }
+
+        return $mapping;
+    }
+
+    private function appendLocaleAnalyzers(string $configurationDirectory, array $mapping, ?string $locale): array
+    {
+        if (null === $locale) {
+            return $mapping;
+        }
+
         foreach ($this->getLocaleCode($locale) as $localeCode) {
-            $analyzerFilePath = $this->configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers_' . $localeCode . '.yaml';
+            $analyzerFilePath = $configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers_' . $localeCode . '.yaml';
 
             try {
                 $analyzer = $this->parser->parseFile($analyzerFilePath) ?? [];

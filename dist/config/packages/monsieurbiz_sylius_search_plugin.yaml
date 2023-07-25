@@ -5,3 +5,6 @@ monsieurbiz_sylius_search:
   documents:
     monsieurbiz_product:
       prefix: 'myprefix' # define a custom index prefix
+
+  elastically_configuration_paths:
+    - '%kernel.project_dir%/src/Resources/config/elasticsearch'

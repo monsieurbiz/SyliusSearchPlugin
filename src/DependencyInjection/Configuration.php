@@ -76,6 +76,10 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('elastically_configuration_paths')
+                    ->defaultValue([])
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
 

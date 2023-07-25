@@ -48,3 +48,8 @@ services:
     App\Search\Request\Sorting\Product\ShortDescriptionSorter:
         tags:
             - { name: monsieurbiz.search.request.product_sorter }
+
+    # Define custom boosts
+    App\Search\Request\FunctionScore\Product\BoostExpensiveProductFunction:
+        tags:
+            - { name: monsieurbiz.search.request.product_function_score }

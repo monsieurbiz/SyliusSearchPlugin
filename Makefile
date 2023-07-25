@@ -23,9 +23,8 @@ down: server.stop docker.down ## Down the project (removes docker containers, st
 
 reset: ## Stop docker and remove dependencies
 	${MAKE} docker.down || true
-	rm -rf ${APP_DIR}/node_modules ${APP_DIR}/yarn.lock
 	rm -rf ${APP_DIR}
-	rm -rf vendor composer.lock
+	rm -rf vendor composer.lock yarn.lock node_modules
 .PHONY: reset
 
 dependencies: composer.lock node_modules ## Setup the dependencies
@@ -64,7 +63,6 @@ ${APP_DIR}:
 	(${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="~${SYLIUS_VERSION}" ${APP_DIR})
 
 setup_application:
-	rm -f ${APP_DIR}/yarn.lock
 	(cd ${APP_DIR} && ${COMPOSER} config repositories.plugin '{"type": "path", "url": "../../"}')
 	(cd ${APP_DIR} && ${COMPOSER} config extra.symfony.allow-contrib true)
 	(cd ${APP_DIR} && ${COMPOSER} config minimum-stability dev)

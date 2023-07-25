@@ -16,7 +16,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest;
 use Elastica\Query;
 use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
@@ -34,18 +34,21 @@ final class InstantSearch implements RequestInterface
      */
     private iterable $queryFilters;
 
-    private FunctionScoreRegistryInterface $functionScoreRegistry;
+    /**
+     * @var iterable<FunctionScoreInterface>
+     */
+    private iterable $functionScores;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
         iterable $queryFilters,
-        FunctionScoreRegistryInterface $functionScoreRegistry
+        iterable $functionScores
     ) {
         /** @var DocumentableInterface $documentable */
         $documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
         $this->documentable = $documentable;
         $this->queryFilters = $queryFilters;
-        $this->functionScoreRegistry = $functionScoreRegistry;
+        $this->functionScores = $functionScores;
     }
 
     public function getType(): string
@@ -79,7 +82,7 @@ final class InstantSearch implements RequestInterface
             ->setBoostMode(Query\FunctionScore::BOOST_MODE_MULTIPLY)
             ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
         ;
-        foreach ($this->functionScoreRegistry->all() as $functionScoreClass) {
+        foreach ($this->functionScores as $functionScoreClass) {
             $functionScoreClass->addFunctionScore($functionScore, $this->configuration);
         }
 

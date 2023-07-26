@@ -19,7 +19,7 @@ use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreRegistryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
@@ -54,7 +54,10 @@ final class Search implements RequestInterface
      */
     private iterable $sorters;
 
-    private FunctionScoreRegistryInterface $functionScoreRegistry;
+    /**
+     * @var iterable<FunctionScoreInterface>
+     */
+    private iterable $functionScores;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
@@ -64,7 +67,7 @@ final class Search implements RequestInterface
         iterable $queryFilters,
         iterable $postFilters,
         iterable $sorters,
-        FunctionScoreRegistryInterface $functionScoreRegistry
+        iterable $functionScores
     ) {
         /** @var DocumentableInterface $documentable */
         $documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
@@ -75,7 +78,7 @@ final class Search implements RequestInterface
         $this->queryFilters = $queryFilters;
         $this->postFilters = $postFilters;
         $this->sorters = $sorters;
-        $this->functionScoreRegistry = $functionScoreRegistry;
+        $this->functionScores = $functionScores;
     }
 
     public function getType(): string
@@ -122,7 +125,7 @@ final class Search implements RequestInterface
             ->setBoostMode(Query\FunctionScore::BOOST_MODE_MULTIPLY)
             ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
         ;
-        foreach ($this->functionScoreRegistry->all() as $functionScoreClass) {
+        foreach ($this->functionScores as $functionScoreClass) {
             $functionScoreClass->addFunctionScore($functionScore, $this->configuration);
         }
 

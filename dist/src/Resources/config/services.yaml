@@ -30,6 +30,8 @@ services:
               - 'name^5'
               - 'description'
               - 'short_description' # We add our new value in search
+        tags:
+            - { name: monsieurbiz.search.request.product_search_filter }
 
     monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
         class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
@@ -39,8 +41,15 @@ services:
               - 'description'
               - 'name.autocomplete'
               - 'short_description' # We add our new value in instant search
+        tags:
+            - { name: monsieurbiz.search.request.product_instant_search_filter }
 
     # Define sorters
     App\Search\Request\Sorting\Product\ShortDescriptionSorter:
         tags:
             - { name: monsieurbiz.search.request.product_sorter }
+
+    # Define custom boosts
+    App\Search\Request\FunctionScore\Product\BoostExpensiveProductFunction:
+        tags:
+            - { name: monsieurbiz.search.request.product_function_score }

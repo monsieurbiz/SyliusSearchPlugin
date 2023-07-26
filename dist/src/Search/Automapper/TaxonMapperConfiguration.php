@@ -15,6 +15,9 @@ namespace App\Search\Automapper;
 
 use App\Search\Model\Taxon\TaxonDTO;
 use DateTimeInterface;
+use Doctrine\Common\Proxy\Proxy;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Jane\Bundle\AutoMapperBundle\Configuration\MapperConfigurationInterface;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use Jane\Component\AutoMapper\MapperGeneratorMetadataInterface;
@@ -31,6 +34,7 @@ final class TaxonMapperConfiguration implements MapperConfigurationInterface
     public function __construct(
         ConfigurationInterface $configuration,
         AutoMapperInterface $autoMapper,
+        private EntityManagerInterface $entityManager
     ) {
         $this->configuration = $configuration;
         $this->autoMapper = $autoMapper;
@@ -86,10 +90,12 @@ final class TaxonMapperConfiguration implements MapperConfigurationInterface
             return $taxon->getRight();
         });
 
+        /** @phpstan-ignore-next-line */
         $metadata->forMember('parent_taxon', function (TaxonInterface $taxon): ?TaxonDTO {
-            return null !== $taxon->getParent()
-                ? $this->autoMapper->map($taxon->getParent(), $this->configuration->getTargetClass('app_taxon'))
-                : null;
+            return ($parent = $taxon->getParent()) ? $this->autoMapper->map(
+                $this->getRealTaxonEntity($parent),
+                $this->configuration->getTargetClass('app_taxon')
+            ) : null;
         });
     }
 
@@ -101,5 +107,20 @@ final class TaxonMapperConfiguration implements MapperConfigurationInterface
     public function getTarget(): string
     {
         return $this->configuration->getTargetClass('app_taxon');
+    }
+
+    private function getRealTaxonEntity(TaxonInterface $taxon): TaxonInterface
+    {
+        if ($taxon instanceof Proxy) {
+            // Clear the entity manager to detach the proxy object
+            $this->entityManager->clear(\get_class($taxon));
+            // Retrieve the original class name
+            $entityClassName = ClassUtils::getRealClass(\get_class($taxon));
+            // Find the object in repository from the ID
+            /** @var ?TaxonInterface $taxon */
+            $taxon = $this->entityManager->find($entityClassName, $taxon->getId());
+        }
+
+        return $taxon;
     }
 }

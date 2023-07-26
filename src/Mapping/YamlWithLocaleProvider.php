@@ -26,7 +26,6 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 {
     private EventDispatcherInterface $eventDispatcher;
 
-
     private FileLocatorInterface $fileLocator;
 
     /**
@@ -96,7 +95,7 @@ class YamlWithLocaleProvider implements MappingProviderInterface
             return $mapping;
         }
 
-        $mapping = $this->appendAnalyzers($configurationDirectory . DIRECTORY_SEPARATOR . 'analyzers.yaml', $mapping);
+        $mapping = $this->appendAnalyzers($configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers.yaml', $mapping);
 
         foreach ($this->getLocaleCode($locale) as $localeCode) {
             $mapping = $this->appendAnalyzers($configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers_' . $localeCode . '.yaml', $mapping);

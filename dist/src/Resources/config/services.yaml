@@ -3,6 +3,8 @@ services:
         autowire: true
         autoconfigure: true
         public: false
+        bind:
+            $documentableRegistry: '@monsieurbiz.search.registry.documentable'
 
     # Makes classes in src/ available to be used as services;
     # this creates a service per class whose id is the fully-qualified class name
@@ -53,3 +55,19 @@ services:
     App\Search\Request\FunctionScore\Product\BoostExpensiveProductFunction:
         tags:
             - { name: monsieurbiz.search.request.product_function_score }
+
+    # Define the taxon queries
+    App\Search\Request\TaxonRequest\InstantSearch:
+        arguments:
+            $queryFilters: !tagged_iterator { tag: 'app.search.request.taxon_instant_search_filter' }
+            $functionScores: !tagged_iterator { tag: 'app.search.request.taxon_function_score' }
+
+    # Define the taxon query filters
+    App\Search\Request\QueryFilter\Taxon\SearchTermFilter:
+        arguments:
+            $fieldsToSearch:
+                - 'name^5'
+                - 'description'
+                - 'name.autocomplete'
+        tags:
+            - { name: app.search.request.taxon_instant_search_filter }

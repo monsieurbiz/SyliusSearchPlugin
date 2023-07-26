@@ -2,3 +2,7 @@ app:
     ui:
         short_desc_a_to_z_path: From short description A to Z
         short_desc_z_to_a_path: From short description Z to A
+monsieurbiz_searchplugin:
+    instant:
+        result:
+            app_taxon: Taxons

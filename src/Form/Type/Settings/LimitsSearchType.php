@@ -14,37 +14,35 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Form\Type\Settings;
 
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
-use MonsieurBiz\SyliusSettingsPlugin\Form\AbstractSettingsType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LimitsSearchType extends AbstractSettingsType
+class LimitsSearchType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var DocumentableInterface $documentable */
         $documentable = $options['documentable'];
 
-        $this->addWithDefaultCheckbox(
-            $builder,
+        $builder->add(
             'search',
             CollectionType::class,
             [
-                'entry_type' => NumberType::class,
+                'entry_type' => IntegerType::class,
                 'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_search_' . $documentable->getIndexCode(),
                 'required' => true,
                 'allow_add' => true,
                 'allow_delete' => true,
             ]
         );
-        $this->addWithDefaultCheckbox(
-            $builder,
+        $builder->add(
             'instant_search',
             CollectionType::class,
             [
-                'entry_type' => NumberType::class,
+                'entry_type' => IntegerType::class,
                 'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_instant_search_' . $documentable->getIndexCode(),
                 'required' => true,
                 'allow_add' => true,

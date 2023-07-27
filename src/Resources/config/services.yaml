@@ -44,6 +44,16 @@ services:
   MonsieurBiz\SyliusSearchPlugin\Generated\:
     resource: '../../../generated'
 
+  # Do not autoconfigure requests
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\InstantSearch:
+    autoconfigure: false
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Search:
+    autoconfigure: false
+
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\Taxon:
+    autoconfigure: false
+
   # ES Client configuration
   MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory:
     arguments:
@@ -197,18 +207,22 @@ services:
   # Define the product queries
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Search:
     arguments:
+      $documentType: monsieurbiz_product
       $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_search_filter' }
       $postFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_post_filter' }
       $sorters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_sorter' }
       $functionScores: !tagged_iterator { tag: 'monsieurbiz.search.request.product_function_score' }
 
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\InstantSearch:
+  monsieurbiz.search.request.product_instant_search:
+    class: MonsieurBiz\SyliusSearchPlugin\Search\Request\InstantSearch
     arguments:
+      $documentType: monsieurbiz_product
       $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_instant_search_filter' }
       $functionScores: !tagged_iterator { tag: 'monsieurbiz.search.request.product_function_score' }
 
   MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest\Taxon:
     arguments:
+      $documentType: monsieurbiz_product
       $queryFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_taxon_filter' }
       $postFilters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_post_filter' }
       $sorters: !tagged_iterator { tag: 'monsieurbiz.search.request.product_sorter' }

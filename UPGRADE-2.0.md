@@ -10,6 +10,7 @@
 - New setting `monsieurbiz_sylius_search.elastically_configuration_paths` to define paths of elasticsearch mapping files. By default it's `['@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch']`.
 - New method `deleteByDocumentIds` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface
 - Deprecated the method `deleteByDocuments` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface. Use `deleteByDocumentIds` instead. 
+- `ChannelFilter` and `EnabledFilter` in `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product` were moved to `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter`
 
 # UPGRADE FROM v1.X.X TO v2.0.x
 

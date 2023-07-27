@@ -20,8 +20,8 @@ class MyCustomQuery implements QueryFilterInterface
 
 Take a look at the existing filters for the products query:
 
-- [Channel filter](../src/Search/Request/QueryFilter/Product/ChannelFilter.php)
-- [In stock filter](../src/Search/Request/QueryFilter/Product/ChannelFilter.php)
+- [Channel filter](../src/Search/Request/QueryFilter/ChannelFilter.php)
+- [In stock filter](../src/Search/Request/QueryFilter/Product/IsInStockFilter.php)
 
 2. Add the tags, depending on the queries you wish to impact:
 
@@ -32,4 +32,3 @@ App\Search\Request\QueryFilter\Product\MyCustomQuery:
         - { name: monsieurbiz.search.request.product_instant_search_filter }
         - { name: monsieurbiz.search.request.product_taxon_filter }
 ```
-

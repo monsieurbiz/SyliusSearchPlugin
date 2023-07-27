@@ -136,13 +136,13 @@ services:
     tags:
       - { name: monsieurbiz.search.request.product_instant_search_filter }
 
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\ChannelFilter:
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\ChannelFilter:
     tags:
       - { name: monsieurbiz.search.request.product_search_filter }
       - { name: monsieurbiz.search.request.product_instant_search_filter }
       - { name: monsieurbiz.search.request.product_taxon_filter }
 
-  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\EnabledFilter:
+  MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\EnabledFilter:
     tags:
       - { name: monsieurbiz.search.request.product_search_filter }
       - { name: monsieurbiz.search.request.product_instant_search_filter }

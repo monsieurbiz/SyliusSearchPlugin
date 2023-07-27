@@ -52,22 +52,18 @@ final class ProductEventListener
         $this->productIdsToDelete[] = $product->getId();
     }
 
-    public function dispatchDeleteProductReindexMessage(GenericEvent $event): void
+    public function dispatchDeleteProductReindexMessage(): void
     {
-        /** @var ProductInterface $product */
-        $product = $event->getSubject();
-        Assert::isInstanceOf($product, ProductInterface::class);
-
         if (empty($this->productIdsToDelete)) {
             return;
         }
 
-        $productReindexFromIdsMessage = new ProductToDeleteFromIds();
+        $productToDeleteFromIds = new ProductToDeleteFromIds();
         foreach ($this->productIdsToDelete as $productIdToDelete) {
-            $productReindexFromIdsMessage->addProductId($productIdToDelete);
+            $productToDeleteFromIds->addProductId($productIdToDelete);
         }
 
         $this->productIdsToDelete = [];
-        $this->messageBus->dispatch($productReindexFromIdsMessage);
+        $this->messageBus->dispatch($productToDeleteFromIds);
     }
 }

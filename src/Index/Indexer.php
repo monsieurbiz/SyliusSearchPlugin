@@ -93,27 +93,34 @@ final class Indexer implements IndexerInterface
 
     public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void
     {
+        $documentIds = [];
+        foreach ($documents as $document) {
+            $documentIds[] = $document->getId();
+        }
+
+        $this->deleteByDocumentIds($documentable, $documentIds, $locale, $indexer);
+    }
+
+    public function deleteByDocumentIds(DocumentableInterface $documentable, array $documentsIds, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void
+    {
         if (null === $indexer) {
             $indexer = $this->clientFactory->getIndexer($documentable, $locale);
         }
 
         if (null === $locale && $documentable->isTranslatable()) {
             foreach ($this->getLocales() as $localeCode) {
-                $this->deleteByDocuments($documentable, $documents, $localeCode, $indexer);
+                $this->deleteByDocumentIds($documentable, $documentsIds, $localeCode, $indexer);
             }
-
-            $indexer->flush();
 
             return;
         }
 
         $index = $this->clientFactory->getIndex($documentable, $locale);
-        foreach ($documents as $document) {
-            if (null !== $locale && $document instanceof TranslatableInterface) {
-                $document->setCurrentLocale($locale);
-            }
-            $indexer->scheduleDelete($index, (string) $document->getId());
+        foreach ($documentsIds as $documentsId) {
+            $indexer->scheduleDelete($index, (string) $documentsId);
         }
+
+        $indexer->flush();
     }
 
     /**

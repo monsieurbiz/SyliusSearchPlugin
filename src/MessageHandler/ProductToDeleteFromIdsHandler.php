@@ -42,11 +42,10 @@ class ProductToDeleteFromIdsHandler implements MessageHandlerInterface
     {
         /** @var DocumentableInterface $documentable */
         $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
-        $products = $this->productRepository->findBy(['id' => $message->getProductIds()]);
 
-        $this->indexer->deleteByDocuments(
+        $this->indexer->deleteByDocumentIds(
             $documentable,
-            $products
+            $message->getProductIds()
         );
     }
 }

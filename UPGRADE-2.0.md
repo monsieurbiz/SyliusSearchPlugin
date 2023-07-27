@@ -8,6 +8,8 @@
 - Remove `\MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\ProductFunctionScoreRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_function_score`
 - The `MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider` is no longer a decorator. Some constructor parameters are removed : `$decorated`, `$configurationDirectory` and `$attributeRepository`, and we have `$yamlProviderFactory`, `$fileLocator` and `$configurationDirectories`.
 - New setting `monsieurbiz_sylius_search.elastically_configuration_paths` to define paths of elasticsearch mapping files. By default it's `['@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch']`.
+- New method `deleteByDocumentIds` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface
+- Deprecated the method `deleteByDocuments` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface. Use `deleteByDocumentIds` instead. 
 
 # UPGRADE FROM v1.X.X TO v2.0.x
 

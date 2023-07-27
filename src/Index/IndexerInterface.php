@@ -22,5 +22,10 @@ interface IndexerInterface
 
     public function indexByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void;
 
+    /**
+     * @deprecated Use deleteByDocumentIds instead
+     */
     public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void;
+
+    public function deleteByDocumentIds(DocumentableInterface $documentable, array $documentsIds, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void;
 }

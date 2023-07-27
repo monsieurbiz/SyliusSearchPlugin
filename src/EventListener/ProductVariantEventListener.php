@@ -75,7 +75,6 @@ final class ProductVariantEventListener
         }
 
         $this->productIdsToReindex = [];
-        // @TODO For the moment, this message doesn't work. We send product id but the product is deleted … Refactor the code to use document ids!
-        // $this->messageBus->dispatch($productReindexFromIdsMessage);
+        $this->messageBus->dispatch($productReindexFromIdsMessage);
     }
 }

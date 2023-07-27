@@ -56,14 +56,18 @@ services:
         tags:
             - { name: monsieurbiz.search.request.product_function_score }
 
-    # Define the taxon queries
-    App\Search\Request\TaxonRequest\InstantSearch:
+    # Define the taxon requests
+    app.search.request.taxon_instant_search:
+        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\InstantSearch
         arguments:
+            $documentType: app_taxon
             $queryFilters: !tagged_iterator { tag: 'app.search.request.taxon_instant_search_filter' }
             $functionScores: !tagged_iterator { tag: 'app.search.request.taxon_function_score' }
 
-    App\Search\Request\TaxonRequest\Search:
+    app.search.request.taxon_search:
+        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\Search
         arguments:
+            $documentType: app_taxon
             $queryFilters: !tagged_iterator { tag: 'app.search.request.taxon_search_filter' }
             $postFilters: !tagged_iterator { tag: 'app.search.request.taxon_post_filter' }
             $sorters: !tagged_iterator { tag: 'app.search.request.taxon_sorter' }

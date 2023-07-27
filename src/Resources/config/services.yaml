@@ -252,3 +252,13 @@ services:
       - { name: kernel.event_listener, event: sylius.product_variant.post_update, method: dispatchProductVariantReindexMessage }
       - { name: kernel.event_listener, event: sylius.product_variant.pre_delete, method: saveProductIdToDispatchReindexMessage }
       - { name: kernel.event_listener, event: sylius.product_variant.post_delete, method: dispatchProductReindexMessage }
+
+  monsieurbiz.search.checker.elasticsearch_checker:
+    class: MonsieurBiz\SyliusSearchPlugin\Checker\ElasticsearchChecker
+    public: true
+    tags:
+      - { name: routing.condition_service }
+
+  MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderSearchForm:
+    arguments:
+      $elasticsearchChecker: '@monsieurbiz.search.checker.elasticsearch_checker'

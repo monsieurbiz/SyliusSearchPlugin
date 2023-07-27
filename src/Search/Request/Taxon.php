@@ -20,6 +20,7 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreInt
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterInterface;
+use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
@@ -82,30 +83,34 @@ class Taxon implements RequestInterface
 
     public function getDocumentable(): DocumentableInterface
     {
-        /** @var DocumentableInterface $documentable */
+        /** @phpstan-ignore-next-line  */
         return $this->documentableRegistry->get('search.documentable.' . $this->documentType);
     }
 
     public function getQuery(): Query
     {
+        if (!($configuration = $this->configuration)) {
+            throw new RuntimeException('Configuration is not set');
+        }
+
         $qb = new QueryBuilder();
 
         $boolQuery = $qb->query()->bool();
         foreach ($this->queryFilters as $queryFilter) {
-            $queryFilter->apply($boolQuery, $this->configuration);
+            $queryFilter->apply($boolQuery, $configuration);
         }
 
         $query = Query::create($boolQuery);
         $postFilter = new Query\BoolQuery();
         foreach ($this->postFilters as $postFilterApplier) {
-            $postFilterApplier->apply($postFilter, $this->configuration);
+            $postFilterApplier->apply($postFilter, $configuration);
         }
         $query->setPostFilter($postFilter);
 
         $this->addAggregations($query, $postFilter);
 
         foreach ($this->sorters as $sorter) {
-            $sorter->apply($query, $this->configuration);
+            $sorter->apply($query, $configuration);
         }
 
         /** @var Query\AbstractQuery $queryObject */
@@ -116,7 +121,7 @@ class Taxon implements RequestInterface
             ->setScoreMode(Query\FunctionScore::SCORE_MODE_MULTIPLY)
         ;
         foreach ($this->functionScores as $functionScoreClass) {
-            $functionScoreClass->addFunctionScore($functionScore, $this->configuration);
+            $functionScoreClass->addFunctionScore($functionScore, $configuration);
         }
 
         $query->setQuery($functionScore);

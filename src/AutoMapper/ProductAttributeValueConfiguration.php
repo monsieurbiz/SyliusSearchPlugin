@@ -57,6 +57,7 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
                 return null;
             }
             if (!\array_key_exists($productAttributeValue->getType(), $this->productAttributeValueReaders)) {
+                // @phpstan-ignore-next-line The logger can't be null here
                 $this->logger->alert(sprintf('Missing product attribute value reader for "%s" type', $productAttributeValue->getType()));
 
                 return null;

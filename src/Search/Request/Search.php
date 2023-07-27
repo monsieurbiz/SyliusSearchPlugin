@@ -77,7 +77,7 @@ class Search implements SearchInterface
 
     public function getDocumentable(): DocumentableInterface
     {
-        /** @var DocumentableInterface $documentable */
+        /** @phpstan-ignore-next-line  */
         return $this->documentableRegistry->get('search.documentable.' . $this->documentType);
     }
 

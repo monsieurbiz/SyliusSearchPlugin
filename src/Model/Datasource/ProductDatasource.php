@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Datasource;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
@@ -30,8 +31,9 @@ class ProductDatasource implements DatasourceInterface
 
     public function getItems(string $sourceClass): iterable
     {
+        /** @phpstan-ignore-next-line */
         $repository = $this->entityManager->getRepository($sourceClass);
-        /** @var ProductRepositoryInterface $repository */
+        /** @var ProductRepositoryInterface&EntityRepository $repository */
         Assert::isInstanceOf($repository, ProductRepositoryInterface::class);
 
         $queryBuilder = $repository->createQueryBuilder('o')

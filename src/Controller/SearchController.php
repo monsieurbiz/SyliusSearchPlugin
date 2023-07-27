@@ -71,7 +71,8 @@ class SearchController extends AbstractController
         Request $request,
         string $query
     ): Response {
-        $documentable = $this->getDocumentable($request->query->get('document_type', null));
+        $documentType = ((string) $request->query->get('document_type')) ?: null;
+        $documentable = $this->getDocumentable($documentType);
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::SEARCH_TYPE,
@@ -171,6 +172,7 @@ class SearchController extends AbstractController
         }
 
         try {
+            /** @phpstan-ignore-next-line */
             return $this->documentableRegistry->get('search.documentable.' . $documentType);
         } catch (NonExistingServiceException $exception) {
             throw new NotFoundHttpException(sprintf('Documentable "%s" not found', $documentType));

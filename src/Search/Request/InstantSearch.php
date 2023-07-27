@@ -58,7 +58,7 @@ class InstantSearch implements InstantSearchInterface
 
     public function getDocumentable(): DocumentableInterface
     {
-        /** @var DocumentableInterface $documentable */
+        /** @phpstan-ignore-next-line  */
         return $this->documentableRegistry->get('search.documentable.' . $this->documentType);
     }
 

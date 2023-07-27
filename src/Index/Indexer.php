@@ -97,6 +97,7 @@ final class Indexer implements IndexerInterface
             $indexer->scheduleIndex($index, new Document((string) $document->getId(), $dto));
         }
     }
+
     public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void
     {
         $documentIds = [];
@@ -110,7 +111,6 @@ final class Indexer implements IndexerInterface
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-
     public function deleteByDocumentIds(DocumentableInterface $documentable, array $documentsIds, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void
     {
         if (null === $indexer) {

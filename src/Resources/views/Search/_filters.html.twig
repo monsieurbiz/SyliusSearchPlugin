@@ -16,18 +16,24 @@
                 {% include '@MonsieurBizSyliusSearchPlugin/Search/_filter.html.twig' with {'filter': filter} %}
             {% endfor %}
 
+            {# Don't loose current document_type #}
+            {% set documentType = app.request.query.all()['document_type']|default() %}
+            {% if documentType is not empty %}
+                <input type="hidden" name="document_type" value="{{ documentType|escape('html_attr') }}" />
+            {% endif %}
+
             {# Don't loose current sorting #}
             {% set sorting = app.request.query.all()['sorting']|default() %}
             {% if sorting is not empty %}
                 {% for sort, order in sorting %}
-                    <input type="hidden" name="sorting[{{ sort }}]" value="{{ order }}" />
+                    <input type="hidden" name="sorting[{{ sort }}]" value="{{ order|escape('html_attr') }}" />
                 {% endfor %}
             {% endif %}
 
             {# Don't loose current limit #}
             {% set limit = app.request.query.get('limit') %}
             {% if limit is not empty %}
-                <input type="hidden" name="limit" value="{{ limit }}" />
+                <input type="hidden" name="limit" value="{{ limit|escape('html_attr') }}" />
             {% endif %}
 {#            {% if gridConfig.haveToApplyManuallyFilters() %}#}
                 <div class="item">

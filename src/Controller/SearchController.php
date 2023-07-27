@@ -71,7 +71,7 @@ class SearchController extends AbstractController
         Request $request,
         string $query
     ): Response {
-        $documentable = $this->getDocumentable($request->query->get('documentType', null));
+        $documentable = $this->getDocumentable($request->query->get('document_type', null));
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::SEARCH_TYPE,

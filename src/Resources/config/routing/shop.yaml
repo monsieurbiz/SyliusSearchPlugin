@@ -3,7 +3,6 @@ monsieurbiz_search_search:
   methods: [GET]
   defaults:
     _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::searchAction
-    documentType: monsieurbiz_product
   requirements:
     query: .+
 

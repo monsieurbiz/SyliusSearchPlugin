@@ -1,14 +1,15 @@
 {% if documentableRegistries|length > 1%}
     <div class="ui pointing secondary menu">
         {% set encodedQuery = app.request.attributes.get('_route_params').query|default('')|url_encode %}
+        {% set firstDocumentable = documentableRegistries|first %}
         {% for documentableRegistry in documentableRegistries %}
-            {% if documentableRegistry.indexCode == 'monsieurbiz_product' %}
+            {% if documentableRegistry.indexCode == firstDocumentable.indexCode %}
                 {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: encodedQuery})) %}
             {% else %}
                 {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: encodedQuery})|merge({documentType: documentableRegistry.indexCode})) %}
             {% endif %}
             {% set isActive = documentableRegistry.indexCode == documentable.indexCode %}
-            <a 
+            <a
                 href="{{ path }}"
                 class="item {% if isActive %}active{% endif%}"
             >

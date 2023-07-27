@@ -69,17 +69,9 @@ class SearchController extends AbstractController
 
     public function searchAction(
         Request $request,
-        string $query,
-        string $documentType,
+        string $query
     ): Response {
-        $documentType = $request->query->get('documentType', null) ?? $documentType;
-        /** @var DocumentableInterface $documentable */
-        try {
-            $documentable = $this->documentableRegistry->get('search.documentable.' . $documentType);
-        } catch (NonExistingServiceException $exception) {
-            throw new NotFoundHttpException(sprintf('Documentable "%s" not found', $documentType));
-        }
-
+        $documentable = $this->getDocumentable($request->query->get('documentType', null));
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::SEARCH_TYPE,
@@ -151,7 +143,7 @@ class SearchController extends AbstractController
     public function taxonAction(Request $request): Response
     {
         /** @var DocumentableInterface $documentable */
-        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
+        $documentable = $this->getDocumentable('monsieurbiz_product');
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::TAXON_TYPE,
@@ -167,5 +159,20 @@ class SearchController extends AbstractController
             'result' => $result,
             'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
         ]);
+    }
+
+    private function getDocumentable(?string $documentType): DocumentableInterface
+    {
+        if (null === $documentType) {
+            $documentables = $this->documentableRegistry->all();
+
+            return reset($documentables);
+        }
+
+        try {
+            return $this->documentableRegistry->get('search.documentable.' . $documentType);
+        } catch (NonExistingServiceException $exception) {
+            throw new NotFoundHttpException(sprintf('Documentable "%s" not found', $documentType));
+        }
     }
 }

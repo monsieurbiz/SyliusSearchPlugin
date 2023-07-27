@@ -1,7 +1,5 @@
 # SyliusSearchPlugin
 
-@TODO Description
-
 ## Menu
 
 - [Add custom sorts](./add_custom_sorts.md)

@@ -13,37 +13,18 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Checker;
 
-use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
-use Sylius\Component\Locale\Context\LocaleContextInterface;
-use Sylius\Component\Registry\ServiceRegistryInterface;
+use JoliCode\Elastically\Factory;
 
-class ElasticsearchChecker
+class ElasticsearchChecker implements ElasticsearchCheckerInterface
 {
-    private ClientFactory $clientFactory;
-
-    private ServiceRegistryInterface $documentableRegistry;
-
-    private LocaleContextInterface $localeContext;
-
     private ?bool $isAvailable = null;
-
-    public function __construct(
-        ClientFactory $clientFactory,
-        ServiceRegistryInterface $documentableRegistry,
-        LocaleContextInterface $localeContext
-    ) {
-        $this->clientFactory = $clientFactory;
-        $this->documentableRegistry = $documentableRegistry;
-        $this->localeContext = $localeContext;
-    }
 
     public function check(): bool
     {
         if (null === $this->isAvailable) {
-            $documentables = $this->documentableRegistry->all();
-            $documentable = reset($documentables);
-            $client = $this->clientFactory->getClient($documentable, $this->localeContext->getLocaleCode());
+            $client = (new Factory())->buildClient();
 
+            // Check client response
             try {
                 $client->getStatus()->getResponse();
             } catch (\Exception $e) {

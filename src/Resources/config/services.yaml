@@ -255,10 +255,14 @@ services:
 
   monsieurbiz.search.checker.elasticsearch_checker:
     class: MonsieurBiz\SyliusSearchPlugin\Checker\ElasticsearchChecker
-    public: true
-    tags:
-      - { name: routing.condition_service }
 
   MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderSearchForm:
     arguments:
       $elasticsearchChecker: '@monsieurbiz.search.checker.elasticsearch_checker'
+
+  # Routing Context
+  MonsieurBiz\SyliusSearchPlugin\Routing\RequestContext:
+    decorates: router.request_context
+    arguments:
+      - '@MonsieurBiz\SyliusSearchPlugin\Routing\RequestContext.inner'
+      - '@monsieurbiz.search.checker.elasticsearch_checker'

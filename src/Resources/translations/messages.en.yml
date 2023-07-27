@@ -22,6 +22,7 @@ monsieurbiz_searchplugin:
     result:
       search_result: 'Search results for "%query%" (%count%)'
       no_result: 'No result.'
+      monsieurbiz_product: 'Products'
   instant:
     result:
       search_result: 'Search results for "%query%" (%count%)'

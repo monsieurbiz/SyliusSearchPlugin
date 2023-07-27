@@ -16,10 +16,12 @@ monsieurbiz_searchplugin:
     result:
       search_result: 'Risultati per la ricerca "%query%" (%count%)'
       no_result: 'Nessun risultato.'
+      monsieurbiz_product: 'Prodotti'
   instant:
     result:
       search_result: 'Risultati per la ricerca "%query%" (%count%)'
       no_result: 'Nessun risultato.'
+      monsieurbiz_product: 'Prodotti'
   filters:
       filter_results: 'Filtra i risultati'
       apply_filters: 'Applica i filtri'

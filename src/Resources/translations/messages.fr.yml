@@ -22,10 +22,12 @@ monsieurbiz_searchplugin:
     result:
       search_result: 'Résultats de recherche pour "%query%" (%count%)'
       no_result: 'Pas de résultat.'
+      monsieurbiz_product: 'Produits'
   instant:
     result:
       search_result: 'Résultats de recherche pour "%query%" (%count%)'
       no_result: 'Pas de résultat.'
+      monsieurbiz_product: 'Produits'
   filters:
       filter_results: 'Filtrer les résultats'
       apply_filters: 'Appliquer les filtres'

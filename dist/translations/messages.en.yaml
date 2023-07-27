@@ -6,3 +6,6 @@ monsieurbiz_searchplugin:
     instant:
         result:
             app_taxon: Taxons
+    search:
+        result:
+            app_taxon: Taxons

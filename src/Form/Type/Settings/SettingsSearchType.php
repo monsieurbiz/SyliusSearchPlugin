@@ -41,10 +41,11 @@ class SettingsSearchType extends AbstractSettingsType
                     'label' => 'monsieurbiz_searchplugin.admin.setting_form.instant_search_enabled_' . $documentable->getIndexCode(),
                 ]
             );
-            $subOptions = $options;
-            $subOptions['data'] = $subOptions['data']['limits__' . $documentable->getIndexCode()] ?? [];
+            $subOptions = [];
+            $subOptions['data'] = $options['data']['limits__' . $documentable->getIndexCode()] ?? [];
             $subOptions['documentable'] = $documentable;
-            $builder->add(
+            $this->addWithDefaultCheckbox(
+                $builder,
                 'limits__' . $documentable->getIndexCode(),
                 LimitsSearchType::class,
                 $subOptions

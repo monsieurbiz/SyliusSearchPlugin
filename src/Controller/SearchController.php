@@ -24,11 +24,13 @@ use Sylius\Bundle\ResourceBundle\Controller\ParametersParserInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
+use Sylius\Component\Registry\NonExistingServiceException;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Intl\Currencies;
 
 class SearchController extends AbstractController
@@ -65,11 +67,19 @@ class SearchController extends AbstractController
         $this->parametersParser = $parametersParser;
     }
 
-    // TODO add an optional parameter $documentType (nullable => get the default document type)
-    public function searchAction(Request $request, string $query): Response
-    {
+    public function searchAction(
+        Request $request,
+        string $query,
+        string $documentType,
+    ): Response {
+        $documentType = $request->query->get('documentType', null) ?? $documentType;
         /** @var DocumentableInterface $documentable */
-        $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
+        try {
+            $documentable = $this->documentableRegistry->get('search.documentable.' . $documentType);
+        } catch (NonExistingServiceException $exception) {
+            throw new NotFoundHttpException(sprintf('Documentable "%s" not found', $documentType));
+        }
+
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::SEARCH_TYPE,
@@ -80,6 +90,7 @@ class SearchController extends AbstractController
         $result = $this->search->search($requestConfiguration);
 
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
+            'documentableRegistries' => $this->documentableRegistry->all(),
             'documentable' => $result->getDocumentable(),
             'requestConfiguration' => $requestConfiguration,
             'query' => urldecode($query),
@@ -126,7 +137,7 @@ class SearchController extends AbstractController
             );
 
             try {
-                $results[] = $this->search->search($requestConfiguration);
+                $results[$documentable->getIndexCode()] = $this->search->search($requestConfiguration);
             } catch (UnknownRequestTypeException $e) {
                 continue;
             }

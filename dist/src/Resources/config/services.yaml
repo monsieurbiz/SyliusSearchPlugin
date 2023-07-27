@@ -62,8 +62,16 @@ services:
             $queryFilters: !tagged_iterator { tag: 'app.search.request.taxon_instant_search_filter' }
             $functionScores: !tagged_iterator { tag: 'app.search.request.taxon_function_score' }
 
+    App\Search\Request\TaxonRequest\Search:
+        arguments:
+            $queryFilters: !tagged_iterator { tag: 'app.search.request.taxon_search_filter' }
+            $postFilters: !tagged_iterator { tag: 'app.search.request.taxon_post_filter' }
+            $sorters: !tagged_iterator { tag: 'app.search.request.taxon_sorter' }
+            $functionScores: !tagged_iterator { tag: 'app.search.request.taxon_function_score' }
+
     # Define the taxon query filters
-    App\Search\Request\QueryFilter\Taxon\SearchTermFilter:
+    app.search.request.query_filter.taxon_instant_search.search_term_filter:
+        class: App\Search\Request\QueryFilter\Taxon\SearchTermFilter
         arguments:
             $fieldsToSearch:
                 - 'name^5'
@@ -71,3 +79,12 @@ services:
                 - 'name.autocomplete'
         tags:
             - { name: app.search.request.taxon_instant_search_filter }
+
+    app.search.request.query_filter.taxon_search.search_term_filter:
+        class: App\Search\Request\QueryFilter\Taxon\SearchTermFilter
+        arguments:
+            $fieldsToSearch:
+                - 'name^5'
+                - 'description'
+        tags:
+            - { name: app.search.request.taxon_search_filter }

@@ -8,7 +8,8 @@
             {{ 'monsieurbiz_searchplugin.filters.no_filter'|trans }}
         </div>
     {% else %}
-        {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)) %}
+        {% set encodedQuery = app.request.attributes.get('_route_params').query|default('')|url_encode %}
+        {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({query: encodedQuery})) %}
         <form name="filters-form" method="get" action="{{ path }}">
 
             {% for filter in result.filters %}

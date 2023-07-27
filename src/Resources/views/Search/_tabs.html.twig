@@ -1,0 +1,19 @@
+{% if documentableRegistries|length > 1%}
+    <div class="ui pointing secondary menu">
+        {% set encodedQuery = app.request.attributes.get('_route_params').query|default('')|url_encode %}
+        {% for documentableRegistry in documentableRegistries %}
+            {% if documentableRegistry.indexCode == 'monsieurbiz_product' %}
+                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: encodedQuery})) %}
+            {% else %}
+                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: encodedQuery})|merge({documentType: documentableRegistry.indexCode})) %}
+            {% endif %}
+            {% set isActive = documentableRegistry.indexCode == documentable.indexCode %}
+            <a 
+                href="{{ path }}"
+                class="item {% if isActive %}active{% endif%}"
+            >
+                {{ ('monsieurbiz_searchplugin.instant.result.' ~ documentableRegistry.indexCode)|trans }}
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Twig\Extension;
 
+use MonsieurBiz\SyliusSearchPlugin\Checker\ElasticsearchCheckerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Form\Type\SearchType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,14 +30,18 @@ class RenderSearchForm extends AbstractExtension
 
     private RequestStack $requestStack;
 
+    private ElasticsearchCheckerInterface $elasticsearchChecker;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         Environment $templatingEngine,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        ElasticsearchCheckerInterface $elasticsearchChecker
     ) {
         $this->formFactory = $formFactory;
         $this->templatingEngine = $templatingEngine;
         $this->requestStack = $requestStack;
+        $this->elasticsearchChecker = $elasticsearchChecker;
     }
 
     public function getFunctions()
@@ -48,6 +53,10 @@ class RenderSearchForm extends AbstractExtension
 
     public function createForm(?string $template = null): Markup
     {
+        if (false === $this->elasticsearchChecker->check()) {
+            return new Markup('', 'UTF-8');
+        }
+
         $request = $this->requestStack->getCurrentRequest();
         $template = $template ?? '@MonsieurBizSyliusSearchPlugin/Search/_form.html.twig';
         $query = null !== $request ? $request->get('query', '') : '';

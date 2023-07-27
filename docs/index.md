@@ -2,6 +2,7 @@
 
 ## Menu
 
+- [Disable the ElasticsearchChecker](./disable_elasticsearch_checker.md)
 - [Add custom sorts](./add_custom_sorts.md)
 - [Add custom values for an entity](./add_custom_values.md)
 - [Add custom filters](./add_custom_filters.md)

@@ -5,6 +5,7 @@ monsieurbiz_search_search:
     _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::searchAction
   requirements:
     query: .+
+  condition: "not(context.getPathInfo() matches '`^%sylius.security.new_api_route%`') and context.checkElasticsearch()"
 
 monsieurbiz_search_post:
   path: /search
@@ -27,3 +28,4 @@ monsieurbiz_sylius_search_taxon:
       taxon: "expr:notFoundOnNull(service('sylius.repository.taxon').findOneBySlug($slug, service('sylius.context.locale').getLocaleCode()))"
   requirements:
     slug: .+
+  condition: "not(context.getPathInfo() matches '`^%sylius.security.new_api_route%`') and context.checkElasticsearch()"

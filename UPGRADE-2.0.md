@@ -11,6 +11,7 @@
 - New method `deleteByDocumentIds` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface
 - Deprecated the method `deleteByDocuments` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface. Use `deleteByDocumentIds` instead. 
 - `ChannelFilter` and `EnabledFilter` in `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product` were moved to `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter`
+- A fallback on the Sylius' taxon display is now used to keep your pages even if you Elasticsearch instance is down. If you want to disable it, check the [FakeElasticsearchChecker](docs/disable_elasticsearch_checker.md)
 
 # UPGRADE FROM v1.X.X TO v2.0.x
 

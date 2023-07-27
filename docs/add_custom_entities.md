@@ -81,12 +81,18 @@ You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\Search` class
 
 ## Define your Search query filter
 
-@TODO
+[Declare your search query filter for instant search](../dist/src/Resources/config/services.yaml#L77).
+
+[Declare your search query filter for search](../dist/src/Resources/config/services.yaml#L87).
+
+You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\SearchTermFilter` class to manage your custom behaviour like in [products](../src/Search/Request/QueryFilter/Product/SearchTermFilter.php).
 
 ## Add the templates for display
 
-@TODO
+[Declare your templates for instant search](../dist/templates/bundles/MonsieurBizSyliusSearchPlugin/Instant/Taxon/_box.html.twig).
+
+[Declare your templates for search](../dist/templates/bundles/MonsieurBizSyliusSearchPlugin/Search/Taxon/_box.html.twig).
 
 ## Add your document translation
 
-@TODO
+[Declare your translations for your entity](../dist/translations/messages.en.yaml#L5).

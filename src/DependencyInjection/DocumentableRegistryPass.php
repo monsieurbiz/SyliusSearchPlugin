@@ -28,15 +28,9 @@ class DocumentableRegistryPass implements CompilerPassInterface
         if (!$container->hasDefinition('monsieurbiz.search.registry.documentable')) {
             return;
         }
-
-        $registry = $container->getDefinition('monsieurbiz.search.registry.documentable');
         $documentables = $container->getParameter('monsieurbiz.search.config.documents');
         if (!\is_array($documentables)) {
             return;
-        }
-        $searchSettings = [];
-        if ($container->hasParameter('monsieurbiz.settings.config.plugins')) {
-            $searchSettings = $container->getParameter('monsieurbiz.settings.config.plugins');
         }
 
         // Sort documentables by position
@@ -44,37 +38,7 @@ class DocumentableRegistryPass implements CompilerPassInterface
             return $documentableA['position'] <=> $documentableB['position'];
         });
 
-        foreach ($documentables as $indexCode => $documentableConfiguration) {
-            $documentableServiceId = 'search.documentable.' . $indexCode;
-            $documentableClass = $documentableConfiguration['document_class'];
-            $this->validateDocumentableResource($documentableClass);
-            $documentableDefinition = (new Definition($documentableClass))
-                ->setAutowired(true)
-                ->setArguments([
-                    '$indexCode' => $indexCode,
-                    '$sourceClass' => $documentableConfiguration['source'],
-                    '$targetClass' => $documentableConfiguration['target'],
-                    '$templates' => $documentableConfiguration['templates'],
-                    '$limits' => $documentableConfiguration['limits'],
-                ])
-            ;
-            $documentableDefinition = $container->setDefinition($documentableServiceId, $documentableDefinition);
-            $documentableDefinition->addTag('monsieurbiz.search.documentable');
-            $documentableDefinition->addMethodCall('setMappingProvider', [new Reference($documentableConfiguration['mapping_provider'])]);
-            $documentableDefinition->addMethodCall('setDatasource', [new Reference($documentableConfiguration['datasource'])]);
-            if ($this->isPrefixedDocumentableClass($documentableClass) && isset($documentableConfiguration['prefix'])) {
-                $documentableDefinition->addMethodCall('setPrefix', [$documentableConfiguration['prefix']]);
-            }
-
-            // Add documentable into registry
-            $registry->addMethodCall('register', [$documentableServiceId, new Reference($documentableServiceId)]);
-
-            // Add the default settings value of documentable
-            $searchSettings['monsieurbiz.search']['default_values']['instant_search_enabled__' . $indexCode] = $documentableConfiguration['instant_search_enabled'];
-            $searchSettings['monsieurbiz.search']['default_values']['limits__' . $indexCode] = $documentableConfiguration['limits'];
-        }
-
-        $container->setParameter('monsieurbiz.settings.config.plugins', $searchSettings);
+        $this->addDocumentableServices($container, $documentables);
     }
 
     /**
@@ -94,5 +58,54 @@ class DocumentableRegistryPass implements CompilerPassInterface
         $interfaces = (array) (class_implements($class) ?? []);
 
         return \in_array(PrefixedDocumentableInterface::class, $interfaces, true);
+    }
+
+    private function addDocumentableServices(ContainerBuilder $container, array $documentables): void
+    {
+        $registry = $container->getDefinition('monsieurbiz.search.registry.documentable');
+
+        $searchSettings = [];
+        if ($container->hasParameter('monsieurbiz.settings.config.plugins')) {
+            $searchSettings = $container->getParameter('monsieurbiz.settings.config.plugins');
+        }
+
+        foreach ($documentables as $indexCode => $documentableConfiguration) {
+            $documentableServiceId = 'search.documentable.' . $indexCode;
+
+            // Create documentable service
+            $this->createDocumentable($container, $documentableServiceId, $indexCode, $documentableConfiguration);
+
+            // Add documentable into registry
+            $registry->addMethodCall('register', [$documentableServiceId, new Reference($documentableServiceId)]);
+
+            // Add the default settings value of documentable
+            $searchSettings['monsieurbiz.search']['default_values']['instant_search_enabled__' . $indexCode] = $documentableConfiguration['instant_search_enabled'];
+            $searchSettings['monsieurbiz.search']['default_values']['limits__' . $indexCode] = $documentableConfiguration['limits'];
+        }
+
+        $container->setParameter('monsieurbiz.settings.config.plugins', $searchSettings);
+    }
+
+    private function createDocumentable(ContainerBuilder $container, string $documentableServiceId, string $indexCode, array $documentableConfiguration): void
+    {
+        $documentableClass = $documentableConfiguration['document_class'];
+        $this->validateDocumentableResource($documentableClass);
+        $documentableDefinition = (new Definition($documentableClass))
+            ->setAutowired(true)
+            ->setArguments([
+                '$indexCode' => $indexCode,
+                '$sourceClass' => $documentableConfiguration['source'],
+                '$targetClass' => $documentableConfiguration['target'],
+                '$templates' => $documentableConfiguration['templates'],
+                '$limits' => $documentableConfiguration['limits'],
+            ])
+        ;
+        $documentableDefinition = $container->setDefinition($documentableServiceId, $documentableDefinition);
+        $documentableDefinition->addTag('monsieurbiz.search.documentable');
+        $documentableDefinition->addMethodCall('setMappingProvider', [new Reference($documentableConfiguration['mapping_provider'])]);
+        $documentableDefinition->addMethodCall('setDatasource', [new Reference($documentableConfiguration['datasource'])]);
+        if ($this->isPrefixedDocumentableClass($documentableClass) && isset($documentableConfiguration['prefix'])) {
+            $documentableDefinition->addMethodCall('setPrefix', [$documentableConfiguration['prefix']]);
+        }
     }
 }

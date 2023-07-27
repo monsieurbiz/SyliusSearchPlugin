@@ -52,20 +52,7 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
             throw new RuntimeException('Undefined product attribute value reader');
         }
 
-        $metadata->forMember('value', function (ProductAttributeValueInterface $productAttributeValue) {
-            if (null === $productAttributeValue->getType()) {
-                return null;
-            }
-            if (!\array_key_exists($productAttributeValue->getType(), $this->productAttributeValueReaders)) {
-                // @phpstan-ignore-next-line The logger can't be null here
-                $this->logger->alert(sprintf('Missing product attribute value reader for "%s" type', $productAttributeValue->getType()));
-
-                return null;
-            }
-            $reader = $this->productAttributeValueReaders[$productAttributeValue->getType()];
-
-            return $reader->getValue($productAttributeValue);
-        });
+        $metadata->forMember('value', [$this, 'getProductAttributeValue']);
     }
 
     public function getSource(): string
@@ -76,5 +63,24 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
     public function getTarget(): string
     {
         return $this->configuration->getTargetClass('product_attribute');
+    }
+
+    /**
+     * @return array|string|null
+     */
+    public function getProductAttributeValue(ProductAttributeValueInterface $productAttributeValue)
+    {
+        if (null === $productAttributeValue->getType()) {
+            return null;
+        }
+        if (!\array_key_exists($productAttributeValue->getType(), $this->productAttributeValueReaders)) {
+            // @phpstan-ignore-next-line The logger can't be null here
+            $this->logger->alert(sprintf('Missing product attribute value reader for "%s" type', $productAttributeValue->getType()));
+
+            return null;
+        }
+        $reader = $this->productAttributeValueReaders[$productAttributeValue->getType()];
+
+        return $reader->getValue($productAttributeValue);
     }
 }

@@ -27,6 +27,8 @@ class FilterValue
 
     /**
      * Filter constructor.
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function __construct(string $label, int $count, string $value = null, bool $isApplied = false)
     {

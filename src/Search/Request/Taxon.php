@@ -87,6 +87,9 @@ class Taxon implements RequestInterface
         return $this->documentableRegistry->get('search.documentable.' . $this->documentType);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function getQuery(): Query
     {
         if (!($configuration = $this->configuration)) {
@@ -139,6 +142,9 @@ class Taxon implements RequestInterface
         $this->configuration = $configuration;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function addAggregations(Query $query, Query\BoolQuery $postFilter): void
     {
         // Used by children classes

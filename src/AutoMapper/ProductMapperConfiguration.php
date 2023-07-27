@@ -118,94 +118,13 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
             }, $product->getChannels()->toArray());
         });
 
-        $metadata->forMember('attributes', function (ProductInterface $product): array {
-            $attributes = [];
-            $currentLocale = $product->getTranslation()->getLocale();
-            if (null === $currentLocale) {
-                return $attributes;
-            }
-            $productAttributeDTOClass = $this->configuration->getTargetClass('product_attribute');
-            foreach ($product->getAttributesByLocale($currentLocale, $currentLocale) as $attributeValue) {
-                if (null === $attributeValue->getName() || null === $attributeValue->getValue()) {
-                    continue;
-                }
-                $attribute = $attributeValue->getAttribute();
-                if (!$attribute instanceof SearchableInterface || (!$attribute->isSearchable() && !$attribute->isFilterable())) {
-                    continue;
-                }
-                $attributes[$attributeValue->getCode()] = $this->autoMapper->map($attributeValue, $productAttributeDTOClass);
-            }
+        $metadata->forMember('attributes', [$this, 'getAttributes']);
 
-            return $attributes;
-        });
+        $metadata->forMember('options', [$this, 'getOptions']);
 
-        $metadata->forMember('options', function (ProductInterface $product): array {
-            $options = [];
-            $currentLocale = $product->getTranslation()->getLocale();
-            foreach ($product->getVariants() as $variant) {
-                foreach ($variant->getOptionValues() as $optionValue) {
-                    if (null === $optionValue->getOption()) {
-                        continue;
-                    }
-                    if (!isset($options[$optionValue->getOptionCode()])) {
-                        $options[$optionValue->getOptionCode()] = [
-                            'name' => $optionValue->getOption()->getTranslation($currentLocale)->getName(),
-                            'values' => [],
-                        ];
-                    }
-                    $isEnabled = ($options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()]['enabled'] ?? false)
-                        || $variant->isEnabled();
-                    // A variant option is considered to be in stock if the current option is enabled and is in stock
-                    $isInStock = ($options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()]['is_in_stock'] ?? false)
-                        || ($variant->isEnabled() && $this->isProductVariantInStock($variant));
-                    $options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()] = [
-                        'value' => $optionValue->getTranslation($currentLocale)->getValue(),
-                        'enabled' => $isEnabled,
-                        'is_in_stock' => $isInStock,
-                    ];
-                }
-            }
+        $metadata->forMember('variants', [$this, 'getVariants']);
 
-            foreach ($options as $optionCode => $optionValues) {
-                $options[$optionCode]['values'] = array_values($optionValues['values']);
-            }
-
-            return $options;
-        });
-
-        $metadata->forMember('variants', function (ProductInterface $product): array {
-            $variants = [];
-            $productVariantDTOClass = $this->configuration->getTargetClass('product_variant');
-            foreach ($product->getEnabledVariants() as $variant) {
-                $variants[] = $this->autoMapper->map($variant, $productVariantDTOClass);
-            }
-
-            return $variants;
-        });
-
-        $metadata->forMember('prices', function (ProductInterface $product): array {
-            $prices = [];
-            foreach ($product->getChannels() as $channel) {
-                /** @var ChannelInterface $channel */
-                $this->channelSimulationContext->setChannel($channel);
-                if (
-                    null === ($variant = $this->productVariantResolver->getVariant($product))
-                    || !$variant instanceof ModelProductVariantInterface
-                    || null === ($channelPricing = $variant->getChannelPricingForChannel($channel))
-                ) {
-                    $this->channelSimulationContext->setChannel(null);
-
-                    continue;
-                }
-                $this->channelSimulationContext->setChannel(null);
-                $prices[] = $this->autoMapper->map(
-                    $channelPricing,
-                    $this->configuration->getTargetClass('pricing')
-                );
-            }
-
-            return $prices;
-        });
+        $metadata->forMember('prices', [$this, 'getPrices']);
     }
 
     public function getSource(): string
@@ -216,6 +135,108 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
     public function getTarget(): string
     {
         return $this->configuration->getTargetClass('product');
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function getAttributes(ProductInterface $product): array
+    {
+        $attributes = [];
+        $currentLocale = $product->getTranslation()->getLocale();
+        if (null === $currentLocale) {
+            return $attributes;
+        }
+        $productAttributeDTOClass = $this->configuration->getTargetClass('product_attribute');
+        foreach ($product->getAttributesByLocale($currentLocale, $currentLocale) as $attributeValue) {
+            if (null === $attributeValue->getName() || null === $attributeValue->getValue()) {
+                continue;
+            }
+            $attribute = $attributeValue->getAttribute();
+            if (!$attribute instanceof SearchableInterface || (!$attribute->isSearchable() && !$attribute->isFilterable())) {
+                continue;
+            }
+            $attributes[$attributeValue->getCode()] = $this->autoMapper->map($attributeValue, $productAttributeDTOClass);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function getOptions(ProductInterface $product): array
+    {
+        $options = [];
+        $currentLocale = $product->getTranslation()->getLocale();
+        foreach ($product->getVariants() as $variant) {
+            foreach ($variant->getOptionValues() as $optionValue) {
+                if (null === $optionValue->getOption()) {
+                    continue;
+                }
+                if (!isset($options[$optionValue->getOptionCode()])) {
+                    $options[$optionValue->getOptionCode()] = [
+                        'name' => $optionValue->getOption()->getTranslation($currentLocale)->getName(),
+                        'values' => [],
+                    ];
+                }
+                $isEnabled = ($options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()]['enabled'] ?? false)
+                    || $variant->isEnabled();
+                // A variant option is considered to be in stock if the current option is enabled and is in stock
+                $isInStock = ($options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()]['is_in_stock'] ?? false)
+                    || ($variant->isEnabled() && $this->isProductVariantInStock($variant));
+                $options[$optionValue->getOptionCode()]['values'][$optionValue->getCode()] = [
+                    'value' => $optionValue->getTranslation($currentLocale)->getValue(),
+                    'enabled' => $isEnabled,
+                    'is_in_stock' => $isInStock,
+                ];
+            }
+        }
+
+        foreach ($options as $optionCode => $optionValues) {
+            $options[$optionCode]['values'] = array_values($optionValues['values']);
+        }
+
+        return $options;
+    }
+
+    public function getVariants(ProductInterface $product): array
+    {
+        $variants = [];
+        $productVariantDTOClass = $this->configuration->getTargetClass('product_variant');
+        foreach ($product->getEnabledVariants() as $variant) {
+            $variants[] = $this->autoMapper->map($variant, $productVariantDTOClass);
+        }
+
+        return $variants;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function getPrices(ProductInterface $product): array
+    {
+        $prices = [];
+        foreach ($product->getChannels() as $channel) {
+            /** @var ChannelInterface $channel */
+            $this->channelSimulationContext->setChannel($channel);
+            if (
+                null === ($variant = $this->productVariantResolver->getVariant($product))
+                || !$variant instanceof ModelProductVariantInterface
+                || null === ($channelPricing = $variant->getChannelPricingForChannel($channel))
+            ) {
+                $this->channelSimulationContext->setChannel(null);
+
+                continue;
+            }
+            $this->channelSimulationContext->setChannel(null);
+            $prices[] = $this->autoMapper->map(
+                $channelPricing,
+                $this->configuration->getTargetClass('pricing')
+            );
+        }
+
+        return $prices;
     }
 
     private function isProductVariantInStock(ProductVariantInterface $productVariant): bool

@@ -86,6 +86,9 @@ class Search implements SearchInterface
         $this->configuration = $configuration;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function getQuery(): Query
     {
         $qb = new QueryBuilder();
@@ -129,6 +132,9 @@ class Search implements SearchInterface
         return $type == $this->getType() && $this->getDocumentable()->getIndexCode() == $documentableCode;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function addAggregations(Query $query, Query\BoolQuery $postFilter): void
     {
         // Used by chidlren classes

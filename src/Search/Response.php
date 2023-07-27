@@ -82,6 +82,9 @@ class Response implements ResponseInterface
         return $this->documentable;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function buildFilters(): void
     {
         /** @var ResultSet $results */

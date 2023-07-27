@@ -20,6 +20,9 @@ use MonsieurBiz\SyliusSearchPlugin\Search\Response\FilterBuilders\FilterBuilderI
 
 class OptionFilterBuilder implements FilterBuilderInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function build(
         DocumentableInterface $documentable,
         RequestConfiguration $requestConfiguration,

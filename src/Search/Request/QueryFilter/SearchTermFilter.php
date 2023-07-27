@@ -57,6 +57,9 @@ class SearchTermFilter implements QueryFilterInterface
         $searchQuery->addShould($nameAndDescriptionQuery);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function addCustomFilters(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
     {
         // Used by children classes

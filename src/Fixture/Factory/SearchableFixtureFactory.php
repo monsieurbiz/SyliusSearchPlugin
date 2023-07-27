@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Fixture\Factory;
 
+use Exception;
 use MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface;
 use Sylius\Bundle\CoreBundle\Fixture\Factory\AbstractExampleFactory;
 use Sylius\Bundle\CoreBundle\Fixture\OptionsResolver\LazyOption;
@@ -20,6 +21,7 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Webmozart\Assert\Assert;
 
 class SearchableFixtureFactory extends AbstractExampleFactory implements SearchableFixtureFactoryInterface
 {
@@ -69,29 +71,29 @@ class SearchableFixtureFactory extends AbstractExampleFactory implements Searcha
     }
 
     /**
-     * @throws \Exception
-     *
-     * @return object
+     * @throws Exception
      */
-    public function create(array $options = [])
+    public function create(array $options = []): SearchableInterface
     {
         $options = $this->optionsResolver->resolve($options);
+        $object = $this->getSearchableObject($options);
+        $object->setFilterable(((bool) $options['filterable']) ?? false);
+        $object->setSearchable(((bool) $options['searchable']) ?? false);
 
-        if (isset($options['attribute']) && !empty($options['attribute'])) {
+        return $object;
+    }
+
+    private function getSearchableObject(array $options): SearchableInterface
+    {
+        $object = null;
+        if (!empty($options['attribute'])) {
             $object = $options['attribute'];
-        } elseif (isset($options['option']) && !empty($options['option'])) {
+        } elseif (!empty($options['option'])) {
             $object = $options['option'];
-        } else {
-            throw new \Exception('You need to specify an attribute or an option to be filterable.');
-        }
-
-        if (!$object instanceof SearchableInterface) {
-            throw new \Exception(sprintf('Your class "%s" is not an instance of %s', \get_class($object), SearchableInterface::class));
         }
 
         /** @var SearchableInterface $object */
-        $object->setFilterable(((bool) $options['filterable']) ?? false);
-        $object->setSearchable(((bool) $options['searchable']) ?? false);
+        Assert::isInstanceOf($object, SearchableInterface::class);
 
         return $object;
     }

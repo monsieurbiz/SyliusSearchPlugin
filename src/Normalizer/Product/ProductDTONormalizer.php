@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Normalizer\Product;
 
-use Jacquesbh\Eater\EaterInterface;
 use MonsieurBiz\SyliusSearchPlugin\AutoMapper\Configuration;
+use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -58,9 +58,15 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
         $this->automapperConfiguration = $automapperConfiguration;
     }
 
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
+     * @param mixed $data
+     */
+    public function denormalize($data, string $type, string $format = null, array $context = []): ProductDTO
     {
-        /** @var EaterInterface $object */
+        /** @var ProductDTO $object */
         $object = parent::denormalize($data, $type, $format, $context);
 
         if (\array_key_exists('main_taxon', $data) && null !== $data['main_taxon']) {
@@ -122,11 +128,21 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
         return $object;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
+     * @param mixed $data
+     */
     public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return $this->automapperConfiguration->getTargetClass('product') === $type;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
+     * @param mixed $data
+     */
     public function supportsNormalization($data, string $format = null): bool
     {
         return false;

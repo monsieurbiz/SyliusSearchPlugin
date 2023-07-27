@@ -28,6 +28,9 @@ final class Taxon extends TaxonRequest
 
     private ProductOptionRepositoryInterface $productOptionRepository;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
         ChannelContextInterface $channelContext,

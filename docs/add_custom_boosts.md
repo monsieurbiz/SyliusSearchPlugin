@@ -21,6 +21,6 @@ The boost is enabled when the value of `monsieurbiz.search.product.is_in_stock_s
 To create a new boost, you must
 
 - [Create a new class that implements `MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreInterface`](../dist/src/Search/Request/FunctionScore/Product/BoostExpensiveProductFunction.php)
-- [Tag it with `monsieurbiz.search.request.product_function_score`](../dist/src/Resources/config/services.yaml#L53)
+- [Tag it with `monsieurbiz.search.request.product_function_score`](../dist/src/Resources/config/services.yaml#L54)
 
 In our example we will boost, in the search, the product with a price greater than 50.

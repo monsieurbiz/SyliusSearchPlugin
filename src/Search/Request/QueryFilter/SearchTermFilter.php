@@ -11,17 +11,16 @@
 
 declare(strict_types=1);
 
-namespace App\Search\Request\QueryFilter\Taxon;
+namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter;
 
 use Elastica\Query\BoolQuery;
 use Elastica\Query\MultiMatch;
 use Elastica\QueryBuilder;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 
-final class SearchTermFilter implements QueryFilterInterface
+class SearchTermFilter implements QueryFilterInterface
 {
-    private array $fieldsToSearch;
+    protected array $fieldsToSearch;
 
     public function __construct(
         array $fieldsToSearch
@@ -39,10 +38,12 @@ final class SearchTermFilter implements QueryFilterInterface
         $searchQuery->addShould($searchCode);
         $this->addFieldsToSearchCondition($searchQuery, $requestConfiguration);
 
+        $this->addCustomFilters($searchQuery, $requestConfiguration);
+
         $boolQuery->addMust($searchQuery);
     }
 
-    private function addFieldsToSearchCondition(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
+    protected function addFieldsToSearchCondition(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
     {
         if (0 === \count($this->fieldsToSearch)) {
             return;
@@ -54,5 +55,10 @@ final class SearchTermFilter implements QueryFilterInterface
         $nameAndDescriptionQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
         $nameAndDescriptionQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
         $searchQuery->addShould($nameAndDescriptionQuery);
+    }
+
+    protected function addCustomFilters(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
+    {
+        // Used by children classes
     }
 }

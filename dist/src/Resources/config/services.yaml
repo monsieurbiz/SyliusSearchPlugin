@@ -75,7 +75,7 @@ services:
 
     # Define the taxon query filters
     app.search.request.query_filter.taxon_instant_search.search_term_filter:
-        class: App\Search\Request\QueryFilter\Taxon\SearchTermFilter
+        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\SearchTermFilter
         arguments:
             $fieldsToSearch:
                 - 'name^5'
@@ -85,7 +85,7 @@ services:
             - { name: app.search.request.taxon_instant_search_filter }
 
     app.search.request.query_filter.taxon_search.search_term_filter:
-        class: App\Search\Request\QueryFilter\Taxon\SearchTermFilter
+        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\SearchTermFilter
         arguments:
             $fieldsToSearch:
                 - 'name^5'

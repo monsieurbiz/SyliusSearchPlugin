@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
-
 interface InstantSearchInterface extends RequestInterface
 {
 }

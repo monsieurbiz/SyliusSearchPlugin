@@ -18,8 +18,6 @@ use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use RuntimeException;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
@@ -58,12 +56,10 @@ class InstantSearch implements InstantSearchInterface
         return RequestInterface::INSTANT_TYPE;
     }
 
-    public function getDocumentable(): DocumentableInterface 
+    public function getDocumentable(): DocumentableInterface
     {
         /** @var DocumentableInterface $documentable */
-        $documentable = $this->documentableRegistry->get('search.documentable.' . $this->documentType);
-
-        return $documentable;
+        return $this->documentableRegistry->get('search.documentable.' . $this->documentType);
     }
 
     public function getQuery(): Query

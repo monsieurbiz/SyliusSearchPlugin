@@ -16,12 +16,9 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 use Elastica\Query;
 use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\PostFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\SorterInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
@@ -86,9 +83,7 @@ class Taxon implements RequestInterface
     public function getDocumentable(): DocumentableInterface
     {
         /** @var DocumentableInterface $documentable */
-        $documentable = $this->documentableRegistry->get('search.documentable.' . $this->documentType);
-
-        return $documentable;
+        return $this->documentableRegistry->get('search.documentable.' . $this->documentType);
     }
 
     public function getQuery(): Query

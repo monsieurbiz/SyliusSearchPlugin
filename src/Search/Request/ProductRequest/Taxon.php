@@ -17,14 +17,15 @@ use Elastica\Query;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\Taxon as TaxonRequest;
 use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\Taxon as TaxonRequest;
 
 final class Taxon extends TaxonRequest
 {
     private ProductAttributeRepositoryInterface $productAttributeRepository;
+
     private ProductOptionRepositoryInterface $productOptionRepository;
 
     public function __construct(

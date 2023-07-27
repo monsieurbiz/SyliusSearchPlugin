@@ -15,15 +15,16 @@ namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest;
 
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\Search as SearchRequest;
-use Sylius\Component\Registry\ServiceRegistryInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductAttributeRepositoryInterface;
 use MonsieurBiz\SyliusSearchPlugin\Repository\ProductOptionRepositoryInterface;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\AggregationBuilder;
+use MonsieurBiz\SyliusSearchPlugin\Search\Request\Search as SearchRequest;
+use Sylius\Component\Registry\ServiceRegistryInterface;
 
 final class Search extends SearchRequest
 {
     private ProductAttributeRepositoryInterface $productAttributeRepository;
+
     private ProductOptionRepositoryInterface $productOptionRepository;
 
     public function __construct(

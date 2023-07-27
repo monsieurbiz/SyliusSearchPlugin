@@ -140,10 +140,11 @@ class SearchController extends AbstractController
         ]);
     }
 
-    public function taxonAction(Request $request): Response
-    {
-        /** @var DocumentableInterface $documentable */
-        $documentable = $this->getDocumentable('monsieurbiz_product');
+    public function taxonAction(
+        Request $request,
+        string $documentType = 'monsieurbiz_product'
+    ): Response {
+        $documentable = $this->getDocumentable($documentType);
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::TAXON_TYPE,

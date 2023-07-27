@@ -21,6 +21,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class ProductOptionTypeExtension extends AbstractTypeExtension
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $searchWeightValues = range(1, 10);

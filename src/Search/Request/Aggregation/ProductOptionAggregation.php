@@ -27,6 +27,11 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
         $this->enableStockFilter = $enableStockFilter;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @param mixed $aggregation
+     */
     public function build($aggregation, array $filters)
     {
         /** @var ProductOptionInterface&SearchableInterface $aggregation */

@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product;
+namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter;
 
 use Elastica\Query\BoolQuery;
 use Elastica\QueryBuilder;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 
 final class EnabledFilter implements QueryFilterInterface

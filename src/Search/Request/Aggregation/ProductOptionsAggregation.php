@@ -26,6 +26,11 @@ final class ProductOptionsAggregation implements AggregationBuilderInterface
         $this->productOptionAggregationBuilder = $productOptionAggregationBuilder;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @param mixed $aggregation
+     */
     public function build($aggregation, array $filters)
     {
         if (!$this->isSupport($aggregation)) {
@@ -42,7 +47,6 @@ final class ProductOptionsAggregation implements AggregationBuilderInterface
         }
 
         $optionsAggregation = $qb->aggregation()->nested('options', 'options');
-        /** @phpstan-ignore-next-line */
         foreach ($aggregation as $subAggregation) {
             $subAggregationObject = $this->productOptionAggregationBuilder->build($subAggregation, $filters);
             if (null === $subAggregationObject || false === $subAggregationObject) {

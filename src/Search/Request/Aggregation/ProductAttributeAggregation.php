@@ -19,6 +19,11 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 
 final class ProductAttributeAggregation implements AggregationBuilderInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @param mixed $aggregation
+     */
     public function build($aggregation, array $filters)
     {
         /** @var ProductAttributeInterface&SearchableInterface $aggregation */

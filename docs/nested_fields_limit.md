@@ -1,37 +1,5 @@
-@TODO
+# Limit of nested fields has been exceeded
 
-```php
-<?php
+If you have a lot of attributes and options, you may have the error `Limit of nested fields [100] has been exceeded`.
 
-declare(strict_types=1);
-
-namespace App\Search\EventListener;
-
-use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-final class AppendProductMappingSubscriber implements EventSubscriberInterface
-{
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MappingProviderEvent::EVENT_NAME => 'onMappingProvider',
-        ];
-    }
-
-    public function onMappingProvider(MappingProviderEvent $event): void
-    {
-        if ('monsieurbiz_product' !== $event->getIndexCode()) {
-            return;
-        }
-
-        $mapping = $event->getMapping();
-        if (null === $mapping || !$mapping->offsetExists('mappings')) {
-            return;
-        }
-
-        $settings = $mapping->offsetGet('settings') ?? [];
-        $mapping->offsetSet('settings', array_merge($settings, ['mapping.nested_fields.limit' => 100])); // Increase the limit of nested fields
-    }
-}
-```
+To change that you can [change the mapping to apply a new setting](../dist/src/Resources/config/elasticsearch/monsieurbiz_product_mapping.yaml#L11).

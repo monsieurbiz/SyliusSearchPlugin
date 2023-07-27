@@ -5,3 +5,7 @@ mappings:
             fields:
                 keyword: # add keyword field for sorting
                     type: keyword
+settings:
+    mapping:
+        nested_fields:
+            limit: 1000

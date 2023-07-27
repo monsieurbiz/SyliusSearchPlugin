@@ -11,42 +11,42 @@
 
 declare(strict_types=1);
 
-namespace MonsieurBiz\SyliusSearchPlugin\Search\Request\ProductRequest;
+namespace MonsieurBiz\SyliusSearchPlugin\Search\Request;
 
 use Elastica\Query;
 use Elastica\QueryBuilder;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\FunctionScoreInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\QueryFilterInterface;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
-use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
 use RuntimeException;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
-final class InstantSearch implements RequestInterface
+class InstantSearch implements InstantSearchInterface
 {
-    private DocumentableInterface $documentable;
+    protected ServiceRegistryInterface $documentableRegistry;
 
-    private ?RequestConfiguration $configuration;
+    protected ?RequestConfiguration $configuration;
+
+    protected string $documentType;
 
     /**
      * @var iterable<QueryFilterInterface>
      */
-    private iterable $queryFilters;
+    protected iterable $queryFilters;
 
     /**
      * @var iterable<FunctionScoreInterface>
      */
-    private iterable $functionScores;
+    protected iterable $functionScores;
 
     public function __construct(
         ServiceRegistryInterface $documentableRegistry,
+        string $documentType,
         iterable $queryFilters,
         iterable $functionScores
     ) {
-        /** @var DocumentableInterface $documentable */
-        $documentable = $documentableRegistry->get('search.documentable.monsieurbiz_product');
-        $this->documentable = $documentable;
+        $this->documentableRegistry = $documentableRegistry;
+        $this->documentType = $documentType;
         $this->queryFilters = $queryFilters;
         $this->functionScores = $functionScores;
     }
@@ -58,7 +58,8 @@ final class InstantSearch implements RequestInterface
 
     public function getDocumentable(): DocumentableInterface
     {
-        return $this->documentable;
+        /** @phpstan-ignore-next-line  */
+        return $this->documentableRegistry->get('search.documentable.' . $this->documentType);
     }
 
     public function getQuery(): Query

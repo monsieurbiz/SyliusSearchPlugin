@@ -55,6 +55,14 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
         }
         /** @var array $mappings */
         $mappings = $mapping->offsetGet('mappings');
+        $mappings = $this->appendAttributesMapping($mappings);
+        $mappings = $this->appendOptionsMapping($mappings);
+
+        $mapping->offsetSet('mappings', $mappings);
+    }
+
+    private function appendAttributesMapping(array $mappings): array
+    {
         $attributesMapping = [];
         foreach ($this->productAttributeRepository->findIsSearchableOrFilterable() as $productAttribute) {
             $attributesMapping[$productAttribute->getCode()] = $this->getProductAttributeProperties($productAttribute);
@@ -66,6 +74,11 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
             ];
         }
 
+        return $mappings;
+    }
+
+    private function appendOptionsMapping(array $mappings): array
+    {
         $optionsMapping = [];
         foreach ($this->productOptionRepository->findIsSearchableOrFilterable() as $productOption) {
             $optionsMapping[$productOption->getCode()] = $this->getProductOptionProperties($productOption);
@@ -77,7 +90,7 @@ class AppendProductAttributeMappingSubscriber implements EventSubscriberInterfac
             ];
         }
 
-        $mapping->offsetSet('mappings', $mappings);
+        return $mappings;
     }
 
     private function getProductAttributeProperties(SearchableInterface $productAttribute): array

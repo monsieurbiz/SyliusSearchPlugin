@@ -4,6 +4,7 @@ parameters:
         - %rootDir%/src/
 
     checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
 
     excludes_analyse:
         # Makes PHPStan crash
@@ -12,6 +13,6 @@ parameters:
 
         # Test dependencies
         - 'tests/Application/**/*'
-        
+
         # Generated files
         - 'generated/**/*'

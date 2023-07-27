@@ -6,10 +6,11 @@
 - Remove `MonsieurBiz\SyliusSearchPlugin\Search\Request\PostFilter\ProductTaxonRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_post_filter`
 - Remove `MonsieurBiz\SyliusSearchPlugin\Search\Request\Sorting\ProductSorterRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_sorter`
 - Remove `\MonsieurBiz\SyliusSearchPlugin\Search\Request\FunctionScore\ProductFunctionScoreRegistry` service to use an iterator of services tagged `monsieurbiz.search.request.product_function_score`
-- The `MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider` is no longer a decorator. Some constructor parameters are removed : `$decorated`, `$configurationDirectory` and `$attributeRepository`, and we have `$yamlProviderFactory`, `$fileLocator` and `$configurationDirectories`.
+- The `MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider` is no longer a decorator. Some constructor parameters are removed : `$decorated`, `$configurationDirectory` and `$attributeRepository`, and we add `$fileLocator` and `$configurationDirectories`.
 - New setting `monsieurbiz_sylius_search.elastically_configuration_paths` to define paths of elasticsearch mapping files. By default it's `['@MonsieurBizSyliusSearchPlugin/Resources/config/elasticsearch']`.
 - New method `deleteByDocumentIds` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface
 - Deprecated the method `deleteByDocuments` in the `MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface` interface. Use `deleteByDocumentIds` instead. 
+- `ChannelFilter` and `EnabledFilter` in `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product` were moved to `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter`
 
 # UPGRADE FROM v1.X.X TO v2.0.x
 

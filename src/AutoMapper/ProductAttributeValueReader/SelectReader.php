@@ -25,6 +25,9 @@ class SelectReader implements ReaderInterface
         $this->defaultLocaleCode = $localeProvider->getDefaultLocaleCode();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function getValue(ProductAttributeValueInterface $productAttribute)
     {
         if (null === $productAttribute->getAttribute()) {

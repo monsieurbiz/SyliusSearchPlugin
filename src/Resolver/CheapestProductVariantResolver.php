@@ -29,6 +29,9 @@ class CheapestProductVariantResolver implements ProductVariantResolverInterface
         $this->channelContext = $channelContext;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function getVariant(ProductInterface $subject): ?ProductVariantInterface
     {
         $channel = $this->channelContext->getChannel();

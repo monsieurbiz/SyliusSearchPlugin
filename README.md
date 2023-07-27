@@ -108,6 +108,10 @@ use Sylius\Component\Product\Model\ProductAttribute as BaseProductAttribute;
 
 4. Run the populate command.
 
+## Documentation
+
+[Documentation is available in the *docs* folder.](docs/index.md)
+
 ## Infrastructure
 
 The plugin was developed for Elasticsearch 7.16.x versions. You need to have analysis-icu and analysis-phonetic elasticsearch plugin installed.

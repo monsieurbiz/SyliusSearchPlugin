@@ -5,7 +5,7 @@
 You can create your own sorter service by implementing the `SorterInterface` interface.  
 For example, in your test application, [we have a short description sorter](../dist/src/Search/Request/Sorting/Product/ShortDescriptionSorter.php).
 
-Add [the tag `monsieurbiz.search.request.product_sorter` to your service](../dist/src/Resources/config/services.yaml#L32).
+Add [the tag `monsieurbiz.search.request.product_sorter` to your service](../dist/src/Resources/config/services.yaml#L49).
 
 ## Replace existing sorter
 

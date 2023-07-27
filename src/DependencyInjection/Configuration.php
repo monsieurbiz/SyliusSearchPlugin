@@ -59,6 +59,9 @@ final class Configuration implements ConfigurationInterface
                                 ->prototype('scalar')->end()
                                 ->end()
                             ->end()
+
+                            // Position
+                            ->integerNode('position')->defaultValue(0)->end()
                         ->end()
                     ->end()
                 ->end()

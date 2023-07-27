@@ -15,10 +15,11 @@ namespace MonsieurBiz\SyliusSearchPlugin\Index;
 
 use JoliCode\Elastically\Indexer as ElasticallyIndexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 interface IndexerInterface
 {
-    public function indexAll(): void;
+    public function indexAll(?OutputInterface $output = null): void;
 
     public function indexByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void;
 

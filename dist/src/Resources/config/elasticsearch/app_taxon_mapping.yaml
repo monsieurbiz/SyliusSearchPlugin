@@ -1,0 +1,51 @@
+mappings:
+  dynamic: false
+  properties:
+    code:
+      type: keyword
+    enabled:
+      type: boolean
+    name:
+      type: text
+      fields:
+        keyword:
+          type: keyword
+        autocomplete:
+          type: text
+          analyzer: search_autocomplete
+          search_analyzer: standard
+    description:
+      type: text
+    created_at:
+      type: date
+      format: yyyy-MM-dd HH:mm:ss||strict_date_optional_time||epoch_second
+    position:
+      type: integer
+    level:
+      type: integer
+    left:
+      type: integer
+    right:
+      type: integer
+    parent_taxon:
+      type: nested
+      properties:
+        code:
+          type: keyword
+        enabled:
+          type: boolean
+        name:
+          type: keyword
+        description:
+          type: text
+        created_at:
+          type: date
+          format: yyyy-MM-dd HH:mm:ss||strict_date_optional_time||epoch_second
+        position:
+          type: integer
+        level:
+          type: integer
+        left:
+          type: integer
+        right:
+          type: integer

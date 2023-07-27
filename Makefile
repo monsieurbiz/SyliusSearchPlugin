@@ -114,10 +114,10 @@ test.composer: ## Validate composer.json
 	${COMPOSER} validate --strict
 
 test.phpstan: ## Run PHPStan
-	${COMPOSER} phpstan || true
+	${COMPOSER} phpstan
 
 test.phpmd: ## Run PHPMD
-	${COMPOSER} phpmd || true
+	${COMPOSER} phpmd
 
 test.phpunit: ## Run PHPUnit
 	${COMPOSER} phpunit

@@ -39,6 +39,11 @@ class DocumentableRegistryPass implements CompilerPassInterface
             $searchSettings = $container->getParameter('monsieurbiz.settings.config.plugins');
         }
 
+        // Sort documentables by position
+        uasort($documentables, function ($documentableA, $documentableB) {
+            return $documentableA['position'] <=> $documentableB['position'];
+        });
+
         foreach ($documentables as $indexCode => $documentableConfiguration) {
             $documentableServiceId = 'search.documentable.' . $indexCode;
             $documentableClass = $documentableConfiguration['document_class'];

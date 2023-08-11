@@ -36,7 +36,7 @@ final class Search extends SearchRequest
         iterable $sorters,
         iterable $functionScores,
         ProductAttributeRepositoryInterface $productAttributeRepository,
-        ProductOptionRepositoryInterface $productOptionRepository,
+        ProductOptionRepositoryInterface $productOptionRepository
     ) {
         parent::__construct(
             $documentableRegistry,

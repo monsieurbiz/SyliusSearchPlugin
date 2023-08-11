@@ -94,7 +94,7 @@ final class Indexer implements IndexerInterface
             }
             $dto = $this->autoMapper->map($document, $documentable->getTargetClass());
             // @phpstan-ignore-next-line
-            $indexer->scheduleIndex($index, new Document((string) $document->getId(), $dto));
+            $indexer->scheduleIndex($index, new Document((string) $dto->getId(), $dto));
         }
     }
 
@@ -184,7 +184,7 @@ final class Indexer implements IndexerInterface
             }
             $dto = $this->autoMapper->map($item, $documentable->getTargetClass());
             // @phpstan-ignore-next-line
-            $indexer->scheduleIndex($newIndex, new Document((string) $item->getId(), $dto));
+            $indexer->scheduleIndex($newIndex, new Document((string) $dto->getId(), $dto));
         }
         $indexer->flush();
 

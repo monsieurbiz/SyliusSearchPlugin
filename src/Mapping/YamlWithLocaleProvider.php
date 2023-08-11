@@ -91,11 +91,11 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
     private function appendLocaleAnalyzers(string $configurationDirectory, array $mapping, ?string $locale): array
     {
+        $mapping = $this->appendAnalyzers($configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers.yaml', $mapping);
+
         if (null === $locale) {
             return $mapping;
         }
-
-        $mapping = $this->appendAnalyzers($configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers.yaml', $mapping);
 
         foreach ($this->getLocaleCode($locale) as $localeCode) {
             $mapping = $this->appendAnalyzers($configurationDirectory . \DIRECTORY_SEPARATOR . 'analyzers_' . $localeCode . '.yaml', $mapping);

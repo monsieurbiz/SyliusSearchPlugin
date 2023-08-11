@@ -48,8 +48,11 @@ class Search implements SearchInterface
     {
         $request = $this->requestHandler->getRequest($requestConfiguration);
 
-        $indexName = $this->clientFactory->getIndexName($request->getDocumentable(), $this->localeContext->getLocaleCode());
-        $client = $this->clientFactory->getClient($request->getDocumentable(), $this->localeContext->getLocaleCode());
+        $documentable = $request->getDocumentable();
+        $localeCode = $documentable->isTranslatable() ? $this->localeContext->getLocaleCode() : null;
+
+        $indexName = $this->clientFactory->getIndexName($documentable, $localeCode);
+        $client = $this->clientFactory->getClient($documentable, $localeCode);
 
         return $this->responseFactory->build(
             $requestConfiguration,

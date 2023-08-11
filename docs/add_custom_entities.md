@@ -33,7 +33,8 @@ We will create the custom DTO later in the documentation.
 
 ### Declare the elastic search mapping
 
-[Declare the mapping of your entity for Elasticsearch](../dist/src/Resources/config/elasticsearch/app_taxon_mapping.yaml).
+- [Add your elasticsearch config path in `monsieurbiz_sylius_search.elastically_configuration_paths`](../dist/config/packages/monsieurbiz_sylius_search_plugin.yaml#L9)
+- [Declare the mapping of your entity for Elasticsearch](../dist/src/Resources/config/elasticsearch/app_taxon_mapping.yaml).
 
 ### Create the Datasource class if you defined a custom one
 

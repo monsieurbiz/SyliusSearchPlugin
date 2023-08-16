@@ -19,6 +19,7 @@ use Elastica\Document;
 use Jane\Component\AutoMapper\AutoMapperInterface;
 use JoliCode\Elastically\Indexer as ElasticallyIndexer;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\PrefixedDocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
@@ -64,7 +65,9 @@ final class Indexer implements IndexerInterface
         $output = $output ?? new NullOutput();
         /** @var DocumentableInterface $documentable */
         foreach ($this->documentableRegistry->all() as $documentable) {
-            $output->writeln(sprintf('Indexing <info>%s</info>', $documentable->getIndexCode()));
+            $documentable instanceof PrefixedDocumentableInterface && !empty($documentable->getPrefix()) ?
+                $output->writeln(sprintf('Indexing <info>%s</info> (Prefix: <info>%s</info>)', $documentable->getIndexCode(), $documentable->getPrefix()))
+                : $output->writeln(sprintf('Indexing <info>%s</info>', $documentable->getIndexCode()));
             $this->indexDocumentable($output, $documentable);
         }
     }
@@ -160,10 +163,16 @@ final class Indexer implements IndexerInterface
     {
         if (null === $locale && $documentable->isTranslatable()) {
             foreach ($this->getLocales() as $localeCode) {
-                $output->writeln(
-                    sprintf('Indexing <info>%s</info> for locale <info>%s</info>', $documentable->getIndexCode(), $localeCode),
-                    OutputInterface::VERBOSITY_VERBOSE
-                );
+                $documentable instanceof PrefixedDocumentableInterface && !empty($documentable->getPrefix()) ?
+                    $output->writeln(
+                        sprintf('Indexing <info>%s</info> for locale <info>%s</info> (Prefix: <info>%s</info>)', $documentable->getIndexCode(), $localeCode, $documentable->getPrefix()),
+                        OutputInterface::VERBOSITY_VERBOSE
+                    )
+                    : $output->writeln(
+                        sprintf('Indexing <info>%s</info> for locale <info>%s</info>', $documentable->getIndexCode(), $localeCode),
+                        OutputInterface::VERBOSITY_VERBOSE
+                    );
+
                 $this->indexDocumentable($output, $documentable, $localeCode);
             }
 

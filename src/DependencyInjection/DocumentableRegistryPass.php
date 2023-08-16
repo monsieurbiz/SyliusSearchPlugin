@@ -79,6 +79,7 @@ class DocumentableRegistryPass implements CompilerPassInterface
             $registry->addMethodCall('register', [$documentableServiceId, new Reference($documentableServiceId)]);
 
             // Add the default settings value of documentable
+            $searchSettings['monsieurbiz.search']['default_values']['search_enabled__' . $indexCode] = $documentableConfiguration['search_enabled'];
             $searchSettings['monsieurbiz.search']['default_values']['instant_search_enabled__' . $indexCode] = $documentableConfiguration['instant_search_enabled'];
             $searchSettings['monsieurbiz.search']['default_values']['limits__' . $indexCode] = $documentableConfiguration['limits'];
         }

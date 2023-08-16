@@ -82,8 +82,12 @@ class SearchController extends AbstractController
         );
         $result = $this->search->search($requestConfiguration);
 
+        $documentableRegistries = array_filter($this->documentableRegistry->all(), function (DocumentableInterface $documentable) {
+            return (bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'search_enabled__' . $documentable->getIndexCode());
+        });
+
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
-            'documentableRegistries' => $this->documentableRegistry->all(),
+            'documentableRegistries' => $documentableRegistries,
             'documentable' => $result->getDocumentable(),
             'requestConfiguration' => $requestConfiguration,
             'query' => urldecode($query),

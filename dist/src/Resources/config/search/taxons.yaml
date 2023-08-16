@@ -3,7 +3,8 @@ monsieurbiz_sylius_search:
     app_taxon:
       #prefix: '…' # define a custom index prefix on index names and aliases
       #document_class: '…' # by default MonsieurBiz\SyliusSearchPlugin\Model\Documentable\Documentable
-      instant_search_enabled: true # by default false
+      #search_enabled: true # by default true
+      #instant_search_enabled: true # by default true
       limits:
         search: [9, 18, 27]
         taxon: [9, 18, 27]

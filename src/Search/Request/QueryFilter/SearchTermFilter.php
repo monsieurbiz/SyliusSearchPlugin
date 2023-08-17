@@ -22,10 +22,14 @@ class SearchTermFilter implements QueryFilterInterface
 {
     protected array $fieldsToSearch;
 
+    protected array $nestedFieldsToSearch;
+
     public function __construct(
-        array $fieldsToSearch
+        array $fieldsToSearch,
+        array $nestedFieldsToSearch = []
     ) {
         $this->fieldsToSearch = $fieldsToSearch;
+        $this->nestedFieldsToSearch = $nestedFieldsToSearch;
     }
 
     public function apply(BoolQuery $boolQuery, RequestConfiguration $requestConfiguration): void
@@ -37,6 +41,7 @@ class SearchTermFilter implements QueryFilterInterface
         $searchQuery = $qb->query()->bool();
         $searchQuery->addShould($searchCode);
         $this->addFieldsToSearchCondition($searchQuery, $requestConfiguration);
+        $this->addNestedFieldsToSearchCondition($searchQuery, $requestConfiguration);
 
         $this->addCustomFilters($searchQuery, $requestConfiguration);
 
@@ -55,6 +60,43 @@ class SearchTermFilter implements QueryFilterInterface
         $nameAndDescriptionQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
         $nameAndDescriptionQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
         $searchQuery->addShould($nameAndDescriptionQuery);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function addNestedFieldsToSearchCondition(BoolQuery $searchQuery, RequestConfiguration $requestConfiguration): void
+    {
+        if (0 === \count($this->nestedFieldsToSearch)) {
+            return;
+        }
+
+        $nestedFields = [];
+
+        // Group nested fields by nested path
+        foreach ($this->nestedFieldsToSearch as $nestedFieldToSearch) {
+            $nestedFieldExpression = explode(':', $nestedFieldToSearch);
+            if (2 !== \count($nestedFieldExpression)) {
+                continue;
+            }
+
+            $nestedFields[$nestedFieldExpression[0]][] = str_replace(':', '.', $nestedFieldToSearch);
+        }
+
+        // Create queries by nested path and nested values
+        $qb = new QueryBuilder();
+        foreach ($nestedFields as $nestedField => $nestedFieldExpressions) {
+            $nestedFieldValueQuery = $qb->query()->multi_match();
+            $nestedFieldValueQuery->setFields($nestedFieldExpressions);
+            $nestedFieldValueQuery->setQuery($requestConfiguration->getQueryText());
+            $nestedFieldValueQuery->setType(MultiMatch::TYPE_MOST_FIELDS);
+            $nestedFieldValueQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
+
+            $nestedFieldQuery = $qb->query()->nested();
+            $nestedFieldQuery->setPath($nestedField)->setQuery($nestedFieldValueQuery);
+
+            $searchQuery->addShould($nestedFieldQuery);
+        }
     }
 
     /**

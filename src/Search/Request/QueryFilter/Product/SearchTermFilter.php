@@ -30,9 +30,10 @@ final class SearchTermFilter extends BaseSearchTermFilter
     public function __construct(
         ProductAttributeRepositoryInterface $productAttributeRepository,
         ProductOptionRepositoryInterface $productOptionRepository,
-        array $fieldsToSearch
+        array $fieldsToSearch,
+        array $nestedFieldsToSearch = []
     ) {
-        parent::__construct($fieldsToSearch);
+        parent::__construct($fieldsToSearch, $nestedFieldsToSearch);
         $this->productAttributeRepository = $productAttributeRepository;
         $this->productOptionRepository = $productOptionRepository;
     }

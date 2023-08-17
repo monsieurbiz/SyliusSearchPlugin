@@ -14,7 +14,7 @@ monsieurbiz_sylius_search:
       templates:
         item: '@MonsieurBizSyliusSearchPlugin/Search/Product/_box.html.twig'
         instant: '@MonsieurBizSyliusSearchPlugin/Instant/Product/_box.html.twig'
-      #mapping_provider: '...' # by default monsieurbiz.search.mapper_provider
+      #mapping_provider: '...' # by default MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider
       datasource: 'MonsieurBiz\SyliusSearchPlugin\Model\Datasource\ProductDatasource' # by default MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource
   automapper_classes:
     sources:

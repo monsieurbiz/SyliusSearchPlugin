@@ -32,6 +32,8 @@ services:
               - 'name^5'
               - 'description'
               - 'short_description' # We add our new value in search
+            $nestedFieldsToSearch:
+                - 'main_taxon:name^2' # We add our new nested value in search
         tags:
             - { name: monsieurbiz.search.request.product_search_filter }
 
@@ -43,6 +45,8 @@ services:
               - 'description'
               - 'name.autocomplete'
               - 'short_description' # We add our new value in instant search
+            $nestedFieldsToSearch:
+                - 'main_taxon:name^2' # We add our new nested value in instant search
         tags:
             - { name: monsieurbiz.search.request.product_instant_search_filter }
 

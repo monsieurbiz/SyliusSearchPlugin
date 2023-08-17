@@ -82,12 +82,8 @@ class SearchController extends AbstractController
         );
         $result = $this->search->search($requestConfiguration);
 
-        $documentableRegistries = array_filter($this->documentableRegistry->all(), function (DocumentableInterface $documentable) {
-            return (bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'search_enabled__' . $documentable->getIndexCode());
-        });
-
         return $this->render('@MonsieurBizSyliusSearchPlugin/Search/result.html.twig', [
-            'documentableRegistries' => $documentableRegistries,
+            'documentableRegistries' => $this->getSearchEnabledDocumentables(),
             'documentable' => $result->getDocumentable(),
             'requestConfiguration' => $requestConfiguration,
             'query' => urldecode($query),
@@ -120,11 +116,7 @@ class SearchController extends AbstractController
     {
         $results = [];
         /** @var DocumentableInterface $documentable */
-        foreach ($this->documentableRegistry->all() as $documentable) {
-            if (!(bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'instant_search_enabled__' . $documentable->getIndexCode())) {
-                continue;
-            }
-
+        foreach ($this->getInstantSearchEnabledDocumentables() as $documentable) {
             $requestConfiguration = new RequestConfiguration(
                 $request,
                 RequestInterface::INSTANT_TYPE,
@@ -170,7 +162,7 @@ class SearchController extends AbstractController
     private function getDocumentable(?string $documentType): DocumentableInterface
     {
         if (null === $documentType) {
-            $documentables = $this->documentableRegistry->all();
+            $documentables = $this->getSearchEnabledDocumentables();
 
             return reset($documentables);
         }
@@ -181,5 +173,19 @@ class SearchController extends AbstractController
         } catch (NonExistingServiceException $exception) {
             throw new NotFoundHttpException(sprintf('Documentable "%s" not found', $documentType));
         }
+    }
+
+    private function getSearchEnabledDocumentables(): array
+    {
+        return array_filter($this->documentableRegistry->all(), function (DocumentableInterface $documentable) {
+            return (bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'search_enabled__' . $documentable->getIndexCode());
+        });
+    }
+
+    private function getInstantSearchEnabledDocumentables(): array
+    {
+        return array_filter($this->documentableRegistry->all(), function (DocumentableInterface $documentable) {
+            return (bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'instant_search_enabled__' . $documentable->getIndexCode());
+        });
     }
 }

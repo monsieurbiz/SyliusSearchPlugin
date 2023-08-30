@@ -255,6 +255,9 @@ services:
 
   monsieurbiz.search.checker.elasticsearch_checker:
     class: MonsieurBiz\SyliusSearchPlugin\Checker\ElasticsearchChecker
+    arguments:
+      $config:
+        url: '%monsieurbiz_search_elasticsearch_url%'
 
   MonsieurBiz\SyliusSearchPlugin\Twig\Extension\RenderSearchForm:
     arguments:

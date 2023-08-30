@@ -19,10 +19,17 @@ class ElasticsearchChecker implements ElasticsearchCheckerInterface
 {
     private ?bool $isAvailable = null;
 
+    private array $config;
+
+    public function __construct(array $config = [])
+    {
+        $this->config = $config;
+    }
+
     public function check(): bool
     {
         if (null === $this->isAvailable) {
-            $client = (new Factory())->buildClient();
+            $client = (new Factory($this->config))->buildClient();
 
             // Check client response
             try {

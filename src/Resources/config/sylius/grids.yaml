@@ -15,7 +15,7 @@ sylius_grid:
                     options:
                         template: "@SyliusUi/Grid/Field/yesNo.html.twig"
                 searchWeight:
-                    label: monsieurbiz_searchplugin.admin.product_attribute.form.search_weight
+                    label: monsieurbiz_searchplugin.admin.product_attribute.form.search_weight_short_label
                     type: string
                     sortable: ~
             filters:
@@ -40,7 +40,7 @@ sylius_grid:
                     options:
                         template: "@SyliusUi/Grid/Field/yesNo.html.twig"
                 searchWeight:
-                    label: monsieurbiz_searchplugin.admin.product_option.form.search_weight
+                    label: monsieurbiz_searchplugin.admin.product_option.form.search_weight_short_label
                     type: string
                     sortable: ~
             filters:

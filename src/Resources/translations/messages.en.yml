@@ -6,12 +6,14 @@ monsieurbiz_searchplugin:
         filterable: Filterable
         searchable: Searchable
         search_weight: Search Weight
+        search_weight_short_label: Weight
     product_option:
       form:
         title: Search
         filterable: Filterable
         searchable: Searchable
         search_weight: Search Weight
+        search_weight_short_label: Weight
     setting_form:
       instant_search_enabled_monsieurbiz_product: 'Product: Instant search enabled'
       limit_search_monsieurbiz_product: 'Product: Available limits for search'

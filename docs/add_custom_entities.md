@@ -64,7 +64,7 @@ Also, the `public function getTarget(): string` method must return the value of 
 
 ## Display your new entity in the search results
 
-## Define your Instant Search request
+### Define your Instant Search request
 
 If you want to display your entity in the instant search (`instant_search_enabled` is `true` in configuration).
 
@@ -72,7 +72,7 @@ If you want to display your entity in the instant search (`instant_search_enable
 
 [Don't forget to bind the parameter for the service](../dist/src/Resources/config/services.yaml#L6).
 
-## Define your Search request
+### Define your Search request
 
 [Declare your search request service](../dist/src/Resources/config/services.yaml#L67).
 
@@ -80,7 +80,7 @@ If you want to display your entity in the instant search (`instant_search_enable
 
 You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\Search` class to manage your aggregations like in [products](../src/Search/Request/ProductRequest/Search.php).
 
-## Define your Search query filter
+### Define your Search query filter
 
 [Declare your search query filter for instant search](../dist/src/Resources/config/services.yaml#L77).
 
@@ -88,12 +88,12 @@ You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\Search` class
 
 You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\SearchTermFilter` class to manage your custom behaviour like in [products](../src/Search/Request/QueryFilter/Product/SearchTermFilter.php).
 
-## Add the templates for display
+### Add the templates for display
 
 [Declare your templates for instant search](../dist/templates/bundles/MonsieurBizSyliusSearchPlugin/Instant/Taxon/_box.html.twig).
 
 [Declare your templates for search](../dist/templates/bundles/MonsieurBizSyliusSearchPlugin/Search/Taxon/_box.html.twig).
 
-## Add your document translation
+### Add your document translation
 
 [Declare your translations for your entity](../dist/translations/messages.en.yaml#L5).

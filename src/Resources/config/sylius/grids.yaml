@@ -1,0 +1,52 @@
+sylius_grid:
+    grids:
+        sylius_admin_product_attribute:
+            fields:
+                filterable:
+                    type: twig
+                    label: monsieurbiz_searchplugin.admin.product_attribute.form.filterable
+                    sortable: ~
+                    options:
+                        template: "@SyliusUi/Grid/Field/yesNo.html.twig"
+                searchable:
+                    type: twig
+                    label: monsieurbiz_searchplugin.admin.product_attribute.form.searchable
+                    sortable: ~
+                    options:
+                        template: "@SyliusUi/Grid/Field/yesNo.html.twig"
+                searchWeight:
+                    label: monsieurbiz_searchplugin.admin.product_attribute.form.search_weight
+                    type: string
+                    sortable: ~
+            filters:
+                filterable:
+                    type: boolean
+                    label: monsieurbiz_searchplugin.admin.product_attribute.form.filterable
+                searchable:
+                    type: boolean
+                    label: monsieurbiz_searchplugin.admin.product_attribute.form.searchable
+        sylius_admin_product_option:
+            fields:
+                filterable:
+                    type: twig
+                    label: monsieurbiz_searchplugin.admin.product_option.form.filterable
+                    sortable: ~
+                    options:
+                        template: "@SyliusUi/Grid/Field/yesNo.html.twig"
+                searchable:
+                    type: twig
+                    label: monsieurbiz_searchplugin.admin.product_option.form.searchable
+                    sortable: ~
+                    options:
+                        template: "@SyliusUi/Grid/Field/yesNo.html.twig"
+                searchWeight:
+                    label: monsieurbiz_searchplugin.admin.product_option.form.search_weight
+                    type: string
+                    sortable: ~
+            filters:
+                filterable:
+                    type: boolean
+                    label: monsieurbiz_searchplugin.admin.product_option.form.filterable
+                searchable:
+                    type: boolean
+                    label: monsieurbiz_searchplugin.admin.product_option.form.searchable

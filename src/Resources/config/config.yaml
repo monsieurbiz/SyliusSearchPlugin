@@ -3,6 +3,7 @@ imports:
   - { resource: "monsieurbiz_search.yaml" }
   - { resource: "sylius/ui.yaml" }
   - { resource: "sylius/fixtures.yaml" }
+  - { resource: "sylius/grids.yaml" }
   - { resource: "monsieurbiz/settings.yaml" }
   - { resource: "messenger.yaml" }
 

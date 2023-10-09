@@ -30,15 +30,15 @@ final class ProductOptionTypeExtension extends AbstractTypeExtension
 
         $builder
             ->add('searchable', CheckboxType::class, [
-                'label' => 'monsieurbiz_searchplugin.admin.product_attribute.form.searchable',
+                'label' => 'monsieurbiz_searchplugin.admin.product_option.form.searchable',
                 'required' => true,
             ])
             ->add('filterable', CheckboxType::class, [
-                'label' => 'monsieurbiz_searchplugin.admin.product_attribute.form.filterable',
+                'label' => 'monsieurbiz_searchplugin.admin.product_option.form.filterable',
                 'required' => true,
             ])
             ->add('search_weight', ChoiceType::class, [
-                'label' => 'monsieurbiz_searchplugin.admin.product_attribute.form.search_weight',
+                'label' => 'monsieurbiz_searchplugin.admin.product_option.form.search_weight',
                 'required' => true,
                 'choices' => array_combine($searchWeightValues, $searchWeightValues),
             ])

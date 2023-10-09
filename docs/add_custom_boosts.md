@@ -8,7 +8,7 @@ You have 2 parameters to modify the behavior of this boost:
 
 ```yaml
 monsieurbiz.search.product.is_in_stock_scoring_boost: 0 # The value is used to multiply the document score (0 to disable the scoring boost)
-monsieururbiz.search.product.apply_is_in_stock_scoring_boost_on: # The type of request where the boost is applied
+monsieurbiz.search.product.apply_is_in_stock_scoring_boost_on: # The type of request where the boost is applied
     - !php/const MonsieurBiz\SyliusSearchPlugin\SearchRequestRequestInterface::SEARCH_TYPE
     - !php/const MonsieurBiz\SyliusSearchPlugin\SearchRequestInterface::TAXON_TYPE
     - !php/const MonsieurBiz\SyliusSearchPlugin\SearchRequestRequestInterface::INSTANT_TYPE

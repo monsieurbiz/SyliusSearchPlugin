@@ -67,6 +67,7 @@ class SearchableFixtureFactory extends AbstractExampleFactory implements Searcha
                 ->setNormalizer('option', LazyOption::findOneBy($this->productOptionRepository, 'code'))
             ->setDefault('filterable', false)
             ->setDefault('searchable', false)
+            ->setDefault('search_weight', 1)
         ;
     }
 
@@ -79,6 +80,7 @@ class SearchableFixtureFactory extends AbstractExampleFactory implements Searcha
         $object = $this->getSearchableObject($options);
         $object->setFilterable(((bool) $options['filterable']) ?? false);
         $object->setSearchable(((bool) $options['searchable']) ?? false);
+        $object->setSearchWeight(((int) $options['search_weight']) ?? 1);
 
         return $object;
     }

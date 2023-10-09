@@ -9,15 +9,19 @@ sylius_fixtures:
                                 attribute: 'cap_collection'
                                 filterable: true
                                 searchable: true
+                                search_weight: 5
                             dress_collection:
                                 attribute: 'dress_collection'
                                 filterable: true
                                 searchable: true
+                                search_weight: 4
                             dress_height:
                                 option: 'dress_height'
                                 filterable: true
                                 searchable: true
+                                search_weight: 3
                             dress_size:
                                 option: 'dress_size'
                                 filterable: true
                                 searchable: true
+                                search_weight: 2

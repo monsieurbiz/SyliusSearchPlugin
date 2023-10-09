@@ -50,6 +50,7 @@ class SearchableFixture extends AbstractResourceFixture implements SearchableFix
             ->scalarNode('option')->end()
             ->booleanNode('filterable')->defaultValue(true)->end()
             ->booleanNode('searchable')->defaultValue(true)->end()
+            ->integerNode('search_weight')->defaultValue(1)->end()
         ;
     }
 }

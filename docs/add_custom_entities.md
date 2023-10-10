@@ -68,13 +68,13 @@ Also, the `public function getTarget(): string` method must return the value of 
 
 If you want to display your entity in the instant search (`instant_search_enabled` is `true` in configuration).
 
-[Declare your instant search request service](../dist/src/Resources/config/services.yaml#L60).
+[Declare your instant search request service](../dist/src/Resources/config/services.yaml#38).
 
 [Don't forget to bind the parameter for the service](../dist/src/Resources/config/services.yaml#L6).
 
 ### Define your Search request
 
-[Declare your search request service](../dist/src/Resources/config/services.yaml#L67).
+[Declare your search request service](../dist/src/Resources/config/services.yaml#45).
 
 [Don't forget to bind the parameter for the service](../dist/src/Resources/config/services.yaml#L6).
 
@@ -82,9 +82,9 @@ You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\Search` class
 
 ### Define your Search query filter
 
-[Declare your search query filter for instant search](../dist/src/Resources/config/services.yaml#L77).
+[Declare your search query filter for instant search](../dist/src/Resources/config/services.yaml#55).
 
-[Declare your search query filter for search](../dist/src/Resources/config/services.yaml#L87).
+[Declare your search query filter for search](../dist/src/Resources/config/services.yaml#65).
 
 You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\SearchTermFilter` class to manage your custom behaviour like in [products](../src/Search/Request/QueryFilter/Product/SearchTermFilter.php).
 

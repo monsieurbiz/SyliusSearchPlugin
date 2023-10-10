@@ -24,32 +24,6 @@ services:
         arguments:
             - '@.inner'
 
-    # Add short_description in searchable fields
-    monsieurbiz.search.request.query_filter.product_search.search_term_filter:
-        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
-        arguments:
-            $fieldsToSearch:
-              - 'name^5'
-              - 'description'
-              - 'short_description' # We add our new value in search
-            $nestedFieldsToSearch:
-                - 'main_taxon:name^2' # We add our new nested value in search
-        tags:
-            - { name: monsieurbiz.search.request.product_search_filter }
-
-    monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
-        class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
-        arguments:
-            $fieldsToSearch:
-              - 'name^5'
-              - 'description'
-              - 'name.autocomplete'
-              - 'short_description' # We add our new value in instant search
-            $nestedFieldsToSearch:
-                - 'main_taxon:name^2' # We add our new nested value in instant search
-        tags:
-            - { name: monsieurbiz.search.request.product_instant_search_filter }
-
     # Define sorters
     App\Search\Request\Sorting\Product\ShortDescriptionSorter:
         tags:

@@ -1,5 +1,18 @@
 parameters:
     monsieurbiz.search.product.is_in_stock_scoring_boost: 200 # Enable the boost for in stock products
+    monsieurbiz.search.product.search.fields_to_search: 
+        - 'name^5'
+        - 'description'
+        - 'short_description' # We add our new value in search
+    monsieurbiz.search.product.search.nested_fields_to_search:
+        - 'main_taxon:name^2' # We add our new nested value in instant search
+    monsieurbiz.search.product.instant.fields_to_search: 
+        - 'name^5'
+        - 'name.autocomplete'
+        - 'description'
+        - 'short_description' # We add our new value in search
+    monsieurbiz.search.product.instant.nested_fields_to_search:
+        - 'main_taxon:name^2' # We add our new nested value in instant search
 
 imports:
     - { resource: "services.yaml" }

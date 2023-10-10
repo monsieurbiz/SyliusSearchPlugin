@@ -14,8 +14,7 @@ You will have the `item.short_description` variable available in your templates.
 ## Search on the custom value
 
 With only the decorator, you will not be able to search in the content of the new field.
-You have to redeclare `monsieurbiz.search.request.query_filter.product_search.search_term_filter` 
-and `monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter` services 
-to add the `short_description` fields.
+You have to change parameters to define the fields to search for the search page and the instant search.
 
-- [Add `short_description` in search term filter](../dist/src/Resources/config/services.yaml#L34)
+- [Add `short_description` in `monsieurbiz.search.product.search.fields_to_search`](../dist/src/Resources/config/config.yaml#6)
+- [Add `short_description` in `monsieurbiz.search.product.instant.fields_to_search`](../dist/src/Resources/config/config.yaml#13)

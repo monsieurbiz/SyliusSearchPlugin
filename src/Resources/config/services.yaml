@@ -12,6 +12,15 @@ parameters:
       - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::SEARCH_TYPE
       - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::TAXON_TYPE
       - !php/const MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface::INSTANT_TYPE
+  monsieurbiz.search.product.search.fields_to_search: 
+      - 'name^5'
+      - 'description'
+  monsieurbiz.search.product.search.nested_fields_to_search: []
+  monsieurbiz.search.product.instant.fields_to_search: 
+      - 'name^5'
+      - 'name.autocomplete'
+      - 'description'
+  monsieurbiz.search.product.instant.nested_fields_to_search: []
 
 services:
 
@@ -120,19 +129,16 @@ services:
   monsieurbiz.search.request.query_filter.product_search.search_term_filter:
     class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
     arguments:
-      $fieldsToSearch:
-        - 'name^5'
-        - 'description'
+      $fieldsToSearch: '%monsieurbiz.search.product.search.fields_to_search%'
+      $nestedFieldsToSearch: '%monsieurbiz.search.product.search.nested_fields_to_search%'
     tags:
       - { name: monsieurbiz.search.request.product_search_filter }
 
   monsieurbiz.search.request.query_filter.product_instant_search.search_term_filter:
     class: MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\Product\SearchTermFilter
     arguments:
-      $fieldsToSearch:
-        - 'name^5'
-        - 'description'
-        - 'name.autocomplete'
+      $fieldsToSearch: '%monsieurbiz.search.product.instant.fields_to_search%'
+      $nestedFieldsToSearch: '%monsieurbiz.search.product.instant.nested_fields_to_search%'
     tags:
       - { name: monsieurbiz.search.request.product_instant_search_filter }
 

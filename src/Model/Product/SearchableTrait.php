@@ -20,16 +20,19 @@ trait SearchableTrait
     /**
      * @ORM\Column(name="searchable", type="boolean", nullable=false, options={"default"=false})
      */
+    #[ORM\Column(name: 'searchable', type: 'boolean', nullable: false, options: ['default' => false])]
     protected bool $searchable = false;
 
     /**
      * @ORM\Column(name="filterable", type="boolean", nullable=false, options={"default"=false})
      */
+    #[ORM\Column(name: 'filterable', type: 'boolean', nullable: false, options: ['default' => false])]
     protected bool $filterable = false;
 
     /**
      * @ORM\Column(name="search_weight", type="smallint", nullable=false, options={"default"=1, "unsigned"=true})
      */
+    #[ORM\Column(name: 'search_weight', type: 'smallint', nullable: false, options: ['default' => 1, 'unsigned' => true])]
     protected int $searchWeight = 1;
 
     public function isSearchable(): bool

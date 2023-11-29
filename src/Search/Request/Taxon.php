@@ -24,7 +24,7 @@ use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 
-class Taxon implements RequestInterface
+class Taxon implements TaxonInterface
 {
     protected ServiceRegistryInterface $documentableRegistry;
 

@@ -4,7 +4,7 @@ monsieurbiz_search_search:
   defaults:
     _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::searchAction
   requirements:
-    query: .+
+    query: .*
   condition: "not(context.getPathInfo() matches '`^%sylius.security.new_api_route%`') and context.checkElasticsearch()"
 
 monsieurbiz_search_post:

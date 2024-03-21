@@ -13,7 +13,7 @@ A search plugin for Sylius using [Elastically](https://github.com/jolicode/elast
 
 Require the plugin :
 ```
-composer require monsieurbiz/sylius-search-plugin="^2.0@RC"
+composer require monsieurbiz/sylius-search-plugin="^2"
 ```
 
 If you are using Symfony Flex, the recipe will automatically do some actions.

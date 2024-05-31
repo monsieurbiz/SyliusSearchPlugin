@@ -221,7 +221,7 @@ final class Indexer implements IndexerInterface
         }
 
         // Clear the entity manager to detach the proxy object
-        $this->entityManager->clear(\get_class($entity));
+        $this->entityManager->clear(\get_class($entity)); /** @phpstan-ignore-line */
         // Retrieve the original class name
         $entityClassName = $this->entityManager->getClassMetadata(\get_class($entity))->rootEntityName;
         // Find the object in repository from the ID

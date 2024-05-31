@@ -55,6 +55,9 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         $this->channelSimulationContext = $channelSimulationContext;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function process(MapperGeneratorMetadataInterface $metadata): void
     {
         if (!$metadata instanceof MapperMetadata) {
@@ -100,13 +103,27 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         });
 
         $metadata->forMember('mainTaxon', function (ProductInterface $product) {
-            return null !== $product->getMainTaxon()
-                ? $this->autoMapper->map($product->getMainTaxon(), $this->configuration->getTargetClass('taxon'))
-                : null;
+            $mainTaxon = $product->getMainTaxon();
+            if (null === $mainTaxon) {
+                return null;
+            }
+
+            $currentLocale = $product->getTranslation()->getLocale();
+            if (null !== $currentLocale) {
+                $mainTaxon->setCurrentLocale($currentLocale);
+            }
+
+            return $this->autoMapper->map($mainTaxon, $this->configuration->getTargetClass('taxon'));
         });
 
         $metadata->forMember('product_taxons', function (ProductInterface $product): array {
-            return array_map(function (ProductTaxonInterface $productTaxon) {
+            return array_map(function (ProductTaxonInterface $productTaxon) use ($product) {
+                $taxon = $productTaxon->getTaxon();
+                $currentLocale = $product->getTranslation()->getLocale();
+                if (null !== $currentLocale && null !== $taxon) {
+                    $taxon->setCurrentLocale($currentLocale);
+                }
+
                 // todo add parent taxon in Taxon object with automapper
                 return $this->autoMapper->map($productTaxon, $this->configuration->getTargetClass('product_taxon'));
             }, $product->getProductTaxons()->toArray());
@@ -149,6 +166,11 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         }
         $productAttributeDTOClass = $this->configuration->getTargetClass('product_attribute');
         foreach ($product->getAttributesByLocale($currentLocale, $currentLocale) as $attributeValue) {
+            $attribute = $attributeValue->getAttribute();
+            $currentLocale = $product->getTranslation()->getLocale();
+            if (null !== $currentLocale && null !== $attribute) {
+                $attribute->setCurrentLocale($currentLocale);
+            }
             if (null === $attributeValue->getName() || null === $attributeValue->getValue()) {
                 continue;
             }

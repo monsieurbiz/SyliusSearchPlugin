@@ -86,8 +86,6 @@ final class Indexer implements IndexerInterface
                 $this->indexByDocuments($documentable, $documents, $localeCode, $indexer);
             }
 
-            $indexer->flush();
-
             return;
         }
         $index = $this->clientFactory->getIndex($documentable, $locale);
@@ -99,6 +97,8 @@ final class Indexer implements IndexerInterface
             // @phpstan-ignore-next-line
             $indexer->scheduleIndex($index, new Document((string) $dto->getId(), $dto));
         }
+
+        $indexer->flush();
     }
 
     public function deleteByDocuments(DocumentableInterface $documentable, array $documents, ?string $locale = null, ?ElasticallyIndexer $indexer = null): void

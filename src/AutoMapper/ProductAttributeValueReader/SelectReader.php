@@ -35,6 +35,10 @@ class SelectReader implements ReaderInterface
         }
 
         $currentLocale = $productAttribute->getLocaleCode();
+        $attribute = $productAttribute->getAttribute();
+        if (null !== $attribute->getTranslation()->getLocale()) {
+            $currentLocale = $attribute->getTranslation()->getLocale();
+        }
         $choices = $productAttribute->getAttribute()->getConfiguration()['choices'] ?? [];
         $productAttributeValue = $productAttribute->getValue();
         if (!is_iterable($productAttributeValue)) {

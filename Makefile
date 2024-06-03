@@ -2,10 +2,12 @@
 SHELL=/bin/bash
 APP_DIR=tests/Application
 SYLIUS_VERSION=1.12.0
+SYLIUS_PAYPAL_VERSION=1.5.0
 SYMFONY=cd ${APP_DIR} && symfony
 COMPOSER=symfony composer
 CONSOLE=${SYMFONY} console
 export COMPOSE_PROJECT_NAME=search
+export USER_UID=$(shell id -u)
 PLUGIN_NAME=sylius-${COMPOSE_PROJECT_NAME}-plugin
 COMPOSE=docker-compose
 YARN=yarn
@@ -68,6 +70,7 @@ setup_application:
 	(cd ${APP_DIR} && ${COMPOSER} config minimum-stability dev)
 	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins allow-plugins true)
 	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}") # Make sure to install the required version of sylius because the sylius-standard has a soft constraint
+	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/paypal-plugin="~${SYLIUS_PAYPAL_VERSION}") # @see https://github.com/Sylius/PayPalPlugin/issues/295
 	@if [ ${SYLIUS_VERSION} == '1.11.0' ]; then\
 		(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress php-http/message-factory)\
 	fi
@@ -81,6 +84,8 @@ setup_application:
 ${APP_DIR}/docker-compose.yaml:
 	rm -f ${APP_DIR}/docker-compose.yml
 	rm -f ${APP_DIR}/docker-compose.yaml
+	rm -f ${APP_DIR}/compose.yml
+	rm -f ${APP_DIR}/compose.override.dist.yml
 	ln -s ../../docker-compose.yaml.dist ${APP_DIR}/docker-compose.yaml
 .PHONY: ${APP_DIR}/docker-compose.yaml
 

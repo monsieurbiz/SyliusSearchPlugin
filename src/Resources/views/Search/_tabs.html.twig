@@ -1,12 +1,12 @@
 {% if documentableRegistries|length > 1%}
     <div class="ui pointing secondary menu">
-        {% set encodedQuery = app.request.attributes.get('_route_params').query|default('')|url_encode %}
+        {% set searchQuery = app.request.attributes.get('_route_params').query|default('') %}
         {% set firstDocumentable = documentableRegistries|first %}
         {% for documentableRegistry in documentableRegistries %}
             {% if documentableRegistry.indexCode == firstDocumentable.indexCode %}
-                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: encodedQuery})) %}
+                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: searchQuery})) %}
             {% else %}
-                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: encodedQuery})|merge({document_type: documentableRegistry.indexCode})) %}
+                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: searchQuery})|merge({document_type: documentableRegistry.indexCode})) %}
             {% endif %}
             {% set isActive = documentableRegistry.indexCode == documentable.indexCode %}
             <a

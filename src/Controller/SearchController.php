@@ -101,10 +101,11 @@ class SearchController extends AbstractController
         $query = (array) $request->request->all()['monsieurbiz_searchplugin_search'] ?? [];
         $query = $query['query'] ?? '';
 
+        // With Apache a URL with a encoded slash (%2F) is provoking a 404 error on the server level
         return $this->redirect(
             $this->generateUrl(
                 'monsieurbiz_search_search',
-                ['query' => urlencode($query)]
+                ['query' => str_replace('%2F', '/', urlencode($query))]
             )
         );
     }

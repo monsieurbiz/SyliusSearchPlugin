@@ -7,6 +7,7 @@ SYMFONY=cd ${APP_DIR} && symfony
 COMPOSER=symfony composer
 CONSOLE=${SYMFONY} console
 export COMPOSE_PROJECT_NAME=search
+export MIGRATIONS_NAMESPACE=MonsieurBiz\\SyliusSearchPlugin\\Migrations
 export USER_UID=$(shell id -u)
 PLUGIN_NAME=sylius-${COMPOSE_PROJECT_NAME}-plugin
 COMPOSE=docker-compose
@@ -140,7 +141,7 @@ test.container: ## Lint the symfony container
 	${CONSOLE} lint:container
 
 test.yaml: ## Lint the symfony Yaml files
-	${CONSOLE} lint:yaml ../../recipes ../../src/Resources/config --parse-tags
+	${CONSOLE} lint:yaml --parse-tags ../../src/Resources/config
 
 test.schema: ## Validate MySQL Schema
 	${CONSOLE} doctrine:schema:validate
@@ -215,7 +216,7 @@ consume.reindex: ## Consume reindex messages during 10min
 	${CONSOLE} messenger:consume async_search --time-limit=600 -vv
 
 doctrine.diff: ## Doctrine diff
-	${CONSOLE} doctrine:migration:diff
+	${CONSOLE} doctrine:migration:diff --namespace="${MIGRATIONS_NAMESPACE}"
 
 doctrine.migrate: ## Doctrine diff
 	${CONSOLE} doctrine:migration:migrate

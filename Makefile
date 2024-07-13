@@ -73,14 +73,11 @@ setup_application:
 	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins allow-plugins true)
 	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins --json extra.symfony.endpoint '["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]')
 	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}") # Make sure to install the required version of sylius because the sylius-standard has a soft constraint
-	@if [ ${SYLIUS_VERSION} == '1.11.0' ]; then\
-		(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress php-http/message-factory)\
-	fi
-	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress nikic/php-parser="^4.0") # Required by jane-php/automapper
 	$(MAKE) ${APP_DIR}/.php-version
 	$(MAKE) ${APP_DIR}/php.ini
 	(cd ${APP_DIR} && ${COMPOSER} install --no-interaction)
 	$(MAKE) apply_dist
+	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress nikic/php-parser="^4.0") # Required by jane-php/automapper
 	(cd ${APP_DIR} && ${COMPOSER} require --no-progress --no-interaction monsieurbiz/${PLUGIN_NAME}="*@dev")
 	git restore dist/docker-compose.override.yaml # Restore dist file to prevent modification by flex recipes (symfony/mailer)
 	rm -rf ${APP_DIR}/var/cache

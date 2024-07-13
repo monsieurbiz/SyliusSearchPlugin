@@ -84,4 +84,5 @@ jobs:
       - name: Require plugin & install all dependencies
         working-directory: ./sylius
         run: |
+          composer require --no-progress --no-interaction nikic/php-parser="^4.0"
           composer require monsieurbiz/sylius-search-plugin="*@dev"

@@ -26,7 +26,11 @@ If you want to use our recipes, you can configure your composer.json by running:
 composer config --no-plugins --json extra.symfony.endpoint '["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]'
 ```
 
+This is the last version using `jane-php/automapper`, which requires `nikic/php-parser="^4.0"`.
+The next version will use `jolicode/automapper`, which is compatible with `nikic/php-parser="^5.0"`.
+
 ```bash
+composer require --no-progress --no-interaction nikic/php-parser="^4.0"
 composer require monsieurbiz/sylius-search-plugin
 ```
 

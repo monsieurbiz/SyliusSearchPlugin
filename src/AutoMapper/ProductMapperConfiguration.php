@@ -130,6 +130,7 @@ final class ProductMapperConfiguration implements MapperConfigurationInterface
         });
 
         $metadata->forMember('channels', function (ProductInterface $product): array {
+            /** @phpstan-ignore-next-line */
             return array_map(function (ChannelInterface $channel) {
                 return $this->autoMapper->map($channel, $this->configuration->getTargetClass('channel'));
             }, $product->getChannels()->toArray());

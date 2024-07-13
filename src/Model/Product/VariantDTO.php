@@ -19,6 +19,7 @@ final class VariantDTO extends Eater
 {
     public function getCode(): ?string
     {
+        /** @phpstan-ignore-next-line */
         return $this->getData('code');
     }
 

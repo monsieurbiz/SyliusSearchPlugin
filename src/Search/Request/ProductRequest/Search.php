@@ -54,6 +54,8 @@ final class Search extends SearchRequest
 
     protected function addAggregations(Query $query, BoolQuery $postFilter): void
     {
+        /** @var array $mustParam */
+        $mustParam = $postFilter->hasParam('must') ? $postFilter->getParam('must') : [];
         $aggregations = $this->aggregationBuilder->buildAggregations(
             [
                 'main_taxon',
@@ -61,7 +63,7 @@ final class Search extends SearchRequest
                 $this->productAttributeRepository->findIsSearchableOrFilterable(),
                 $this->productOptionRepository->findIsSearchableOrFilterable(),
             ],
-            $postFilter->hasParam('must') ? $postFilter->getParam('must') : []
+            $mustParam
         );
 
         foreach ($aggregations as $aggregation) {

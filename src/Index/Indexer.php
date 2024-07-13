@@ -187,6 +187,7 @@ final class Indexer implements IndexerInterface
 
         $indexer = $this->clientFactory->getIndexer($documentable, $locale);
         foreach ($documentable->getDatasource()->getItems($documentable->getSourceClass()) as $item) {
+            /** @var object $item */
             $item = $this->getRealEntity($item);
             if (null !== $locale && $item instanceof TranslatableInterface) {
                 $item->setCurrentLocale($locale);

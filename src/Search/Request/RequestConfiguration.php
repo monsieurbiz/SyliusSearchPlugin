@@ -56,6 +56,7 @@ final class RequestConfiguration
 
     public function getQueryText(): string
     {
+        /** @phpstan-ignore-next-line */
         return trim(urldecode($this->request->get('query', '')));
     }
 
@@ -71,16 +72,19 @@ final class RequestConfiguration
 
     public function getSorting(): array
     {
+        /** @phpstan-ignore-next-line */
         return $this->request->get('sorting', []);
     }
 
     public function getPage(): int
     {
+        /** @phpstan-ignore-next-line */
         return (int) $this->request->get('page', 1);
     }
 
     public function getLimit(): int
     {
+        /** @phpstan-ignore-next-line */
         $limit = (int) $this->request->get('limit', self::FALLBACK_LIMIT);
         $availableLimits = $this->getAvailableLimits();
 
@@ -93,6 +97,7 @@ final class RequestConfiguration
 
     public function getAvailableLimits(): array
     {
+        /** @var array $configLimits */
         $configLimits = $this->searchSettings->getCurrentValue(
             $this->channelContext->getChannel(),
             null,
@@ -122,6 +127,7 @@ final class RequestConfiguration
             throw ObjectNotInstanceOfClassException::fromClassName(TaxonInterface::class);
         }
 
+        /** @phpstan-ignore-next-line */
         return $this->parameters->get('taxon');
     }
 

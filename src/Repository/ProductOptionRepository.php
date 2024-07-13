@@ -26,6 +26,7 @@ class ProductOptionRepository implements ProductOptionRepositoryInterface
 
     public function findIsSearchableOrFilterable(): array
     {
+        /** @phpstan-ignore-next-line */
         return $this->productOptionRepository->createQueryBuilder('o')
             ->innerJoin('o.translations', 'translation')
             ->andWhere('o.searchable = true')

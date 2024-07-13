@@ -16,24 +16,19 @@ namespace MonsieurBiz\SyliusSearchPlugin\MessageHandler;
 use MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductToDeleteFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
-use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class ProductToDeleteFromIdsHandler implements MessageHandlerInterface
 {
-    private ProductRepositoryInterface $productRepository;
-
     private IndexerInterface $indexer;
 
     private ServiceRegistryInterface $documentableRegistry;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository,
         IndexerInterface $indexer,
         ServiceRegistryInterface $documentableRegistry
     ) {
-        $this->productRepository = $productRepository;
         $this->indexer = $indexer;
         $this->documentableRegistry = $documentableRegistry;
     }

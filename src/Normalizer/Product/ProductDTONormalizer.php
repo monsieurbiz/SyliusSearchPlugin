@@ -31,7 +31,6 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 final class ProductDTONormalizer extends ObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
-
     use NormalizerAwareTrait;
 
     private Configuration $automapperConfiguration;

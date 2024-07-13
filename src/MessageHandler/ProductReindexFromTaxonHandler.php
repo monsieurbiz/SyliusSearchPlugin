@@ -50,7 +50,7 @@ class ProductReindexFromTaxonHandler implements MessageHandlerInterface
                 ->innerJoin('o.productTaxons', 'productTaxon')
                 ->andWhere('productTaxon.taxon = :taxonId')
                 ->setParameter('taxonId', $message->getTaxonId())->getQuery()->getResult()
-            ;
+        ;
 
         $this->indexer->indexByDocuments(
             $documentable,

@@ -18,7 +18,6 @@ use Sylius\Component\Resource\Model\TranslatableInterface;
 class Documentable implements PrefixedDocumentableInterface
 {
     use DocumentableDatasourceTrait;
-
     use DocumentableMappingProviderTrait;
 
     private string $indexCode;

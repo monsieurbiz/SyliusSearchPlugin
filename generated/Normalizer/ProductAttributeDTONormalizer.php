@@ -25,9 +25,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class ProductAttributeDTONormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use CheckArray;
-
     use DenormalizerAwareTrait;
-
     use NormalizerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)

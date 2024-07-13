@@ -32,6 +32,6 @@ class ProductAttributeRepository implements ProductAttributeRepositoryInterface
             ->orWhere('o.filterable = true')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

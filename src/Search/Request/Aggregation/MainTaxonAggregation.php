@@ -54,7 +54,7 @@ final class MainTaxonAggregation implements AggregationBuilderInterface
                             )
                     )
             )
-            ;
+        ;
     }
 
     /**

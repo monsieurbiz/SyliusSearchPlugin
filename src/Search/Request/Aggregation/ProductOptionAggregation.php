@@ -43,9 +43,9 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
 
         $filters = array_filter($filters, function (AbstractQuery $filter) use ($aggregation): bool {
             return !$filter->hasParam('path') || (
-                    false !== strpos($filter->getParam('path'), 'options.')
+                false !== strpos($filter->getParam('path'), 'options.')
                     && 'options.' . $aggregation->getCode() . '.values' !== $filter->getParam('path')
-                );
+            );
         });
 
         $filterQuery = $qb->query()->bool();

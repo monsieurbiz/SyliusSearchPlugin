@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader;
 
+use DateTime;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 
 class DateTimeReader implements ReaderInterface
@@ -26,7 +27,7 @@ class DateTimeReader implements ReaderInterface
         }
 
         $productAttributeValue = $productAttribute->getValue();
-        if ($productAttributeValue instanceof \DateTime) {
+        if ($productAttributeValue instanceof DateTime) {
             $productAttributeValue = $productAttributeValue->format($this->defaultFormat);
         }
 

@@ -113,9 +113,9 @@ final class TaxonMapperConfiguration implements MapperConfigurationInterface
     {
         if ($taxon instanceof Proxy) {
             // Clear the entity manager to detach the proxy object
-            $this->entityManager->clear(\get_class($taxon));
+            $this->entityManager->clear($taxon::class);
             // Retrieve the original class name
-            $entityClassName = ClassUtils::getRealClass(\get_class($taxon));
+            $entityClassName = ClassUtils::getRealClass($taxon::class);
             // Find the object in repository from the ID
             /** @var ?TaxonInterface $taxon */
             $taxon = $this->entityManager->find($entityClassName, $taxon->getId());

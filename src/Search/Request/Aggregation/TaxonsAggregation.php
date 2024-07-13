@@ -61,7 +61,7 @@ final class TaxonsAggregation implements AggregationBuilderInterface
                             )
                     )
             )
-            ;
+        ;
     }
 
     /**

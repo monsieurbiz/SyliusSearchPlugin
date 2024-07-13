@@ -32,6 +32,6 @@ class ProductOptionRepository implements ProductOptionRepositoryInterface
             ->orWhere('o.filterable = true')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

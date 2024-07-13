@@ -15,7 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Message;
 
 class ProductReindexFromTaxon
 {
-    //todo rename to ProductReindexFromTaxonId
+    // todo rename to ProductReindexFromTaxonId
 
     private int $taxonId;
 

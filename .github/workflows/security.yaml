@@ -3,48 +3,51 @@ name: Security
 on:
   push:
   pull_request:
-  schedule:
-    - cron:  '0 0 * * 0'
 
 jobs:
 
   security:
 
-    name: Security check (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        php: [ '8.0', '8.1', '8.2' ]
+        php: ['8.1', '8.2']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          extensions: gd, intl, json
 
       - name: Set project php-version
         run: |
           echo "${{ matrix.php }}" > .php-version
 
-      - uses: actions/cache@v1
+      - name: Determine composer cache directory
+        id: composer-cache-directory
+        run: echo "directory=$(composer config cache-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies installed with composer
+        uses: actions/cache@v3
         id: cache-composer
         with:
-          path: /home/runner/.composer/cache
+          path: ${{ steps.composer-cache-directory.outputs.directory }}
           key: composer2-php:${{ matrix.php }}-${{ github.sha }}
           restore-keys: composer2-php:${{ matrix.php }}-
 
-      - run: mkdir -p /home/runner/{.composer/cache,.config/composer}
+      - name: Ensure that composer cache directory exists
+        run: mkdir -p ${{ steps.composer-cache-directory.outputs.directory }}
 
       - name: Composer Github Auth
         run: composer config -g github-oauth.github.com ${{ github.token }}
 
-      - uses: actions/checkout@v2
-
       - name: Install PHP dependencies
         run: composer update --prefer-dist
 
-      - uses: symfonycorp/security-checker-action@v3
+      - uses: symfonycorp/security-checker-action@v4
+

@@ -3,10 +3,7 @@ parameters:
     paths:
         - %rootDir%/src/
 
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
-
-    excludes_analyse:
+    excludePaths:
         # Makes PHPStan crash
         - 'src/DependencyInjection/Configuration.php'
         - 'src/DependencyInjection/MonsieurBizSyliusSearchExtension.php'
@@ -16,3 +13,7 @@ parameters:
 
         # Generated files
         - 'generated/**/*'
+
+    ignoreErrors:
+        - identifier: missingType.generics
+        - identifier: missingType.iterableValue

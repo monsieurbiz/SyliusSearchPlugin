@@ -63,6 +63,8 @@ final class Taxon extends TaxonRequest
         if (null === $this->configuration) {
             throw new RuntimeException('Missing request configuration');
         }
+        /** @var array $mustParam */
+        $mustParam = $postFilter->hasParam('must') ? $postFilter->getParam('must') : [];
         $aggregations = $this->aggregationBuilder->buildAggregations(
             [
                 ['taxons' => $this->configuration->getTaxon()],
@@ -70,7 +72,7 @@ final class Taxon extends TaxonRequest
                 $this->productAttributeRepository->findIsSearchableOrFilterable(),
                 $this->productOptionRepository->findIsSearchableOrFilterable(),
             ],
-            $postFilter->hasParam('must') ? $postFilter->getParam('must') : []
+            $mustParam
         );
 
         foreach ($aggregations as $aggregation) {

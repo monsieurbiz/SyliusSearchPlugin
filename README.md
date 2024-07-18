@@ -3,17 +3,35 @@
 <h1 align="center">Search</h1>
 
 [![Search Plugin license](https://img.shields.io/github/license/monsieurbiz/SyliusSearchPlugin?public)](https://github.com/monsieurbiz/SyliusSearchPlugin/blob/master/LICENSE.txt)
-[![Recipe](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/recipe.yaml/badge.svg?branch=master&event=push)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/recipe.yaml)
-[![Tests](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/tests.yaml/badge.svg?branch=master&event=push)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/tests.yaml)
-[![Security](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/security.yaml/badge.svg?branch=master&event=push)](https://github.com/monsieurbiz/SyliusSearchPlugin/actions/workflows/security.yaml)
+[![Tests Status](https://img.shields.io/github/actions/workflow/status/monsieurbiz/SyliusSearchPlugin/tests.yaml?branch=master&logo=github)](https://github.com/monsieurbiz/SyliusCmsPagePlugin/actions?query=workflow%3ATests)
+[![Recipe Status](https://img.shields.io/github/actions/workflow/status/monsieurbiz/SyliusSearchPlugin/recipe.yaml?branch=master&label=recipes&logo=github)](https://github.com/monsieurbiz/SyliusCmsPagePlugin/actions?query=workflow%3ASecurity)
+[![Security Status](https://img.shields.io/github/actions/workflow/status/monsieurbiz/SyliusSearchPlugin/security.yaml?branch=master&label=security&logo=github)](https://github.com/monsieurbiz/SyliusCmsPagePlugin/actions?query=workflow%3ASecurity)
+
 
 A search plugin for Sylius using [Elastically](https://github.com/jolicode/elastically) and [Jane](https://github.com/janephp/janephp).
 
+## Compatibility
+
+| Sylius Version | PHP Version |
+|---|---|
+| 1.11 | 8.0 - 8.1 |
+| 1.12 | 8.1 - 8.2 |
+| 1.13 | 8.1 - 8.2 |
+
 ## Installation
 
-Require the plugin :
+If you want to use our recipes, you can configure your composer.json by running:
+
+```bash
+composer config --no-plugins --json extra.symfony.endpoint '["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]'
 ```
-composer require monsieurbiz/sylius-search-plugin="^2"
+
+This is the last version using `jane-php/automapper`, which requires `nikic/php-parser="^4.0"`.
+The next version will use `jolicode/automapper`, which is compatible with `nikic/php-parser="^5.0"`.
+
+```bash
+composer require --no-progress --no-interaction nikic/php-parser="^4.0"
+composer require monsieurbiz/sylius-search-plugin
 ```
 
 If you are using Symfony Flex, the recipe will automatically do some actions.
@@ -84,6 +102,8 @@ use Sylius\Component\Product\Model\ProductAttribute as BaseProductAttribute;
  * @ORM\Entity
  * @ORM\Table(name="sylius_product_attribute")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'sylius_product_attribute')]
 -class ProductAttribute extends BaseProductAttribute
 +class ProductAttribute extends BaseProductAttribute implements SearchableInterface
 {

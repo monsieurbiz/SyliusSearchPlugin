@@ -46,11 +46,13 @@ class ProductReindexFromTaxonHandler implements MessageHandlerInterface
         if (!$this->productRepository instanceof EntityRepository) {
             return;
         }
+
+        /** @var array $products */
         $products = $this->productRepository->createQueryBuilder('o')
                 ->innerJoin('o.productTaxons', 'productTaxon')
                 ->andWhere('productTaxon.taxon = :taxonId')
                 ->setParameter('taxonId', $message->getTaxonId())->getQuery()->getResult()
-            ;
+        ;
 
         $this->indexer->indexByDocuments(
             $documentable,

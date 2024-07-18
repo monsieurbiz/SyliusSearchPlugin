@@ -63,7 +63,7 @@ final class PriceAggregation implements AggregationBuilderInterface
                             )
                     )
             )
-            ;
+        ;
     }
 
     /**

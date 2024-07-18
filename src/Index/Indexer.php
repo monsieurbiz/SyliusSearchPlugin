@@ -187,6 +187,7 @@ final class Indexer implements IndexerInterface
 
         $indexer = $this->clientFactory->getIndexer($documentable, $locale);
         foreach ($documentable->getDatasource()->getItems($documentable->getSourceClass()) as $item) {
+            /** @var object $item */
             $item = $this->getRealEntity($item);
             if (null !== $locale && $item instanceof TranslatableInterface) {
                 $item->setCurrentLocale($locale);
@@ -221,9 +222,10 @@ final class Indexer implements IndexerInterface
         }
 
         // Clear the entity manager to detach the proxy object
-        $this->entityManager->clear(\get_class($entity)); /** @phpstan-ignore-line */
+        $this->entityManager->clear($entity::class); /** @phpstan-ignore-line */
         // Retrieve the original class name
-        $entityClassName = $this->entityManager->getClassMetadata(\get_class($entity))->rootEntityName;
+        $entityClassName = $this->entityManager->getClassMetadata($entity::class)->rootEntityName;
+
         // Find the object in repository from the ID
         return $this->entityManager->find($entityClassName, $entity->getId());
     }

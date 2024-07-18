@@ -1,8 +1,7 @@
 .DEFAULT_GOAL := help
 SHELL=/bin/bash
 APP_DIR=tests/Application
-SYLIUS_VERSION=1.12.0
-SYLIUS_PAYPAL_VERSION=1.5.0
+SYLIUS_VERSION=1.13.0
 SYMFONY=cd ${APP_DIR} && symfony
 COMPOSER=symfony composer
 CONSOLE=${SYMFONY} console
@@ -26,8 +25,9 @@ down: server.stop docker.down ## Down the project (removes docker containers, st
 
 reset: ## Stop docker and remove dependencies
 	${MAKE} docker.down || true
+	rm -rf ${APP_DIR}/node_modules ${APP_DIR}/yarn.lock
 	rm -rf ${APP_DIR}
-	rm -rf vendor composer.lock yarn.lock node_modules
+	rm -rf vendor composer.lock
 .PHONY: reset
 
 dependencies: composer.lock node_modules ## Setup the dependencies
@@ -66,27 +66,28 @@ ${APP_DIR}:
 	(${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="~${SYLIUS_VERSION}" ${APP_DIR})
 
 setup_application:
+	rm -f ${APP_DIR}/yarn.lock
 	(cd ${APP_DIR} && ${COMPOSER} config repositories.plugin '{"type": "path", "url": "../../"}')
 	(cd ${APP_DIR} && ${COMPOSER} config extra.symfony.allow-contrib true)
 	(cd ${APP_DIR} && ${COMPOSER} config minimum-stability dev)
 	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins allow-plugins true)
+	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins --json extra.symfony.endpoint '["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]')
 	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}") # Make sure to install the required version of sylius because the sylius-standard has a soft constraint
-	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/paypal-plugin="~${SYLIUS_PAYPAL_VERSION}") # @see https://github.com/Sylius/PayPalPlugin/issues/295
-	@if [ ${SYLIUS_VERSION} == '1.11.0' ]; then\
-		(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress php-http/message-factory)\
-	fi
-	$(MAKE) ${APP_DIR}/.php-version ${APP_DIR}/php.ini
+	$(MAKE) ${APP_DIR}/.php-version
+	$(MAKE) ${APP_DIR}/php.ini
 	(cd ${APP_DIR} && ${COMPOSER} install --no-interaction)
 	$(MAKE) apply_dist
+	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress nikic/php-parser="^4.0") # Required by jane-php/automapper
 	(cd ${APP_DIR} && ${COMPOSER} require --no-progress --no-interaction monsieurbiz/${PLUGIN_NAME}="*@dev")
 	git restore dist/docker-compose.override.yaml # Restore dist file to prevent modification by flex recipes (symfony/mailer)
 	rm -rf ${APP_DIR}/var/cache
 
+
 ${APP_DIR}/docker-compose.yaml:
 	rm -f ${APP_DIR}/docker-compose.yml
 	rm -f ${APP_DIR}/docker-compose.yaml
-	rm -f ${APP_DIR}/compose.yml
-	rm -f ${APP_DIR}/compose.override.dist.yml
+	rm -f ${APP_DIR}/compose.yml # Remove Sylius file about Docker
+	rm -f ${APP_DIR}/compose.override.dist.yml # Remove Sylius file about Docker
 	ln -s ../../docker-compose.yaml.dist ${APP_DIR}/docker-compose.yaml
 .PHONY: ${APP_DIR}/docker-compose.yaml
 
@@ -141,7 +142,7 @@ test.container: ## Lint the symfony container
 	${CONSOLE} lint:container
 
 test.yaml: ## Lint the symfony Yaml files
-	${CONSOLE} lint:yaml --parse-tags ../../src/Resources/config
+	${CONSOLE} lint:yaml ../../src/Resources/config --parse-tags
 
 test.schema: ## Validate MySQL Schema
 	${CONSOLE} doctrine:schema:validate

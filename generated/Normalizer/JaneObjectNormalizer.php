@@ -24,9 +24,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class JaneObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use CheckArray;
-
     use DenormalizerAwareTrait;
-
     use NormalizerAwareTrait;
 
     protected $normalizers = ['MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ImageDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ImageDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ChannelDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ChannelDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductTaxonDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ProductTaxonDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\TaxonDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\TaxonDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductAttributeDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ProductAttributeDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\PricingDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\PricingDTONormalizer', '\\Jane\\Component\\JsonSchemaRuntime\\Reference' => '\\MonsieurBiz\\SyliusSearchPlugin\\Generated\\Runtime\\Normalizer\\ReferenceNormalizer'];
@@ -40,12 +38,12 @@ class JaneObjectNormalizer implements DenormalizerInterface, NormalizerInterface
 
     public function supportsNormalization($data, $format = null)
     {
-        return \is_object($data) && \array_key_exists(\get_class($data), $this->normalizers);
+        return \is_object($data) && \array_key_exists($data::class, $this->normalizers);
     }
 
     public function normalize($object, $format = null, array $context = [])
     {
-        $normalizerClass = $this->normalizers[\get_class($object)];
+        $normalizerClass = $this->normalizers[$object::class];
         $normalizer = $this->getNormalizer($normalizerClass);
 
         return $normalizer->normalize($object, $format, $context);

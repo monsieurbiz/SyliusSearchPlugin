@@ -29,7 +29,7 @@ final class ProductAttributesAggregation implements AggregationBuilderInterface
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
-     * @param mixed $aggregation
+     * @param array $aggregation
      */
     public function build($aggregation, array $filters)
     {
@@ -40,7 +40,10 @@ final class ProductAttributesAggregation implements AggregationBuilderInterface
         $qb = new QueryBuilder();
 
         $currentFilters = array_filter($filters, function (AbstractQuery $filter): bool {
-            return !$filter->hasParam('path') || false === strpos($filter->getParam('path'), 'attributes.');
+            /** @var string $path */
+            $path = $filter->hasParam('path') ? $filter->getParam('path') : '';
+
+            return !$filter->hasParam('path') || false === strpos($path, 'attributes.');
         });
 
         $filterQuery = $qb->query()->bool();

@@ -28,10 +28,11 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
+/** @TODO remove ObjectNormalizer extends before Symfony 7.0 */
+/** @phpstan-ignore-next-line */
 final class ProductDTONormalizer extends ObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
-
     use NormalizerAwareTrait;
 
     private Configuration $automapperConfiguration;
@@ -69,13 +70,13 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
         /** @var ProductDTO $object */
         $object = parent::denormalize($data, $type, $format, $context);
 
-        if (\array_key_exists('main_taxon', $data) && null !== $data['main_taxon']) {
+        if (\is_array($data) && \array_key_exists('main_taxon', $data) && null !== $data['main_taxon']) {
             $taxonDTOClass = $this->automapperConfiguration->getTargetClass('taxon');
             $object->setData('main_taxon', $this->denormalizer->denormalize($data['main_taxon'], $taxonDTOClass, 'json', $context));
             unset($data['main_taxon']);
         }
 
-        if (\array_key_exists('product_taxons', $data) && null !== $data['product_taxons']) {
+        if (\is_array($data) && \array_key_exists('product_taxons', $data) && null !== $data['product_taxons']) {
             $values = [];
             $productTaxonDTOClass = $this->automapperConfiguration->getTargetClass('product_taxon');
             foreach ($data['product_taxons'] as $value) {
@@ -85,7 +86,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             unset($data['product_taxons']);
         }
 
-        if (\array_key_exists('images', $data) && null !== $data['images']) {
+        if (\is_array($data) && \array_key_exists('images', $data) && null !== $data['images']) {
             $values = [];
             $imageDTOClass = $this->automapperConfiguration->getTargetClass('image');
             foreach ($data['images'] as $value) {
@@ -95,7 +96,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             unset($data['product_taxons']);
         }
 
-        if (\array_key_exists('channels', $data) && null !== $data['channels']) {
+        if (\is_array($data) && \array_key_exists('channels', $data) && null !== $data['channels']) {
             $values = [];
             $channelDTOClass = $this->automapperConfiguration->getTargetClass('channel');
             foreach ($data['channels'] as $value) {
@@ -105,7 +106,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             unset($data['channels']);
         }
 
-        if (\array_key_exists('attributes', $data) && null !== $data['attributes']) {
+        if (\is_array($data) && \array_key_exists('attributes', $data) && null !== $data['attributes']) {
             $values = [];
             $productAttributeDTOClass = $this->automapperConfiguration->getTargetClass('product_attribute');
             foreach ($data['attributes'] as $key => $value) {
@@ -115,7 +116,7 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
             unset($data['channels']);
         }
 
-        if (\array_key_exists('prices', $data) && null !== $data['prices']) {
+        if (\is_array($data) && \array_key_exists('prices', $data) && null !== $data['prices']) {
             $values = [];
             $pricingDTOClass = $this->automapperConfiguration->getTargetClass('pricing');
             foreach ($data['prices'] as $key => $value) {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Checker;
 
+use Exception;
 use JoliCode\Elastically\Factory;
 
 class ElasticsearchChecker implements ElasticsearchCheckerInterface
@@ -34,7 +35,7 @@ class ElasticsearchChecker implements ElasticsearchCheckerInterface
             // Check client response
             try {
                 $client->getStatus()->getResponse();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->isAvailable = false;
 
                 return $this->isAvailable;

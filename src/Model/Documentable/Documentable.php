@@ -18,7 +18,6 @@ use Sylius\Component\Resource\Model\TranslatableInterface;
 class Documentable implements PrefixedDocumentableInterface
 {
     use DocumentableDatasourceTrait;
-
     use DocumentableMappingProviderTrait;
 
     private string $indexCode;
@@ -67,7 +66,7 @@ class Documentable implements PrefixedDocumentableInterface
 
     public function isTranslatable(): bool
     {
-        $interface = (array) (class_implements($this->getSourceClass()) ?? []);
+        $interface = (array) class_implements($this->getSourceClass());
 
         return \in_array(TranslatableInterface::class, $interface, true);
     }

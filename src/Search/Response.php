@@ -69,6 +69,7 @@ class Response implements ResponseInterface
     public function getPaginator(): Pagerfanta
     {
         if (null === $this->paginator) {
+            /** @phpstan-ignore-next-line */
             $this->paginator = new Pagerfanta($this->adapter);
             $this->paginator->setMaxPerPage($this->requestConfiguration->getLimit());
             $this->paginator->setCurrentPage($this->requestConfiguration->getPage());

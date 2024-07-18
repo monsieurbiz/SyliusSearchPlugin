@@ -22,6 +22,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
+use Traversable;
 
 final class ProductAttributeValueConfiguration implements MapperConfigurationInterface, LoggerAwareInterface
 {
@@ -38,7 +39,7 @@ final class ProductAttributeValueConfiguration implements MapperConfigurationInt
     {
         $this->logger = new NullLogger();
         $this->configuration = $configuration;
-        $this->productAttributeValueReaders = $productAttributeValueReaders instanceof \Traversable
+        $this->productAttributeValueReaders = $productAttributeValueReaders instanceof Traversable
             ? iterator_to_array($productAttributeValueReaders)
             : $productAttributeValueReaders;
     }

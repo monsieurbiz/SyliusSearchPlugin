@@ -46,7 +46,7 @@ class DocumentableRegistryPass implements CompilerPassInterface
      */
     private function validateDocumentableResource(string $class): void
     {
-        $interfaces = (array) (class_implements($class) ?? []);
+        $interfaces = (array) class_implements($class);
 
         if (!\in_array(DocumentableInterface::class, $interfaces, true)) {
             throw new InvalidArgumentException(sprintf('Class "%s" must implement "%s" to be registered as a Documentable.', $class, DocumentableInterface::class));
@@ -55,7 +55,7 @@ class DocumentableRegistryPass implements CompilerPassInterface
 
     private function isPrefixedDocumentableClass(string $class): bool
     {
-        $interfaces = (array) (class_implements($class) ?? []);
+        $interfaces = (array) class_implements($class);
 
         return \in_array(PrefixedDocumentableInterface::class, $interfaces, true);
     }
@@ -66,6 +66,7 @@ class DocumentableRegistryPass implements CompilerPassInterface
 
         $searchSettings = [];
         if ($container->hasParameter('monsieurbiz.settings.config.plugins')) {
+            /** @var array $searchSettings */
             $searchSettings = $container->getParameter('monsieurbiz.settings.config.plugins');
         }
 

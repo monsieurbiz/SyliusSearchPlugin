@@ -98,7 +98,7 @@ class SearchController extends AbstractController
      */
     public function postAction(Request $request): RedirectResponse
     {
-        $query = (array) $request->request->all()['monsieurbiz_searchplugin_search'] ?? [];
+        $query = (array) ($request->request->all()['monsieurbiz_searchplugin_search'] ?? []);
         $query = $query['query'] ?? '';
 
         // With Apache a URL with a encoded slash (%2F) is provoking a 404 error on the server level
@@ -143,13 +143,15 @@ class SearchController extends AbstractController
         string $documentType = 'monsieurbiz_product'
     ): Response {
         $documentable = $this->getDocumentable($documentType);
+        /** @var array $syliusAttribute */
+        $syliusAttribute = $request->attributes->get('_sylius', []);
         $requestConfiguration = new RequestConfiguration(
             $request,
             RequestInterface::TAXON_TYPE,
             $documentable,
             $this->searchSettings,
             $this->channelContext,
-            new Parameters($this->parametersParser->parseRequestValues($request->attributes->get('_sylius', []), $request))
+            new Parameters($this->parametersParser->parseRequestValues($syliusAttribute, $request))
         );
         $result = $this->search->search($requestConfiguration);
 

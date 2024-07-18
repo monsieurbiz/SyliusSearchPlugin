@@ -26,12 +26,13 @@ class ProductAttributeRepository implements ProductAttributeRepositoryInterface
 
     public function findIsSearchableOrFilterable(): array
     {
+        /** @phpstan-ignore-next-line */
         return $this->attributeRepository->createQueryBuilder('o')
             ->innerJoin('o.translations', 'translation')
             ->andWhere('o.searchable = true')
             ->orWhere('o.filterable = true')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

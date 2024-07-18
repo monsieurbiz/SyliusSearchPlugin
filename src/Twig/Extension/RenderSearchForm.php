@@ -59,6 +59,7 @@ class RenderSearchForm extends AbstractExtension
 
         $request = $this->requestStack->getCurrentRequest();
         $template = $template ?? '@MonsieurBizSyliusSearchPlugin/Search/_form.html.twig';
+        /** @var string $query */
         $query = null !== $request ? $request->get('query', '') : '';
 
         return new Markup($this->templatingEngine->render($template, [

@@ -49,6 +49,17 @@ class LimitsSearchType extends AbstractType
                 'allow_delete' => true,
             ]
         );
+        $builder->add(
+            'taxon',
+            CollectionType::class,
+            [
+                'entry_type' => IntegerType::class,
+                'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_taxon_' . $documentable->getIndexCode(),
+                'required' => true,
+                'allow_add' => true,
+                'allow_delete' => true,
+            ]
+        );
     }
 
     public function configureOptions(OptionsResolver $resolver): void

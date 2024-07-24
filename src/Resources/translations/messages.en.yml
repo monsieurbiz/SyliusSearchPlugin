@@ -18,6 +18,7 @@ monsieurbiz_searchplugin:
       instant_search_enabled_monsieurbiz_product: 'Product: Instant search enabled'
       limit_search_monsieurbiz_product: 'Product: Available limits for search'
       limit_instant_search_monsieurbiz_product: 'Product: Available limits for instant search'
+      limit_taxon_monsieurbiz_product: 'Product: Available limits for category overview'
   form:
     query: 'Search'
     query_placeholder: 'Search…'

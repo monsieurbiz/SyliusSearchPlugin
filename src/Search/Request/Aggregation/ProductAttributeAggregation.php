@@ -49,13 +49,13 @@ final class ProductAttributeAggregation implements AggregationBuilderInterface
             ->setFilter($filterQuery)
             ->addAggregation(
                 /** @phpstan-ignore-next-line */
-                $qb->aggregation()->nested($aggregation->getCode(), sprintf('attributes.%s', $aggregation->getCode()))
+                $qb->aggregation()->nested($aggregation->getCode(), \sprintf('attributes.%s', $aggregation->getCode()))
                     ->addAggregation(
                         $qb->aggregation()->terms('names')
-                            ->setField(sprintf('attributes.%s.name', $aggregation->getCode()))
+                            ->setField(\sprintf('attributes.%s.name', $aggregation->getCode()))
                             ->addAggregation(
                                 $qb->aggregation()->terms('values')
-                                    ->setField(sprintf('attributes.%s.value.keyword', $aggregation->getCode()))
+                                    ->setField(\sprintf('attributes.%s.value.keyword', $aggregation->getCode()))
                             )
                     )
             )

@@ -28,12 +28,12 @@ final class AttributesPostFilter implements PostFilterInterface
             $attributeValueQuery = $qb->query()->bool();
 
             foreach ($values as $value) {
-                $termQuery = $qb->query()->term([sprintf('attributes.%s.value.keyword', $field) => SlugHelper::toLabel($value)]);
+                $termQuery = $qb->query()->term([\sprintf('attributes.%s.value.keyword', $field) => SlugHelper::toLabel($value)]);
                 $attributeValueQuery->addShould($termQuery); // todo configure the "and" or "or"
             }
 
             $attributeQuery = $qb->query()->nested();
-            $attributeQuery->setPath(sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
+            $attributeQuery->setPath(\sprintf('attributes.%s', $field))->setQuery($attributeValueQuery);
 
             $boolQuery->addMust($attributeQuery);
         }

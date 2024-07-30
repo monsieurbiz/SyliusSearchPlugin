@@ -34,19 +34,19 @@ final class OptionsPostFilter implements PostFilterInterface
         foreach ($requestConfiguration->getAppliedFilters('options') as $field => $values) {
             $optionValueQuery = $qb->query()->bool();
             foreach ($values as $value) {
-                $termQuery = $qb->query()->term([sprintf('options.%s.values.value.keyword', $field) => SlugHelper::toLabel($value)]);
+                $termQuery = $qb->query()->term([\sprintf('options.%s.values.value.keyword', $field) => SlugHelper::toLabel($value)]);
                 $optionValueQuery->addShould($termQuery); // todo configure the "and" or "or"
             }
 
             $optionQuery = $qb->query()->nested();
             $condition = $qb->query()->bool()
-                ->addMust($qb->query()->term([sprintf('options.%s.values.enabled', $field) => true]))
+                ->addMust($qb->query()->term([\sprintf('options.%s.values.enabled', $field) => true]))
             ;
             if ($this->enableStockFilter) {
-                $condition->addMust($qb->query()->term([sprintf('options.%s.values.is_in_stock', $field) => true]));
+                $condition->addMust($qb->query()->term([\sprintf('options.%s.values.is_in_stock', $field) => true]));
             }
             $condition->addMust($optionValueQuery);
-            $optionQuery->setPath(sprintf('options.%s.values', $field))->setQuery($condition);
+            $optionQuery->setPath(\sprintf('options.%s.values', $field))->setQuery($condition);
 
             $boolQuery->addMust($optionQuery);
         }

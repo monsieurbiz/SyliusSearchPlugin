@@ -171,7 +171,7 @@ class SearchController extends AbstractController
             /** @phpstan-ignore-next-line */
             return $this->documentableRegistry->get('search.documentable.' . $documentType);
         } catch (NonExistingServiceException $exception) {
-            throw new NotFoundHttpException(sprintf('Documentable "%s" not found', $documentType));
+            throw new NotFoundHttpException(\sprintf('Documentable "%s" not found', $documentType));
         }
     }
 

@@ -55,15 +55,15 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
 
         $qb = new QueryBuilder();
         $optionBoolConditions = $qb->query()->bool()
-                ->addMust($qb->query()->term([sprintf('options.%s.values.enabled', $aggregation->getCode()) => ['value' => true]]))
+                ->addMust($qb->query()->term([\sprintf('options.%s.values.enabled', $aggregation->getCode()) => ['value' => true]]))
         ;
         if ($this->enableStockFilter) {
-            $optionBoolConditions->addMust($qb->query()->term([sprintf('options.%s.values.is_in_stock', $aggregation->getCode()) => ['value' => true]]));
+            $optionBoolConditions->addMust($qb->query()->term([\sprintf('options.%s.values.is_in_stock', $aggregation->getCode()) => ['value' => true]]));
         }
         $valuesAggregation = $qb->aggregation()->filter('values', $optionBoolConditions)
             ->addAggregation(
                 $qb->aggregation()->terms('values')
-                    ->setField(sprintf('options.%s.values.value.keyword', $aggregation->getCode()))
+                    ->setField(\sprintf('options.%s.values.value.keyword', $aggregation->getCode()))
             )
         ;
 
@@ -72,12 +72,12 @@ final class ProductOptionAggregation implements AggregationBuilderInterface
             ->setFilter($filterQuery)
             ->addAggregation(
                 /** @phpstan-ignore-next-line */
-                $qb->aggregation()->nested($aggregation->getCode(), sprintf('options.%s', $aggregation->getCode()))
+                $qb->aggregation()->nested($aggregation->getCode(), \sprintf('options.%s', $aggregation->getCode()))
                     ->addAggregation(
                         $qb->aggregation()->terms('names')
-                            ->setField(sprintf('options.%s.name', $aggregation->getCode()))
+                            ->setField(\sprintf('options.%s.name', $aggregation->getCode()))
                             ->addAggregation(
-                                $qb->aggregation()->nested('values', sprintf('options.%s.values', $aggregation->getCode()))
+                                $qb->aggregation()->nested('values', \sprintf('options.%s.values', $aggregation->getCode()))
                                     ->addAggregation(
                                         $valuesAggregation
                                     )

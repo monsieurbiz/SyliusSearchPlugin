@@ -68,7 +68,7 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
         $mapping = (array) $mappingProviderEvent->getMapping();
         if (empty($mapping['mappings'] ?? [])) {
-            throw new InvalidException(sprintf('Mapping no found for "%s" not found. Please check your configuration.', $indexName));
+            throw new InvalidException(\sprintf('Mapping no found for "%s" not found. Please check your configuration.', $indexName));
         }
 
         return $mapping;

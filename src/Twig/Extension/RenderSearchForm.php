@@ -24,24 +24,12 @@ use Twig\TwigFunction;
 
 class RenderSearchForm extends AbstractExtension
 {
-    private FormFactoryInterface $formFactory;
-
-    private Environment $templatingEngine;
-
-    private RequestStack $requestStack;
-
-    private ElasticsearchCheckerInterface $elasticsearchChecker;
-
     public function __construct(
-        FormFactoryInterface $formFactory,
-        Environment $templatingEngine,
-        RequestStack $requestStack,
-        ElasticsearchCheckerInterface $elasticsearchChecker
+        private FormFactoryInterface $formFactory,
+        private Environment $templatingEngine,
+        private RequestStack $requestStack,
+        private ElasticsearchCheckerInterface $elasticsearchChecker
     ) {
-        $this->formFactory = $formFactory;
-        $this->templatingEngine = $templatingEngine;
-        $this->requestStack = $requestStack;
-        $this->elasticsearchChecker = $elasticsearchChecker;
     }
 
     public function getFunctions()

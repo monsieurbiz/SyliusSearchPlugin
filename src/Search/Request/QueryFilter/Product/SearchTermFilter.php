@@ -54,13 +54,13 @@ final class SearchTermFilter extends BaseSearchTermFilter
 
             $attributeValueQuery = $qb->query()->multi_match();
             $attributeValueQuery->setFields([
-                sprintf('attributes.%s.value^%d', $productAttribute->getCode(), $productAttribute->getSearchWeight()),
+                \sprintf('attributes.%s.value^%d', $productAttribute->getCode(), $productAttribute->getSearchWeight()),
             ]);
             $attributeValueQuery->setQuery($requestConfiguration->getQueryText());
             $attributeValueQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
 
             $attributeQuery = $qb->query()->nested();
-            $attributeQuery->setPath(sprintf('attributes.%s', $productAttribute->getCode()))->setQuery($attributeValueQuery);
+            $attributeQuery->setPath(\sprintf('attributes.%s', $productAttribute->getCode()))->setQuery($attributeValueQuery);
 
             $searchQuery->addShould($attributeQuery);
         }
@@ -76,13 +76,13 @@ final class SearchTermFilter extends BaseSearchTermFilter
 
             $attributeValueQuery = $qb->query()->multi_match();
             $attributeValueQuery->setFields([
-                sprintf('options.%s.values.value^%d', $productOption->getCode(), $productOption->getSearchWeight()),
+                \sprintf('options.%s.values.value^%d', $productOption->getCode(), $productOption->getSearchWeight()),
             ]);
             $attributeValueQuery->setQuery($requestConfiguration->getQueryText());
             $attributeValueQuery->setFuzziness(MultiMatch::FUZZINESS_AUTO);
 
             $attributeQuery = $qb->query()->nested();
-            $attributeQuery->setPath(sprintf('options.%s.values', $productOption->getCode()))->setQuery($attributeValueQuery);
+            $attributeQuery->setPath(\sprintf('options.%s.values', $productOption->getCode()))->setQuery($attributeValueQuery);
 
             $searchQuery->addShould($attributeQuery);
         }

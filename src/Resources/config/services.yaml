@@ -269,6 +269,10 @@ services:
     arguments:
       $elasticsearchChecker: '@monsieurbiz.search.checker.elasticsearch_checker'
 
+  MonsieurBiz\SyliusSearchPlugin\Twig\Extension\SearchExtension:
+    arguments:
+      $elasticsearchChecker: '@monsieurbiz.search.checker.elasticsearch_checker'
+
   # Routing Context
   MonsieurBiz\SyliusSearchPlugin\Routing\RequestContext:
     decorates: router.request_context

@@ -49,7 +49,7 @@ class DocumentableRegistryPass implements CompilerPassInterface
         $interfaces = (array) class_implements($class);
 
         if (!\in_array(DocumentableInterface::class, $interfaces, true)) {
-            throw new InvalidArgumentException(sprintf('Class "%s" must implement "%s" to be registered as a Documentable.', $class, DocumentableInterface::class));
+            throw new InvalidArgumentException(\sprintf('Class "%s" must implement "%s" to be registered as a Documentable.', $class, DocumentableInterface::class));
         }
     }
 

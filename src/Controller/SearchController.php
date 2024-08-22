@@ -35,19 +35,19 @@ use Symfony\Component\Intl\Currencies;
 
 class SearchController extends AbstractController
 {
-    private Search $search;
+    protected Search $search;
 
-    private CurrencyContextInterface $currencyContext;
+    protected CurrencyContextInterface $currencyContext;
 
-    private LocaleContextInterface $localeContext;
+    protected LocaleContextInterface $localeContext;
 
-    private ChannelContextInterface $channelContext;
+    protected ChannelContextInterface $channelContext;
 
-    private SettingsInterface $searchSettings;
+    protected SettingsInterface $searchSettings;
 
-    private ServiceRegistryInterface $documentableRegistry;
+    protected ServiceRegistryInterface $documentableRegistry;
 
-    private ParametersParserInterface $parametersParser;
+    protected ParametersParserInterface $parametersParser;
 
     public function __construct(
         Search $search,
@@ -162,7 +162,7 @@ class SearchController extends AbstractController
         ]);
     }
 
-    private function getDocumentable(?string $documentType): DocumentableInterface
+    protected function getDocumentable(?string $documentType): DocumentableInterface
     {
         if (null === $documentType) {
             $documentables = $this->getSearchEnabledDocumentables();
@@ -178,14 +178,14 @@ class SearchController extends AbstractController
         }
     }
 
-    private function getSearchEnabledDocumentables(): array
+    protected function getSearchEnabledDocumentables(): array
     {
         return array_filter($this->documentableRegistry->all(), function (DocumentableInterface $documentable) {
             return (bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'search_enabled__' . $documentable->getIndexCode());
         });
     }
 
-    private function getInstantSearchEnabledDocumentables(): array
+    protected function getInstantSearchEnabledDocumentables(): array
     {
         return array_filter($this->documentableRegistry->all(), function (DocumentableInterface $documentable) {
             return (bool) $this->searchSettings->getCurrentValue($this->channelContext->getChannel(), null, 'instant_search_enabled__' . $documentable->getIndexCode());

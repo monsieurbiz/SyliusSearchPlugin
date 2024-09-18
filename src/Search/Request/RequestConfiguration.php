@@ -67,6 +67,8 @@ final class RequestConfiguration
             return \is_array($query) ? array_filter($query) : $query;
         }, $requestQuery);
 
+        $this->manageRangeField('price');
+
         return null !== $type ? ($requestQuery[$type] ?? []) : $requestQuery;
     }
 
@@ -80,6 +82,41 @@ final class RequestConfiguration
     {
         /** @phpstan-ignore-next-line */
         return (int) $this->request->get('page', 1);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function manageRangeField(string $field): void
+    {
+        $range = $this->request->get($field, []);
+        if (!\is_array($range) || empty($range)) {
+            return;
+        }
+
+        /** @var array $range */
+
+        // Reverse min and max if min is greater than max
+        if (isset($range['min'], $range['max'])) {
+            $min = (float) $range['min'];
+            $max = (float) $range['max'];
+            if ($min > $max) {
+                $range['min'] = $range['max'];
+                $range['max'] = $range['min'];
+            }
+        }
+
+        // Remove min value is 0 or less
+        if (isset($range['min']) && 0 >= (float) $range['min']) {
+            unset($range['min']);
+        }
+
+        // Remove max value if it is 0 or less
+        if (isset($range['max']) && 0 >= (float) $range['max']) {
+            unset($range['max']);
+        }
+
+        $this->request->query->set($field, $range);
     }
 
     public function getLimit(): int

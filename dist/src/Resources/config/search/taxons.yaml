@@ -16,7 +16,7 @@ monsieurbiz_sylius_search:
         instant: '@MonsieurBizSyliusSearchPlugin/Instant/Taxon/_box.html.twig'
       #mapping_provider: '...' # by default MonsieurBiz\SyliusSearchPlugin\Mapping\YamlWithLocaleProvider
       datasource: 'App\Search\Model\Datasource\TaxonDatasource' # by default MonsieurBiz\SyliusSearchPlugin\Model\Datasource\RepositoryDatasource
-      position: -1
+      position: 2
   automapper_classes:
     sources:
       taxon: '%sylius.model.taxon.class%'

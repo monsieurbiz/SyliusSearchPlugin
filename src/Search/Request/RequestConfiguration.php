@@ -101,8 +101,9 @@ final class RequestConfiguration
             $min = (float) $range['min'];
             $max = (float) $range['max'];
             if ($min > $max) {
+                $min = $range['min']; // Take the original value, not casted
                 $range['min'] = $range['max'];
-                $range['max'] = $range['min'];
+                $range['max'] = $min;
             }
         }
 

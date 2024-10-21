@@ -64,12 +64,14 @@ global.MonsieurBizInstantSearch = class {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    new MonsieurBizInstantSearch(
-        monsieurbizSearchPlugin.instantUrl,
-        monsieurbizSearchPlugin.searchInputSelector,
-        monsieurbizSearchPlugin.resultClosestSelector,
-        monsieurbizSearchPlugin.resultFindSelector,
-        monsieurbizSearchPlugin.keyUpTimeOut,
-        monsieurbizSearchPlugin.minQueryLength
-    );
+    if (monsieurbizSearchPlugin.instantEnabled) {
+        new MonsieurBizInstantSearch(
+            monsieurbizSearchPlugin.instantUrl,
+            monsieurbizSearchPlugin.searchInputSelector,
+            monsieurbizSearchPlugin.resultClosestSelector,
+            monsieurbizSearchPlugin.resultFindSelector,
+            monsieurbizSearchPlugin.keyUpTimeOut,
+            monsieurbizSearchPlugin.minQueryLength
+        );
+    }
 });

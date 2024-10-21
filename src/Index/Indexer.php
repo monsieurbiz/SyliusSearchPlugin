@@ -28,6 +28,7 @@ use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Model\TranslatableInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use TypeError;
 
 final class Indexer implements IndexerInterface
 {
@@ -192,7 +193,16 @@ final class Indexer implements IndexerInterface
             if (null !== $locale && $item instanceof TranslatableInterface) {
                 $item->setCurrentLocale($locale);
             }
-            $dto = $this->autoMapper->map($item, $documentable->getTargetClass());
+
+            try {
+                $dto = $this->autoMapper->map($item, $documentable->getTargetClass());
+            } catch (TypeError $e) {
+                $id = method_exists($item, 'getId') ? $item->getId() : 'unknown';
+                $output->writeln(\sprintf('Error while mapping %s (id: %s): %s', $item::class, $id, $e->getMessage()));
+
+                continue;
+            }
+
             // @phpstan-ignore-next-line
             $indexer->scheduleIndex($newIndex, new Document((string) $dto->getId(), $dto));
         }

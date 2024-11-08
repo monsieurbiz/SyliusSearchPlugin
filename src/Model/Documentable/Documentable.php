@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
-use Sylius\Component\Resource\Model\TranslatableInterface;
+use Sylius\Component\Resource\Model\TranslatableInterface as OldTranslatableInterface;
+use Sylius\Resource\Model\TranslatableInterface;
 
 class Documentable implements PrefixedDocumentableInterface
 {
@@ -68,7 +69,8 @@ class Documentable implements PrefixedDocumentableInterface
     {
         $interface = (array) class_implements($this->getSourceClass());
 
-        return \in_array(TranslatableInterface::class, $interface, true);
+        return \in_array(TranslatableInterface::class, $interface, true)
+            || \in_array(OldTranslatableInterface::class, $interface, true);
     }
 
     public function getTemplate(string $type): ?string

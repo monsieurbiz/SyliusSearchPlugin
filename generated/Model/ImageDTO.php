@@ -1,34 +1,71 @@
 <?php
 
-/*
- * This file is part of Monsieur Biz' Search plugin for Sylius.
- *
- * (c) Monsieur Biz <sylius@monsieurbiz.com>
- *
- * For the full copyright and license information, please view the LICENSE.txt
- * file that was distributed with this source code.
- */
-
-declare(strict_types=1);
-
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
 class ImageDTO
 {
     /**
-     * @var string|null
+     * @var array
+     */
+    protected $initialized = [];
+    public function isInitialized($property) : bool
+    {
+        return array_key_exists($property, $this->initialized);
+    }
+    /**
+     * 
+     *
+     * @var null|string
      */
     protected $path;
-
-    public function getPath(): ?string
+    /**
+     * 
+     *
+     * @var null|string
+     */
+    protected $type;
+    /**
+     * 
+     *
+     * @return null|string
+     */
+    public function getPath() : ?string
     {
         return $this->path;
     }
-
-    public function setPath(?string $path): self
+    /**
+     * 
+     *
+     * @param null|string $path
+     *
+     * @return self
+     */
+    public function setPath(?string $path) : self
     {
+        $this->initialized['path'] = true;
         $this->path = $path;
-
+        return $this;
+    }
+    /**
+     * 
+     *
+     * @return null|string
+     */
+    public function getType() : ?string
+    {
+        return $this->type;
+    }
+    /**
+     * 
+     *
+     * @param null|string $type
+     *
+     * @return self
+     */
+    public function setType(?string $type) : self
+    {
+        $this->initialized['type'] = true;
+        $this->type = $type;
         return $this;
     }
 }

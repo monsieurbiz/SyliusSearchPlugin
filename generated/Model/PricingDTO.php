@@ -1,85 +1,127 @@
 <?php
 
-/*
- * This file is part of Monsieur Biz' Search plugin for Sylius.
- *
- * (c) Monsieur Biz <sylius@monsieurbiz.com>
- *
- * For the full copyright and license information, please view the LICENSE.txt
- * file that was distributed with this source code.
- */
-
-declare(strict_types=1);
-
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
 class PricingDTO
 {
     /**
+     * @var array
+     */
+    protected $initialized = [];
+    public function isInitialized($property) : bool
+    {
+        return array_key_exists($property, $this->initialized);
+    }
+    /**
+     * 
+     *
      * @var string
      */
     protected $channelCode;
-
     /**
-     * @var int|null
+     * 
+     *
+     * @var null|int
      */
     protected $price;
-
     /**
-     * @var int|null
+     * 
+     *
+     * @var null|int
      */
     protected $originalPrice;
-
     /**
+     * 
+     *
      * @var bool
      */
     protected $priceReduced;
-
-    public function getChannelCode(): string
+    /**
+     * 
+     *
+     * @return string
+     */
+    public function getChannelCode() : string
     {
         return $this->channelCode;
     }
-
-    public function setChannelCode(string $channelCode): self
+    /**
+     * 
+     *
+     * @param string $channelCode
+     *
+     * @return self
+     */
+    public function setChannelCode(string $channelCode) : self
     {
+        $this->initialized['channelCode'] = true;
         $this->channelCode = $channelCode;
-
         return $this;
     }
-
-    public function getPrice(): ?int
+    /**
+     * 
+     *
+     * @return null|int
+     */
+    public function getPrice() : ?int
     {
         return $this->price;
     }
-
-    public function setPrice(?int $price): self
+    /**
+     * 
+     *
+     * @param null|int $price
+     *
+     * @return self
+     */
+    public function setPrice(?int $price) : self
     {
+        $this->initialized['price'] = true;
         $this->price = $price;
-
         return $this;
     }
-
-    public function getOriginalPrice(): ?int
+    /**
+     * 
+     *
+     * @return null|int
+     */
+    public function getOriginalPrice() : ?int
     {
         return $this->originalPrice;
     }
-
-    public function setOriginalPrice(?int $originalPrice): self
+    /**
+     * 
+     *
+     * @param null|int $originalPrice
+     *
+     * @return self
+     */
+    public function setOriginalPrice(?int $originalPrice) : self
     {
+        $this->initialized['originalPrice'] = true;
         $this->originalPrice = $originalPrice;
-
         return $this;
     }
-
-    public function getPriceReduced(): bool
+    /**
+     * 
+     *
+     * @return bool
+     */
+    public function getPriceReduced() : bool
     {
         return $this->priceReduced;
     }
-
-    public function setPriceReduced(bool $priceReduced): self
+    /**
+     * 
+     *
+     * @param bool $priceReduced
+     *
+     * @return self
+     */
+    public function setPriceReduced(bool $priceReduced) : self
     {
+        $this->initialized['priceReduced'] = true;
         $this->priceReduced = $priceReduced;
-
         return $this;
     }
 }

@@ -17,4 +17,15 @@ use Jacquesbh\Eater\Eater;
 
 class ProductDTO extends Eater
 {
+    public function getImagesByType(string $type): array
+    {
+        $images = $this->getData('images') ?? [];
+        if (!\is_array($images)) {
+            return [];
+        }
+
+        return array_filter($images, function ($image) use ($type) {
+            return \is_object($image) && method_exists($image, 'getType') && $image->getType() === $type;
+        });
+    }
 }

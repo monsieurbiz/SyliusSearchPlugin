@@ -24,6 +24,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude(
         [
+            'generated',
             'tests/Application',
         ]
     )

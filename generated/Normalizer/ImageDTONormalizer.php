@@ -52,6 +52,18 @@ if (!class_exists(Kernel::class) or (Kernel::MAJOR_VERSION >= 7 or Kernel::MAJOR
             elseif (\array_key_exists('path', $data) && $data['path'] === null) {
                 $object->setPath(null);
             }
+            if (\array_key_exists('type', $data) && $data['type'] !== null) {
+                $value_1 = $data['type'];
+                if (is_null($data['type'])) {
+                    $value_1 = $data['type'];
+                } elseif (is_string($data['type'])) {
+                    $value_1 = $data['type'];
+                }
+                $object->setType($value_1);
+            }
+            elseif (\array_key_exists('type', $data) && $data['type'] === null) {
+                $object->setType(null);
+            }
             return $object;
         }
         public function normalize(mixed $object, string $format = null, array $context = []) : array|string|int|float|bool|\ArrayObject|null
@@ -65,6 +77,15 @@ if (!class_exists(Kernel::class) or (Kernel::MAJOR_VERSION >= 7 or Kernel::MAJOR
                     $value = $object->getPath();
                 }
                 $data['path'] = $value;
+            }
+            if ($object->isInitialized('type') && null !== $object->getType()) {
+                $value_1 = $object->getType();
+                if (is_null($object->getType())) {
+                    $value_1 = $object->getType();
+                } elseif (is_string($object->getType())) {
+                    $value_1 = $object->getType();
+                }
+                $data['type'] = $value_1;
             }
             return $data;
         }
@@ -115,6 +136,18 @@ if (!class_exists(Kernel::class) or (Kernel::MAJOR_VERSION >= 7 or Kernel::MAJOR
             elseif (\array_key_exists('path', $data) && $data['path'] === null) {
                 $object->setPath(null);
             }
+            if (\array_key_exists('type', $data) && $data['type'] !== null) {
+                $value_1 = $data['type'];
+                if (is_null($data['type'])) {
+                    $value_1 = $data['type'];
+                } elseif (is_string($data['type'])) {
+                    $value_1 = $data['type'];
+                }
+                $object->setType($value_1);
+            }
+            elseif (\array_key_exists('type', $data) && $data['type'] === null) {
+                $object->setType(null);
+            }
             return $object;
         }
         /**
@@ -131,6 +164,15 @@ if (!class_exists(Kernel::class) or (Kernel::MAJOR_VERSION >= 7 or Kernel::MAJOR
                     $value = $object->getPath();
                 }
                 $data['path'] = $value;
+            }
+            if ($object->isInitialized('type') && null !== $object->getType()) {
+                $value_1 = $object->getType();
+                if (is_null($object->getType())) {
+                    $value_1 = $object->getType();
+                } elseif (is_string($object->getType())) {
+                    $value_1 = $object->getType();
+                }
+                $data['type'] = $value_1;
             }
             return $data;
         }

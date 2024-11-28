@@ -9,6 +9,12 @@
             "null",
             "string"
           ]
+        },
+        "type": {
+          "type": [
+            "null",
+            "string"
+          ]
         }
       }
     },

@@ -21,6 +21,12 @@ class ImageDTO
     /**
      * 
      *
+     * @var null|string
+     */
+    protected $type;
+    /**
+     * 
+     *
      * @return null|string
      */
     public function getPath() : ?string
@@ -38,6 +44,28 @@ class ImageDTO
     {
         $this->initialized['path'] = true;
         $this->path = $path;
+        return $this;
+    }
+    /**
+     * 
+     *
+     * @return null|string
+     */
+    public function getType() : ?string
+    {
+        return $this->type;
+    }
+    /**
+     * 
+     *
+     * @param null|string $type
+     *
+     * @return self
+     */
+    public function setType(?string $type) : self
+    {
+        $this->initialized['type'] = true;
+        $this->type = $type;
         return $this;
     }
 }

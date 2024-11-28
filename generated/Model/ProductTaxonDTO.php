@@ -1,51 +1,71 @@
 <?php
 
-/*
- * This file is part of Monsieur Biz' Search plugin for Sylius.
- *
- * (c) Monsieur Biz <sylius@monsieurbiz.com>
- *
- * For the full copyright and license information, please view the LICENSE.txt
- * file that was distributed with this source code.
- */
-
-declare(strict_types=1);
-
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Model;
 
 class ProductTaxonDTO
 {
     /**
+     * @var array
+     */
+    protected $initialized = [];
+    public function isInitialized($property) : bool
+    {
+        return array_key_exists($property, $this->initialized);
+    }
+    /**
+     * 
+     *
      * @var TaxonDTO
      */
     protected $taxon;
-
     /**
-     * @var int|null
+     * 
+     *
+     * @var null|int
      */
     protected $position;
-
-    public function getTaxon(): TaxonDTO
+    /**
+     * 
+     *
+     * @return TaxonDTO
+     */
+    public function getTaxon() : TaxonDTO
     {
         return $this->taxon;
     }
-
-    public function setTaxon(TaxonDTO $taxon): self
+    /**
+     * 
+     *
+     * @param TaxonDTO $taxon
+     *
+     * @return self
+     */
+    public function setTaxon(TaxonDTO $taxon) : self
     {
+        $this->initialized['taxon'] = true;
         $this->taxon = $taxon;
-
         return $this;
     }
-
-    public function getPosition(): ?int
+    /**
+     * 
+     *
+     * @return null|int
+     */
+    public function getPosition() : ?int
     {
         return $this->position;
     }
-
-    public function setPosition(?int $position): self
+    /**
+     * 
+     *
+     * @param null|int $position
+     *
+     * @return self
+     */
+    public function setPosition(?int $position) : self
     {
+        $this->initialized['position'] = true;
         $this->position = $position;
-
         return $this;
     }
 }

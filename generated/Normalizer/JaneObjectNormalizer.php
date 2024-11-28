@@ -1,74 +1,158 @@
 <?php
 
-/*
- * This file is part of Monsieur Biz' Search plugin for Sylius.
- *
- * (c) Monsieur Biz <sylius@monsieurbiz.com>
- *
- * For the full copyright and license information, please view the LICENSE.txt
- * file that was distributed with this source code.
- */
-
-declare(strict_types=1);
-
 namespace MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer;
 
 use MonsieurBiz\SyliusSearchPlugin\Generated\Runtime\Normalizer\CheckArray;
+use MonsieurBiz\SyliusSearchPlugin\Generated\Runtime\Normalizer\ValidatorTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
-class JaneObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
-{
-    use CheckArray;
-    use DenormalizerAwareTrait;
-    use NormalizerAwareTrait;
-
-    protected $normalizers = ['MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ImageDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ImageDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ChannelDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ChannelDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductTaxonDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ProductTaxonDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\TaxonDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\TaxonDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\ProductAttributeDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\ProductAttributeDTONormalizer', 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Model\\PricingDTO' => 'MonsieurBiz\\SyliusSearchPlugin\\Generated\\Normalizer\\PricingDTONormalizer', '\\Jane\\Component\\JsonSchemaRuntime\\Reference' => '\\MonsieurBiz\\SyliusSearchPlugin\\Generated\\Runtime\\Normalizer\\ReferenceNormalizer'];
-
-    protected $normalizersCache = [];
-
-    public function supportsDenormalization($data, $type, $format = null)
+use Symfony\Component\HttpKernel\Kernel;
+if (!class_exists(Kernel::class) or (Kernel::MAJOR_VERSION >= 7 or Kernel::MAJOR_VERSION === 6 and Kernel::MINOR_VERSION === 4)) {
+    class JaneObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
     {
-        return \array_key_exists($type, $this->normalizers);
+        use DenormalizerAwareTrait;
+        use NormalizerAwareTrait;
+        use CheckArray;
+        use ValidatorTrait;
+        protected $normalizers = [
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ImageDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ChannelDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ChannelDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ProductTaxonDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\TaxonDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\TaxonDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ProductAttributeDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\PricingDTONormalizer::class,
+            
+            \Jane\Component\JsonSchemaRuntime\Reference::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Runtime\Normalizer\ReferenceNormalizer::class,
+        ], $normalizersCache = [];
+        public function supportsDenormalization($data, $type, $format = null, array $context = []) : bool
+        {
+            return array_key_exists($type, $this->normalizers);
+        }
+        public function supportsNormalization($data, $format = null, array $context = []) : bool
+        {
+            return is_object($data) && array_key_exists(get_class($data), $this->normalizers);
+        }
+        public function normalize(mixed $object, string $format = null, array $context = []) : array|string|int|float|bool|\ArrayObject|null
+        {
+            $normalizerClass = $this->normalizers[get_class($object)];
+            $normalizer = $this->getNormalizer($normalizerClass);
+            return $normalizer->normalize($object, $format, $context);
+        }
+        public function denormalize(mixed $data, string $type, string $format = null, array $context = []) : mixed
+        {
+            $denormalizerClass = $this->normalizers[$type];
+            $denormalizer = $this->getNormalizer($denormalizerClass);
+            return $denormalizer->denormalize($data, $type, $format, $context);
+        }
+        private function getNormalizer(string $normalizerClass)
+        {
+            return $this->normalizersCache[$normalizerClass] ?? $this->initNormalizer($normalizerClass);
+        }
+        private function initNormalizer(string $normalizerClass)
+        {
+            $normalizer = new $normalizerClass();
+            $normalizer->setNormalizer($this->normalizer);
+            $normalizer->setDenormalizer($this->denormalizer);
+            $this->normalizersCache[$normalizerClass] = $normalizer;
+            return $normalizer;
+        }
+        public function getSupportedTypes(?string $format = null) : array
+        {
+            return [
+                
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ChannelDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\TaxonDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO::class => false,
+                \Jane\Component\JsonSchemaRuntime\Reference::class => false,
+            ];
+        }
     }
-
-    public function supportsNormalization($data, $format = null)
+} else {
+    class JaneObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
     {
-        return \is_object($data) && \array_key_exists($data::class, $this->normalizers);
-    }
-
-    public function normalize($object, $format = null, array $context = [])
-    {
-        $normalizerClass = $this->normalizers[$object::class];
-        $normalizer = $this->getNormalizer($normalizerClass);
-
-        return $normalizer->normalize($object, $format, $context);
-    }
-
-    public function denormalize($data, $class, $format = null, array $context = [])
-    {
-        $denormalizerClass = $this->normalizers[$class];
-        $denormalizer = $this->getNormalizer($denormalizerClass);
-
-        return $denormalizer->denormalize($data, $class, $format, $context);
-    }
-
-    private function getNormalizer(string $normalizerClass)
-    {
-        return $this->normalizersCache[$normalizerClass] ?? $this->initNormalizer($normalizerClass);
-    }
-
-    private function initNormalizer(string $normalizerClass)
-    {
-        $normalizer = new $normalizerClass();
-        $normalizer->setNormalizer($this->normalizer);
-        $normalizer->setDenormalizer($this->denormalizer);
-        $this->normalizersCache[$normalizerClass] = $normalizer;
-
-        return $normalizer;
+        use DenormalizerAwareTrait;
+        use NormalizerAwareTrait;
+        use CheckArray;
+        use ValidatorTrait;
+        protected $normalizers = [
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ImageDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ChannelDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ChannelDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ProductTaxonDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\TaxonDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\TaxonDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\ProductAttributeDTONormalizer::class,
+            
+            \MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Normalizer\PricingDTONormalizer::class,
+            
+            \Jane\Component\JsonSchemaRuntime\Reference::class => \MonsieurBiz\SyliusSearchPlugin\Generated\Runtime\Normalizer\ReferenceNormalizer::class,
+        ], $normalizersCache = [];
+        public function supportsDenormalization($data, $type, $format = null, array $context = []) : bool
+        {
+            return array_key_exists($type, $this->normalizers);
+        }
+        public function supportsNormalization($data, $format = null, array $context = []) : bool
+        {
+            return is_object($data) && array_key_exists(get_class($data), $this->normalizers);
+        }
+        /**
+         * @return array|string|int|float|bool|\ArrayObject|null
+         */
+        public function normalize($object, $format = null, array $context = [])
+        {
+            $normalizerClass = $this->normalizers[get_class($object)];
+            $normalizer = $this->getNormalizer($normalizerClass);
+            return $normalizer->normalize($object, $format, $context);
+        }
+        /**
+         * @return mixed
+         */
+        public function denormalize($data, $type, $format = null, array $context = [])
+        {
+            $denormalizerClass = $this->normalizers[$type];
+            $denormalizer = $this->getNormalizer($denormalizerClass);
+            return $denormalizer->denormalize($data, $type, $format, $context);
+        }
+        private function getNormalizer(string $normalizerClass)
+        {
+            return $this->normalizersCache[$normalizerClass] ?? $this->initNormalizer($normalizerClass);
+        }
+        private function initNormalizer(string $normalizerClass)
+        {
+            $normalizer = new $normalizerClass();
+            $normalizer->setNormalizer($this->normalizer);
+            $normalizer->setDenormalizer($this->denormalizer);
+            $this->normalizersCache[$normalizerClass] = $normalizer;
+            return $normalizer;
+        }
+        public function getSupportedTypes(?string $format = null) : array
+        {
+            return [
+                
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ImageDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ChannelDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductTaxonDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\TaxonDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\ProductAttributeDTO::class => false,
+                \MonsieurBiz\SyliusSearchPlugin\Generated\Model\PricingDTO::class => false,
+                \Jane\Component\JsonSchemaRuntime\Reference::class => false,
+            ];
+        }
     }
 }

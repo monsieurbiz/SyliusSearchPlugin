@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\MessageHandler;
 
+use Exception;
 use MonsieurBiz\SyliusSearchPlugin\Index\IndexerInterface;
 use MonsieurBiz\SyliusSearchPlugin\Message\ProductToDeleteFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
+use Psr\Log\LoggerInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -25,12 +27,16 @@ class ProductToDeleteFromIdsHandler implements MessageHandlerInterface
 
     private ServiceRegistryInterface $documentableRegistry;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         IndexerInterface $indexer,
-        ServiceRegistryInterface $documentableRegistry
+        ServiceRegistryInterface $documentableRegistry,
+        LoggerInterface $logger
     ) {
         $this->indexer = $indexer;
         $this->documentableRegistry = $documentableRegistry;
+        $this->logger = $logger;
     }
 
     public function __invoke(ProductToDeleteFromIds $message): void
@@ -38,9 +44,15 @@ class ProductToDeleteFromIdsHandler implements MessageHandlerInterface
         /** @var DocumentableInterface $documentable */
         $documentable = $this->documentableRegistry->get('search.documentable.monsieurbiz_product');
 
-        $this->indexer->deleteByDocumentIds(
-            $documentable,
-            $message->getProductIds()
-        );
+        try {
+            $this->indexer->deleteByDocumentIds(
+                $documentable,
+                $message->getProductIds()
+            );
+        } catch (Exception $e) {
+            $this->logger->error('An error occurred while deleting products from search index', [
+                'exception' => $e,
+            ]);
+        }
     }
 }

@@ -60,7 +60,7 @@ class YamlWithLocaleProvider implements MappingProviderInterface
             $mapping = $this->appendLocaleAnalyzers($configurationDirectory, $mapping, $locale);
         }
 
-        $mappingProviderEvent = new MappingProviderEvent($context['index_code'] ?? $indexName, new ArrayObject($mapping));
+        $mappingProviderEvent = new MappingProviderEvent($context['index_code'] ?? $indexName, new ArrayObject($mapping), $context);
         $this->eventDispatcher->dispatch(
             $mappingProviderEvent,
             MappingProviderEvent::EVENT_NAME

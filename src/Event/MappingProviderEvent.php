@@ -27,13 +27,16 @@ class MappingProviderEvent extends Event
      */
     private ?ArrayObject $mapping;
 
+    private array $context;
+
     /**
      * @param ArrayObject<string, array>|null $mapping
      */
-    public function __construct(string $indexCode, ?ArrayObject $mapping)
+    public function __construct(string $indexCode, ?ArrayObject $mapping, array $context = [])
     {
         $this->indexCode = $indexCode;
         $this->mapping = $mapping;
+        $this->context = $context;
     }
 
     public function getIndexCode(): string
@@ -47,5 +50,10 @@ class MappingProviderEvent extends Event
     public function getMapping(): ?ArrayObject
     {
         return $this->mapping;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 }

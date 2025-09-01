@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
 use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
+use MonsieurBiz\SyliusSearchPlugin\Form\Type\SearchType;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestInterface;
@@ -98,8 +99,15 @@ class SearchController extends AbstractController
      */
     public function postAction(Request $request): RedirectResponse
     {
-        $query = (array) ($request->request->all()['monsieurbiz_searchplugin_search'] ?? []);
-        $query = $query['query'] ?? '';
+        $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createNotFoundException();
+        }
+
+        /** @var array $data */
+        $data = $form->getData();
+        $query = $data['query'] ?? '';
 
         // With Apache a URL with a encoded slash (%2F) is provoking a 404 error on the server level
         return $this->redirect(

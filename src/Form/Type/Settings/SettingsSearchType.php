@@ -15,6 +15,7 @@ namespace MonsieurBiz\SyliusSearchPlugin\Form\Type\Settings;
 
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSettingsPlugin\Form\AbstractSettingsType;
+use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -43,8 +44,12 @@ class SettingsSearchType extends AbstractSettingsType
             );
             /** @var array $optionsData */
             $optionsData = $options['data'] ?? [];
+            /** @var SettingsInterface $settings */
+            $settings = $options['settings'];
             $subOptions = [];
-            $subOptions['data'] = $optionsData['limits__' . $documentable->getIndexCode()] ?? [];
+            $subOptions['data'] = $optionsData['limits__' . $documentable->getIndexCode()]
+                ?? $settings->getCurrentValue(null, null, 'limits__' . $documentable->getIndexCode())
+                ?? $documentable->getLimits(null);
             $subOptions['documentable'] = $documentable;
             $this->addWithDefaultCheckbox(
                 $builder,

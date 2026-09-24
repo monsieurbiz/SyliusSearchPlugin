@@ -1,0 +1,11 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+<div class="monsieurbiz-search-form">
+        {{ form_start(form, {'action': path('monsieurbiz_search_post'), 'method': 'POST', 'attr': {'class': 'position-relative autocomplete-search', 'role': 'search', 'autocomplete': 'off'}}) }}
+        {{ form_errors(form) }}
+        <div class="input-group">
+            {{ form_widget(form.query, {'value': query, 'attr': {'aria-label': 'sylius.ui.search'|trans, 'aria-expanded': 'false'}}) }}
+            {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+        </div>
+        <div class="autocomplete-results position-absolute start-0 end-0 bg-body border rounded shadow p-3" style="display: none; z-index: 1050; max-height: 70vh; overflow-y: auto;" aria-live="polite"></div>
+        {{ form_end(form) }}
+</div>

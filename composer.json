@@ -5,14 +5,15 @@
     "description": "A search plugin using Elasticsearch for Sylius.",
     "license": "MIT",
     "require": {
-        "babdev/pagerfanta-bundle": "^2.5 || ^3.0",
+        "babdev/pagerfanta-bundle": "^4.4",
         "jacquesbh/eater": "^2.0",
-        "jane-php/automapper-bundle": "^7.1",
-        "jolicode/elastically": "^1.4.0",
-        "monsieurbiz/sylius-settings-plugin": "^1.2",
-        "php": "^8.1",
-        "sylius/sylius": ">=1.12 <2.0",
-        "symfony/messenger": "^4.4 || ^5.2 || ^6.0"
+        "jane-php/json-schema-runtime": "^7.14",
+        "jolicode/elastically": "^1.9.2",
+        "monsieurbiz/sylius-settings-plugin": "^2.0.4",
+        "php": "^8.2",
+        "sylius/sylius": "~2.0",
+        "symfony/messenger": "^6.4 || ^7.2",
+        "symfony/property-access": "^6.4 || ^7.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.16",
@@ -31,6 +32,11 @@
             "MonsieurBiz\\SyliusSearchPlugin\\Generated\\": "generated/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "MonsieurBiz\\SyliusSearchPlugin\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
@@ -44,7 +50,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-upgrade-2.x": "3.0-dev"
         },
         "symfony": {
             "docker": false,

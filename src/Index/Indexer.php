@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Index;
 
-use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Proxy;
 use Elastica\Document;
-use Jane\Component\AutoMapper\AutoMapperInterface;
 use JoliCode\Elastically\Indexer as ElasticallyIndexer;
+use MonsieurBiz\SyliusSearchPlugin\Mapper\DocumentMapperInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\PrefixedDocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\ClientFactory;
@@ -25,7 +25,7 @@ use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
-use Sylius\Component\Resource\Model\TranslatableInterface;
+use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use TypeError;
@@ -40,7 +40,7 @@ final class Indexer implements IndexerInterface
 
     private EntityManagerInterface $entityManager;
 
-    private AutoMapperInterface $autoMapper;
+    private DocumentMapperInterface $documentMapper;
 
     private ClientFactory $clientFactory;
 
@@ -48,13 +48,13 @@ final class Indexer implements IndexerInterface
         ServiceRegistryInterface $documentableRegistry,
         ChannelRepositoryInterface $channelRepository,
         EntityManagerInterface $entityManager,
-        AutoMapperInterface $autoMapper,
+        DocumentMapperInterface $documentMapper,
         ClientFactory $clientFactory
     ) {
         $this->documentableRegistry = $documentableRegistry;
         $this->channelRepository = $channelRepository;
         $this->entityManager = $entityManager;
-        $this->autoMapper = $autoMapper;
+        $this->documentMapper = $documentMapper;
         $this->clientFactory = $clientFactory;
     }
 
@@ -94,7 +94,7 @@ final class Indexer implements IndexerInterface
             if (null !== $locale && $document instanceof TranslatableInterface) {
                 $document->setCurrentLocale($locale);
             }
-            $dto = $this->autoMapper->map($document, $documentable->getTargetClass());
+            $dto = $this->documentMapper->map($document, $documentable->getTargetClass());
             // @phpstan-ignore-next-line
             $indexer->scheduleIndex($index, new Document((string) $dto->getId(), $dto));
         }
@@ -148,7 +148,7 @@ final class Indexer implements IndexerInterface
             foreach ($enabledChannels as $channel) {
                 $this->locales = array_merge(
                     $this->locales,
-                    $channel->getLocales()->map(function (LocaleInterface $locale): string { return $locale->getCode() ?? ''; })->toArray()
+                    $channel->getLocales()->map(static function (LocaleInterface $locale): string { return $locale->getCode() ?? ''; })->toArray()
                 );
             }
             $this->locales = array_unique(array_filter($this->locales));
@@ -195,12 +195,12 @@ final class Indexer implements IndexerInterface
             }
 
             try {
-                $dto = $this->autoMapper->map($item, $documentable->getTargetClass());
+                $dto = $this->documentMapper->map($item, $documentable->getTargetClass());
             } catch (TypeError $e) {
                 $id = method_exists($item, 'getId') ? $item->getId() : 'unknown';
                 $output->writeln(\sprintf('Error while mapping %s (id: %s): %s', $item::class, $id, $e->getMessage()));
 
-                continue;
+                throw $e;
             }
 
             // @phpstan-ignore-next-line
@@ -231,8 +231,8 @@ final class Indexer implements IndexerInterface
             return $entity;
         }
 
-        // Clear the entity manager to detach the proxy object
-        $this->entityManager->clear($entity::class); /** @phpstan-ignore-line */
+        // Detach only this proxy; class-scoped clear was removed in ORM 3.
+        $this->entityManager->detach($entity);
         // Retrieve the original class name
         $entityClassName = $this->entityManager->getClassMetadata($entity::class)->rootEntityName;
 

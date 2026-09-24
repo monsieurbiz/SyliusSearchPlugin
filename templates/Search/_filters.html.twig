@@ -1,0 +1,46 @@
+<div class="card card-body mbiz-sylius-search-filters">
+    <h2 class="h5 mb-3">
+        {{ 'monsieurbiz_searchplugin.filters.filter_results' | trans }}
+    </h2>
+
+    {% if result.filters|length == 0 %}
+        <div>
+            {{ 'monsieurbiz_searchplugin.filters.no_filter'|trans }}
+        </div>
+    {% else %}
+        {% set searchQuery = app.request.attributes.get('_route_params').query|default('') %}
+        {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({query: searchQuery})) %}
+        <form name="filters-form" method="get" action="{{ path }}">
+
+            {% for filter in result.filters %}
+                {% include '@MonsieurBizSyliusSearchPlugin/Search/_filter.html.twig' with {'filter': filter} %}
+            {% endfor %}
+
+            {# Don't loose current document_type #}
+            {% set documentType = app.request.query.all()['document_type']|default() %}
+            {% if documentType is not empty %}
+                <input type="hidden" name="document_type" value="{{ documentType|escape('html_attr') }}" />
+            {% endif %}
+
+            {# Don't loose current sorting #}
+            {% set sorting = app.request.query.all()['sorting']|default() %}
+            {% if sorting is not empty %}
+                {% for sort, order in sorting %}
+                    <input type="hidden" name="sorting[{{ sort }}]" value="{{ order|escape('html_attr') }}" />
+                {% endfor %}
+            {% endif %}
+
+            {# Don't loose current limit #}
+            {% set limit = app.request.query.get('limit') %}
+            {% if limit is not empty %}
+                <input type="hidden" name="limit" value="{{ limit|escape('html_attr') }}" />
+            {% endif %}
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        {{ 'monsieurbiz_searchplugin.filters.apply_filters' | trans }}
+                    </button>
+                </div>
+        </form>
+    {% endif %}
+
+</div>

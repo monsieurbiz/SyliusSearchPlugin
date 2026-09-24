@@ -15,10 +15,10 @@ namespace MonsieurBiz\SyliusSearchPlugin\Form\Type\Settings;
 
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\UX\LiveComponent\Form\Type\LiveCollectionType;
 
 class LimitsSearchType extends AbstractType
 {
@@ -29,7 +29,7 @@ class LimitsSearchType extends AbstractType
 
         $builder->add(
             'search',
-            CollectionType::class,
+            LiveCollectionType::class,
             [
                 'entry_type' => IntegerType::class,
                 'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_search_' . $documentable->getIndexCode(),
@@ -40,7 +40,7 @@ class LimitsSearchType extends AbstractType
         );
         $builder->add(
             'instant_search',
-            CollectionType::class,
+            LiveCollectionType::class,
             [
                 'entry_type' => IntegerType::class,
                 'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_instant_search_' . $documentable->getIndexCode(),
@@ -51,7 +51,7 @@ class LimitsSearchType extends AbstractType
         );
         $builder->add(
             'taxon',
-            CollectionType::class,
+            LiveCollectionType::class,
             [
                 'entry_type' => IntegerType::class,
                 'label' => 'monsieurbiz_searchplugin.admin.setting_form.limit_taxon_' . $documentable->getIndexCode(),

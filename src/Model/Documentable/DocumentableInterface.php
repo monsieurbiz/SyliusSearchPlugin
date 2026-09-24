@@ -27,6 +27,7 @@ interface DocumentableInterface
 
     public function getSourceClass(): string;
 
+    /** @return class-string */
     public function getTargetClass(): string;
 
     public function setDatasource(DatasourceInterface $datasource): void;

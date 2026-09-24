@@ -1,0 +1,3 @@
+analyzer:
+    search:
+        tokenizer: icu_tokenizer

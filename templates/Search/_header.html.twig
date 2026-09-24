@@ -1,0 +1,5 @@
+{% hook 'monsieurbiz_search.search.header.before' with { query, result } %}
+<h1 class="mb-4">
+    {{ 'monsieurbiz_searchplugin.search.result.search_result'|trans({'%query%': query, '%count%': result.count}) }}
+</h1>
+{% hook 'monsieurbiz_search.search.header.after' with { query, result } %}

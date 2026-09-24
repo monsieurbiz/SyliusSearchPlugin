@@ -1,2 +1,7 @@
 imports:
-    - { resource: "../../src/Resources/config/config.yaml" }
+    - { resource: "../search/config.yaml" }
+
+framework:
+    test: true
+    session:
+        storage_factory_id: session.storage.factory.mock_file

@@ -30,10 +30,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+#[\Symfony\Component\Console\Attribute\AsCommand(name: 'monsieurbiz:search:search')]
 class SearchCommand extends Command
 {
-    protected static $defaultName = 'monsieurbiz:search:search';
-
     private Search $search;
 
     private RequestStack $requestStack;
@@ -67,7 +66,7 @@ class SearchCommand extends Command
         $this->addOption('channel', 'c', InputOption::VALUE_OPTIONAL, 'Channel code', 'FASHION_WEB');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 

@@ -1,9 +1,0 @@
-{
-  "entrypoints": {
-    "monsieurbiz-search": {
-      "js": [
-        "/bundles/monsieurbizsyliussearchplugin/js/monsieurbiz-search.eb2121b2.js"
-      ]
-    }
-  }
-}

@@ -5,7 +5,7 @@
 You can create your own sorter service by implementing the `SorterInterface` interface.  
 For example, in your test application, [we have a short description sorter](../dist/src/Search/Request/Sorting/Product/ShortDescriptionSorter.php).
 
-Add [the tag `monsieurbiz.search.request.product_sorter` to your service](../dist/src/Resources/config/services.yaml#27).
+Add [the tag `monsieurbiz.search.request.product_sorter` to your service](../dist/config/search/services.yaml).
 
 ## Replace existing sorter
 
@@ -29,4 +29,4 @@ Override the [sorting.html.twig template](../dist/templates/bundles/MonsieurBizS
 
 ## Tips
 
-A text field can't be used for sorting. In this case, you can [create a "keyword" subfield](../dist/src/Resources/config/elasticsearch/monsieurbiz_product_mapping.yaml#L5).
+A text field can't be used for sorting. In this case, you can [create a "keyword" subfield](../dist/config/search/elasticsearch/monsieurbiz_product_mapping.yaml).

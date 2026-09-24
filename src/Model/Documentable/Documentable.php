@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Model\Documentable;
 
+use RuntimeException;
 use Sylius\Component\Resource\Model\TranslatableInterface as OldTranslatableInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 
@@ -62,6 +63,10 @@ class Documentable implements PrefixedDocumentableInterface
 
     public function getTargetClass(): string
     {
+        if (!class_exists($this->targetClass)) {
+            throw new RuntimeException('Invalid document target class: ' . $this->targetClass);
+        }
+
         return $this->targetClass;
     }
 

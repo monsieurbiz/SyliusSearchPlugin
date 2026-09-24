@@ -19,10 +19,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[\Symfony\Component\Console\Attribute\AsCommand(name: 'monsieurbiz:search:populate')]
 class PopulateCommand extends Command
 {
-    protected static $defaultName = 'monsieurbiz:search:populate';
-
     private IndexerInterface $indexer;
 
     public function __construct(IndexerInterface $indexer, $name = null)
@@ -36,7 +35,7 @@ class PopulateCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $this->indexer->indexAll($io);

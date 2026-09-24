@@ -43,7 +43,6 @@ class SearchableFixture extends AbstractResourceFixture implements SearchableFix
      */
     protected function configureResourceNode(ArrayNodeDefinition $resourceNode): void
     {
-        /** @phpstan-ignore-next-line */
         $resourceNode
             ->children()
             ->scalarNode('attribute')->end()

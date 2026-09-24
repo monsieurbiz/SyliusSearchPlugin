@@ -1,2 +1,2 @@
 monsieurbiz_search_plugin:
-    resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/routing.yaml"
+  resource: "@MonsieurBizSyliusSearchPlugin/config/routing.yaml"

@@ -6,6 +6,7 @@
 !/etc/build/.gitignore
 
 /tests/Application
+/tests/RecipeEndpoint
 
 /behat.yml
 /phpspec.yml

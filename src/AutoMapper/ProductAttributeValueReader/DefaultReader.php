@@ -13,13 +13,20 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader;
 
+use Stringable;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
+use UnexpectedValueException;
 
 abstract class DefaultReader implements ReaderInterface
 {
     public function getValue(ProductAttributeValueInterface $productAttribute)
     {
-        return (string) $productAttribute->getValue();
+        $value = $productAttribute->getValue();
+        if (null !== $value && !\is_scalar($value) && !$value instanceof Stringable) {
+            throw new UnexpectedValueException('Expected a scalar attribute value.');
+        }
+
+        return (string) $value;
     }
 
     abstract public static function getReaderCode(): string;

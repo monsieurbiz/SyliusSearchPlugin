@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         colors="true" bootstrap="tests/bootstrap-integration.php">
+    <testsuites>
+        <testsuite name="Installed Sylius application"><directory>tests/Integration</directory></testsuite>
+    </testsuites>
+    <php>
+        <server name="KERNEL_CLASS" value="App\Kernel"/>
+    </php>
+</phpunit>

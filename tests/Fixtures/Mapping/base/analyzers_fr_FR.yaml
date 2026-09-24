@@ -1,0 +1,3 @@
+analyzer:
+    search:
+        filter: [regional_filter]

@@ -59,6 +59,11 @@ final class Configuration implements ConfigurationInterface
             throw new RuntimeException('Unknown target class for: ' . $identifier);
         }
 
-        return $this->targetClasses[$identifier];
+        $class = $this->targetClasses[$identifier];
+        if (!\is_string($class) || !class_exists($class)) {
+            throw new RuntimeException('Invalid target class for: ' . $identifier);
+        }
+
+        return $class;
     }
 }

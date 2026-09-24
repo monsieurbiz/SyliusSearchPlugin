@@ -1,0 +1,31 @@
+monsieurbiz_search_search:
+  path: /search/{query}
+  methods: [GET]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::searchAction
+  requirements:
+    query: .+
+  condition: "not(context.getPathInfo() matches '`^%sylius.security.api_route%`') and context.checkElasticsearch()"
+
+monsieurbiz_search_post:
+  path: /search
+  methods: [POST]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::postAction
+
+monsieurbiz_search_instant:
+  path: /instant
+  methods: [POST]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::instantAction
+
+monsieurbiz_sylius_search_taxon:
+  path: /taxons/{slug}
+  methods: [GET]
+  defaults:
+    _controller: MonsieurBiz\SyliusSearchPlugin\Controller\SearchController::taxonAction
+    _sylius:
+      taxon: "expr:notFoundOnNull(service('sylius.repository.taxon').findOneBySlug($slug, service('sylius.context.locale').getLocaleCode()))"
+  requirements:
+    slug: .+
+  condition: "not(context.getPathInfo() matches '`^%sylius.security.api_route%`') and context.checkElasticsearch()"

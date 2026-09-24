@@ -1,0 +1,33 @@
+{% extends '@SyliusShop/shared/layout/base.html.twig' %}
+{% import '@SyliusShop/shared/pagination/pagination.html.twig' as pagination %}
+
+{% block content %}
+    <div class="container my-4">
+    {% block search_header %}{% include '@MonsieurBizSyliusSearchPlugin/Search/_header.html.twig' %}{% endblock %}
+    {% block search_tabs %}{% include '@MonsieurBizSyliusSearchPlugin/Search/_tabs.html.twig' %}{% endblock %}
+    <div class="row g-4 monsieurbiz-sylius-search-grid">
+        <aside class="col-12 col-lg-3">
+            {% include '@MonsieurBizSyliusSearchPlugin/Search/_sidebar.html.twig' %}
+        </aside>
+        <div class="col-12 col-lg-9">
+            {% if result.count == 0 %}
+                <div class="alert alert-info" role="status">
+                    {{ 'monsieurbiz_searchplugin.search.result.no_result'|trans }}
+                </div>
+            {% else %}
+                <div class="d-flex flex-wrap justify-content-end gap-3 mb-4">
+                    {% include '@MonsieurBizSyliusSearchPlugin/Search/_pagination.html.twig' %}
+                    {% include '@MonsieurBizSyliusSearchPlugin/Search/_sorting.html.twig' %}
+                </div>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-4 mb-4" id="products">
+                    {% for item in result %}
+                        <div class="col">{% include result.documentable.template('item') with {'item': item.model} %}</div>
+                    {% endfor %}
+                </div>
+
+                 {{ pagination.simple(result.paginator) }}
+            {% endif %}
+        </div>
+    </div>
+    </div>
+{% endblock %}

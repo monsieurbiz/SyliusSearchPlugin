@@ -1,0 +1,4 @@
+analyzer:
+    search:
+        tokenizer: standard
+        filter: [lowercase]

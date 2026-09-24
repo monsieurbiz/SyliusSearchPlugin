@@ -19,9 +19,10 @@ use MonsieurBiz\SyliusSearchPlugin\Message\ProductToDeleteFromIds;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Registry\ServiceRegistryInterface;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-class ProductToDeleteFromIdsHandler implements MessageHandlerInterface
+#[AsMessageHandler]
+class ProductToDeleteFromIdsHandler
 {
     private IndexerInterface $indexer;
 

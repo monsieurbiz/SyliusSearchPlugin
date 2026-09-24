@@ -4,6 +4,11 @@
 
 A product attribute value reader is used to transform the value of an attribute into an indexable value for the elasticsearch document.
 
+In Search 3.0, [`NestedProductMapper`](../src/Mapper/NestedProductMapper.php) uses
+[`ProductAttributeValueResolver`](../src/AutoMapper/ProductAttributeValueResolver.php)
+to select these readers. The existing `AutoMapper` namespace and reader tag remain
+valid; no JoliCode AutoMapper dependency or bundle registration is required.
+
 We have defined a reader for the native Sylius types:
 
 - checkbox

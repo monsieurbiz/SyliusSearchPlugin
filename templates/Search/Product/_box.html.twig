@@ -1,0 +1,16 @@
+{% import '@SyliusShop/shared/macro/money.html.twig' as money %}
+{% set productUrl = path('sylius_shop_product_show', {'slug': item.slug, '_locale': sylius.localeCode}) %}
+{% set imagePath = item.images|first ? item.images|first.path|imagine_filter(filter|default('sylius_shop_product_thumbnail')) : asset('bundles/monsieurbizsyliussearchplugin/images/product-placeholder.svg') %}
+
+<article class="card h-100">
+    <a href="{{ productUrl }}"><img src="{{ imagePath }}" alt="{{ item.name }}" class="card-img-top object-fit-contain" width="300" height="300" loading="lazy" /></a>
+    <div class="card-body">
+        <a href="{{ productUrl }}" class="h5 card-title sylius-product-name">{{ item.name }}</a>
+        {% block product_description %}{% endblock %}
+        {% set pricing = item.prices|filter(price => price.channelCode == sylius.channel.code)|first %}
+        {% if pricing and pricing.price is not null %}
+            <div class="sylius-product-price mt-2">{{ money.convertAndFormat(pricing.price) }}</div>
+        {% endif %}
+        <a href="{{ productUrl }}" class="btn btn-outline-primary mt-3">{{ 'sylius.ui.view_more'|trans }}</a>
+    </div>
+</article>

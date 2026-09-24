@@ -18,7 +18,7 @@ By clicking on the tab you will switch to the results of the selected type of do
 
 ### Add your new entity as a type of document
 
-[Declare your entity as a type of document for search](../dist/src/Resources/config/search/taxons.yaml).
+[Declare your entity as a type of document for search](../dist/config/search/search/taxons.yaml).
 
 - Use `instant_search_enabled` config to define if your entity should be displayed in the instant search.
 - Use `position` config to change the order of the entity compared to each others.
@@ -30,11 +30,13 @@ By clicking on the tab you will switch to the results of the selected type of do
 In the node `automapper_classes`, you have to define the source and the target classes of the data.
 For our example, the source is the Sylius' taxon model, and the target in a custom DTO.
 We will create the custom DTO later in the documentation.
+The key and `AutoMapper\ConfigurationInterface` / `Configuration` names are retained
+for backwards compatibility; they do not require JoliCode AutoMapper.
 
 ### Declare the elastic search mapping
 
 - [Add your elasticsearch config path in `monsieurbiz_sylius_search.elastically_configuration_paths`](../dist/config/packages/monsieurbiz_sylius_search_plugin.yaml#L9)
-- [Declare the mapping of your entity for Elasticsearch](../dist/src/Resources/config/elasticsearch/app_taxon_mapping.yaml).
+- [Declare the mapping of your entity for Elasticsearch](../dist/config/search/elasticsearch/app_taxon_mapping.yaml).
 
 ### Create the Datasource class if you defined a custom one
 
@@ -52,15 +54,26 @@ This is the class used in `targets` of your `automapper_classes` configuration.
 In our example, we use an Eater class which will allow us the `get` and `set` any value we want.
 You can use a custom DTO with custom methods if you want.   
 
-### Define a MapperConfiguration (optional)
+### Register an explicit document mapping
 
-We have to define how to populate the data from the model to the DTO object because we use a dynamic DTO which used Eater class.
-You can use another automapper if you want and avoid this part.
+[Create the TaxonMapper](../dist/src/Search/Mapper/TaxonMapper.php), implementing
+the plugin's [`DocumentMappingInterface`](../src/Mapper/DocumentMappingInterface.php):
+`supports(object $source, string $targetClass): bool` and
+`map(object $source, string $targetClass): object`.
 
-[Create the TaxonMapperConfiguration](../dist/src/Search/Automapper/TaxonMapperConfiguration.php).
+The example matches the configured `taxon` source and `app_taxon` target. It
+creates that target class, writes each field explicitly through PropertyAccessor,
+and recursively maps `parent_taxon` after propagating the current locale.
+[Register it with the `monsieurbiz.search.document_mapping` tag](../dist/config/search/services.yaml).
+The public `DocumentMapperInterface` service selects the first tagged strategy
+whose `supports()` returns true; it throws if none supports the source/target.
+Keep custom strategies' support checks specific to their configured classes.
 
-Be careful, the `public function getSource(): string` method must return the value of one of the `sources` defined in the `automapper_classes` configuration.  
-Also, the `public function getTarget(): string` method must return the value of one of the `targets` defined in the `automapper_classes` configuration.
+**Search 3.0 breaking change:** even ordinary DTOs no longer receive additional
+matching-name fields automatically. Map every custom field explicitly; use a
+[decorator](add_custom_values.md) to extend the product mapping. No Jane/JoliCode
+mapper listener or transformer interface is needed. Clear the application cache
+and repopulate after changing mappings.
 
 ## Display your new entity in the search results
 
@@ -68,23 +81,23 @@ Also, the `public function getTarget(): string` method must return the value of 
 
 If you want to display your entity in the instant search (`instant_search_enabled` is `true` in configuration).
 
-[Declare your instant search request service](../dist/src/Resources/config/services.yaml#38).
+[Declare your instant search request service](../dist/config/search/services.yaml).
 
-[Don't forget to bind the parameter for the service](../dist/src/Resources/config/services.yaml#L6).
+[Don't forget to bind the parameter for the service](../dist/config/search/services.yaml).
 
 ### Define your Search request
 
-[Declare your search request service](../dist/src/Resources/config/services.yaml#45).
+[Declare your search request service](../dist/config/search/services.yaml).
 
-[Don't forget to bind the parameter for the service](../dist/src/Resources/config/services.yaml#L6).
+[Don't forget to bind the parameter for the service](../dist/config/search/services.yaml).
 
 You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\Search` class to manage your aggregations like in [products](../src/Search/Request/ProductRequest/Search.php).
 
 ### Define your Search query filter
 
-[Declare your search query filter for instant search](../dist/src/Resources/config/services.yaml#55).
+[Declare your search query filter for instant search](../dist/config/search/services.yaml).
 
-[Declare your search query filter for search](../dist/src/Resources/config/services.yaml#65).
+[Declare your search query filter for search](../dist/config/search/services.yaml).
 
 You can extends the `MonsieurBiz\SyliusSearchPlugin\Search\Request\QueryFilter\SearchTermFilter` class to manage your custom behaviour like in [products](../src/Search/Request/QueryFilter/Product/SearchTermFilter.php).
 

@@ -1,0 +1,4 @@
+mappings:
+    properties:
+        alternate:
+            type: keyword

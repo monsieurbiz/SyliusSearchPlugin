@@ -8,7 +8,7 @@ Example, for the products index:
 
 ```diff
 imports:
-  - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
+  - { resource: "@MonsieurBizSyliusSearchPlugin/config/config.yaml" }
 
 +monsieurbiz_sylius_search:
 +  documents:

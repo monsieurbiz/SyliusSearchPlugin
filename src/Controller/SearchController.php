@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\Controller;
 
+use LogicException;
 use MonsieurBiz\SyliusSearchPlugin\Exception\UnknownRequestTypeException;
 use MonsieurBiz\SyliusSearchPlugin\Model\Documentable\DocumentableInterface;
 use MonsieurBiz\SyliusSearchPlugin\Search\Request\RequestConfiguration;
@@ -22,6 +23,7 @@ use MonsieurBiz\SyliusSettingsPlugin\Settings\SettingsInterface;
 use Sylius\Bundle\ResourceBundle\Controller\Parameters;
 use Sylius\Bundle\ResourceBundle\Controller\ParametersParserInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Currency\Context\CurrencyContextInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Registry\NonExistingServiceException;
@@ -30,6 +32,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Intl\Currencies;
 
@@ -89,7 +92,7 @@ class SearchController extends AbstractController
             'query' => urldecode($query),
             'query_url' => $query,
             'result' => $result,
-            'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
+            'currencySymbol' => $this->getFilterCurrencyLabel(),
         ]);
     }
 
@@ -100,6 +103,9 @@ class SearchController extends AbstractController
     {
         $query = (array) ($request->request->all()['monsieurbiz_searchplugin_search'] ?? []);
         $query = $query['query'] ?? '';
+        if (!\is_string($query)) {
+            throw new BadRequestHttpException('The search query must be a string.');
+        }
 
         // With Apache a URL with a encoded slash (%2F) is provoking a 404 error on the server level
         return $this->redirect(
@@ -156,16 +162,31 @@ class SearchController extends AbstractController
         $result = $this->search->search($requestConfiguration);
 
         return $this->render('@MonsieurBizSyliusSearchPlugin/Taxon/result.html.twig', [
+            'taxon' => $requestConfiguration->getTaxon(),
             'requestConfiguration' => $requestConfiguration,
             'result' => $result,
-            'currencySymbol' => Currencies::getSymbol($this->currencyContext->getCurrencyCode(), $this->localeContext->getLocaleCode()),
+            'currencySymbol' => $this->getFilterCurrencyLabel(),
         ]);
+    }
+
+    private function getFilterCurrencyLabel(): string
+    {
+        $channel = $this->channelContext->getChannel();
+        if (!$channel instanceof ChannelInterface || null === ($currency = $channel->getBaseCurrency()) || null === ($code = $currency->getCode())) {
+            throw new LogicException('A channel base currency is required for indexed price filters.');
+        }
+
+        // Indexed amounts and bookmarked filter parameters are in the channel base currency.
+        return $code . ' (' . Currencies::getSymbol($code, $this->localeContext->getLocaleCode()) . ')';
     }
 
     protected function getDocumentable(?string $documentType): DocumentableInterface
     {
         if (null === $documentType) {
             $documentables = $this->getSearchEnabledDocumentables();
+            if ([] === $documentables) {
+                throw new NotFoundHttpException('Search is disabled.');
+            }
 
             return reset($documentables);
         }

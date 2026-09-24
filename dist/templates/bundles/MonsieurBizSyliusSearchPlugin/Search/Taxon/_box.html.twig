@@ -1,7 +1,5 @@
-{% import "@SyliusShop/Common/Macro/money.html.twig" as money %}
-
-<div class="ui fluid card">
-    <div class="content">
-        <a href="{{ path('monsieurbiz_sylius_search_taxon', {'slug': item.slug, '_locale': sylius.localeCode}) }}" class="header sylius-product-name">{{ item.name }}</a>
+<div class="card h-100">
+    <div class="card-body">
+        <a href="{{ path('monsieurbiz_sylius_search_taxon', {'slug': item.slug, '_locale': sylius.localeCode}) }}" class="h5 sylius-product-name">{{ item.name }}</a>
     </div>
 </div>

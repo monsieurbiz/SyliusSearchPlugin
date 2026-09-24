@@ -18,7 +18,12 @@
   },
   "homepage": "https://github.com/monsieurbiz/SyliusSearchPlugin#readme",
   "devDependencies": {
-    "@symfony/webpack-encore": "^0.28.1"
+    "@babel/core": "^7.17.0",
+    "@babel/preset-env": "^7.16.0",
+    "file-loader": "^6.0.0",
+    "@symfony/webpack-encore": "^5.0.1",
+    "webpack": "^5.99",
+    "webpack-cli": "^6.0"
   },
   "dependencies": {
   }

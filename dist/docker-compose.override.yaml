@@ -8,18 +8,26 @@ services:
             - esdata:/usr/share/elasticsearch/data:rw
         environment:
             - node.name=elasticsearch
-            - cluster.initial_master_nodes=elasticsearch
+            - discovery.type=single-node
             - cluster.name=docker-cluster
             - bootstrap.memory_lock=true
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - "xpack.security.enabled=false"
+            # Keep a bounded reserve on small Docker Desktop disks; test indexes are tiny.
+            - cluster.routing.allocation.disk.watermark.low=1gb
+            - cluster.routing.allocation.disk.watermark.high=512mb
+            - cluster.routing.allocation.disk.watermark.flood_stage=256mb
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
         ports:
-            - "9200:9200"
-            - "9300:9300"
+            - "127.0.0.1::9200"
+        healthcheck:
+            test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health >/dev/null"]
+            interval: 5s
+            timeout: 5s
+            retries: 30
 
 volumes:
     esdata: {}

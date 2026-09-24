@@ -19,7 +19,6 @@ use JoliCode\Elastically\Mapping\MappingProviderInterface;
 use MonsieurBiz\SyliusSearchPlugin\Event\MappingProviderEvent;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
 class YamlWithLocaleProvider implements MappingProviderInterface
@@ -76,19 +75,17 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
     private function appendMapping(string $configurationDirectory, array $mapping, string $indexName, array $context): array
     {
-        try {
-            $indexName = $context['index_code'] ?? $indexName;
-            $fileName = $context['filename'] ?? ($indexName . '_mapping.yaml');
-            $mappingFilePath = $configurationDirectory . \DIRECTORY_SEPARATOR . $fileName;
-
-            /** @var array $parsedMapping */
-            $parsedMapping = $this->parser->parseFile($mappingFilePath) ?? [];
-            $mapping = array_merge_recursive($mapping, $parsedMapping);
-        } catch (ParseException $exception) {
-            // the mapping yaml file does not exist.
+        $indexName = $context['index_code'] ?? $indexName;
+        $fileName = $context['filename'] ?? ($indexName . '_mapping.yaml');
+        $mappingFilePath = $configurationDirectory . \DIRECTORY_SEPARATOR . $fileName;
+        if (!file_exists($mappingFilePath)) {
+            return $mapping;
         }
 
-        return $mapping;
+        /** @var array $parsedMapping */
+        $parsedMapping = $this->parser->parseFile($mappingFilePath) ?? [];
+
+        return $this->mergeConfiguration($mapping, $parsedMapping);
     }
 
     private function appendLocaleAnalyzers(string $configurationDirectory, array $mapping, ?string $locale): array
@@ -108,15 +105,41 @@ class YamlWithLocaleProvider implements MappingProviderInterface
 
     private function appendAnalyzers(string $analyzerFilePath, array $mapping): array
     {
-        try {
-            /** @var array $analyzer */
-            $analyzer = $this->parser->parseFile($analyzerFilePath) ?? [];
-            $mapping['settings']['analysis'] = array_merge_recursive($mapping['settings']['analysis'] ?? [], $analyzer);
-        } catch (ParseException $exception) {
-            // the yaml file does not exist or does not exist.
+        if (!file_exists($analyzerFilePath)) {
+            return $mapping;
         }
+        /** @var array $analyzer */
+        $analyzer = $this->parser->parseFile($analyzerFilePath) ?? [];
+        $mapping['settings']['analysis'] = $this->mergeConfiguration($mapping['settings']['analysis'] ?? [], $analyzer);
 
         return $mapping;
+    }
+
+    /** Append ordered analyzer lists, but let later scalar settings override earlier ones. */
+    private function mergeConfiguration(array $base, array $additional): array
+    {
+        foreach ($additional as $key => $value) {
+            if (\is_int($key)) {
+                $base[] = $value;
+
+                continue;
+            }
+
+            if ($this->canMergeRecursively($base, $key, $value)) {
+                $base[$key] = $this->mergeConfiguration($base[$key], $value);
+
+                continue;
+            }
+
+            $base[$key] = $value;
+        }
+
+        return $base;
+    }
+
+    private function canMergeRecursively(array $base, int|string $key, mixed $value): bool
+    {
+        return isset($base[$key]) && \is_array($base[$key]) && \is_array($value);
     }
 
     private function getLocaleCode(string $locale): array

@@ -1,0 +1,8 @@
+mappings:
+    properties:
+        name:
+            type: keyword
+        custom:
+            type: text
+settings:
+    number_of_shards: 2

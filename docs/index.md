@@ -2,6 +2,10 @@
 
 ## Menu
 
+- [Installation and compatibility](../README.md)
+- [Sylius 2 migration / upcoming Search 3.0](../UPGRADE-SYLIUS-2.md)
+- [Development and unpublished recipe testing](../DEVELOPMENT.md)
+- [Verification status and known limitations](../TESTING.md)
 - [Disable the ElasticsearchChecker](./disable_elasticsearch_checker.md)
 - [Add custom sorts](./add_custom_sorts.md)
 - [Add custom values for an entity](./add_custom_values.md)

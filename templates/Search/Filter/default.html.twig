@@ -1,0 +1,30 @@
+{% set inputName = filter.code %}
+{% if filter.type is not empty %}
+    {% set inputName = filter.type ~ '[' ~ inputName ~ ']' %}
+{% endif %}
+
+{% if filter.values|length %}
+    <div class="mb-3">
+        <div class="filter-item" id="{{ 'filter-' ~ filter.code }}" >
+            <h3 class="h6">{{ filter.label | trans }}</h3>
+            <div class="filter-values" style="width: 100%">
+                {% for value in filter.values %}
+                    <div class="filter-value" style="margin-top: 10px;">
+                        <div class="form-check">
+                            <input
+                                    type="checkbox"
+                                    id="{{ 'filter-' ~ filter.code ~ '-value-' ~ value.slug }}"
+                                    name="{{ inputName }}[]"
+                                    value="{{ value.slug }}"
+                                     class="form-check-input"
+                                    {% if value.isApplied %}
+                                        checked="checked"
+                                    {% endif %}
+                            >
+                            <label class="form-check-label" for="{{ 'filter-' ~ filter.code ~ '-value-' ~ value.slug }}">{{ value.label }} <span class="count">({{ value.count }})</span></label></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}

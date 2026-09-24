@@ -1,0 +1,3 @@
+analyzer:
+    search:
+        filter: [french_stemmer]

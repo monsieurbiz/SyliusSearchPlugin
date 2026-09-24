@@ -1,5 +1,10 @@
 imports:
-  - { resource: "@MonsieurBizSyliusSearchPlugin/Resources/config/config.yaml" }
+  - { resource: "@MonsieurBizSyliusSearchPlugin/config/config.yaml" }
+
+parameters:
+  env(ELASTICSEARCH_URL): 'http://127.0.0.1:9200'
+  env(MONSIEURBIZ_SEARCHPLUGIN_MESSENGER_TRANSPORT_DSN): 'doctrine://default'
+  monsieurbiz_search_elasticsearch_url: '%env(ELASTICSEARCH_URL)%'
 
 monsieurbiz_sylius_search:
   documents:
@@ -7,4 +12,4 @@ monsieurbiz_sylius_search:
       prefix: 'myprefix' # define a custom index prefix
 
   elastically_configuration_paths:
-    - '%kernel.project_dir%/src/Resources/config/elasticsearch'
+    - '%kernel.project_dir%/config/search/elasticsearch'

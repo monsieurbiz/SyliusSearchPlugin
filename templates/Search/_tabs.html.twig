@@ -1,0 +1,20 @@
+{% if documentableRegistries|length > 1%}
+    <nav class="nav nav-tabs mb-4" aria-label="{{ 'sylius.ui.search'|trans }}">
+        {% set searchQuery = app.request.attributes.get('_route_params').query|default('') %}
+        {% set firstDocumentable = documentableRegistries|first %}
+        {% for documentableRegistry in documentableRegistries %}
+            {% if documentableRegistry.indexCode == firstDocumentable.indexCode %}
+                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: searchQuery})) %}
+            {% else %}
+                {% set path = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({query: searchQuery})|merge({document_type: documentableRegistry.indexCode})) %}
+            {% endif %}
+            {% set isActive = documentableRegistry.indexCode == documentable.indexCode %}
+            <a
+                href="{{ path }}"
+                class="nav-link {% if isActive %}active{% endif%}" {% if isActive %}aria-current="page"{% endif %}
+            >
+                {{ ('monsieurbiz_searchplugin.search.result.' ~ documentableRegistry.indexCode)|trans }}
+            </a>
+        {% endfor %}
+    </nav>
+{% endif %}

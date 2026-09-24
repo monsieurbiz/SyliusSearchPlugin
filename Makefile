@@ -1,22 +1,29 @@
 .DEFAULT_GOAL := help
 SHELL=/bin/bash
 APP_DIR=tests/Application
-SYLIUS_VERSION=1.14.0
+export SYLIUS_VERSION?=2.2.9
+SYLIUS_STANDARD_VERSION?=~2.2.0
+export SYMFONY_VERSION?=~7.4.0
 SYMFONY=cd ${APP_DIR} && symfony
 COMPOSER=symfony composer
 CONSOLE=${SYMFONY} console
 export COMPOSE_PROJECT_NAME=search
-export MIGRATIONS_NAMESPACE=MonsieurBiz\\SyliusSearchPlugin\\Migrations
+export COMPOSE_FILE=$(abspath ${APP_DIR}/docker-compose.yaml):$(abspath ${APP_DIR}/docker-compose.override.yaml)
+export MIGRATIONS_NAMESPACE=DoctrineMigrations
 export USER_UID=$(shell id -u)
 PLUGIN_NAME=sylius-${COMPOSE_PROJECT_NAME}-plugin
-COMPOSE=docker compose
+COMPOSE=docker compose --project-name search -f docker-compose.yaml -f docker-compose.override.yaml
 YARN=yarn
 
 ###
 ### DEVELOPMENT
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
-install: application platform sylius es.reindex ## Install the plugin
+install: ## Install the plugin in the disposable test application
+	${MAKE} application
+	${MAKE} platform
+	${MAKE} sylius
+	${MAKE} es.reindex
 .PHONY: install
 
 up: docker.up server.start ## Up the project (start docker, start symfony server)
@@ -30,7 +37,9 @@ reset: ## Stop docker and remove dependencies
 	rm -rf vendor composer.lock
 .PHONY: reset
 
-dependencies: composer.lock node_modules ## Setup the dependencies
+dependencies: ## Setup the dependencies
+	${COMPOSER} update --with sylius/sylius="${SYLIUS_VERSION}" --no-interaction --no-scripts --no-plugins --prefer-dist
+	${MAKE} yarn.install
 .PHONY: dependencies
 
 .php-version: .php-version.dist
@@ -44,43 +53,46 @@ php.ini: php.ini.dist
 composer.lock: composer.json
 	${COMPOSER} install --no-scripts --no-plugins
 
-yarn.install: ${APP_DIR}/yarn.lock
+yarn.install: ## Build independent application and plugin assets
+	${YARN} --cwd ${APP_DIR} install --non-interactive
+	${YARN} --cwd ${APP_DIR} build:prod
+	${MAKE} plugin.assets
+.PHONY: yarn.install
 
-${APP_DIR}/yarn.lock:
-	ln -sf ${APP_DIR}/node_modules node_modules
-	cd ${APP_DIR} && ${YARN} install && ${YARN} build
-	${YARN} install
-	${YARN} encore prod
-
-node_modules: ${APP_DIR}/node_modules ## Install the Node dependencies using yarn
-
-${APP_DIR}/node_modules: yarn.install
+plugin.assets: ## Build distributable plugin assets
+	${YARN} install --non-interactive
+	${YARN} build
+.PHONY: plugin.assets
 
 ###
 ### TEST APPLICATION
 ### ¯¯¯¯¯
 
-application: .php-version php.ini ${APP_DIR} setup_application ${APP_DIR}/docker-compose.yaml
+application: .php-version php.ini ${APP_DIR}
+	${MAKE} setup_application
+.PHONY: application
 
 ${APP_DIR}:
-	(${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="~${SYLIUS_VERSION}" ${APP_DIR})
+	${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_STANDARD_VERSION}" ${APP_DIR}
 
 setup_application:
-	rm -f ${APP_DIR}/yarn.lock
-	(cd ${APP_DIR} && ${COMPOSER} config repositories.plugin '{"type": "path", "url": "../../"}')
+	(cd ${APP_DIR} && ${COMPOSER} config repositories.plugin '{"type": "path", "url": "../../", "options": {"versions": {"monsieurbiz/sylius-search-plugin": "dev-upgrade-2.x"}}}')
 	(cd ${APP_DIR} && ${COMPOSER} config extra.symfony.allow-contrib true)
-	(cd ${APP_DIR} && ${COMPOSER} config minimum-stability dev)
-	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins allow-plugins true)
-	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins --json extra.symfony.endpoint '["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]')
-	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}") # Make sure to install the required version of sylius because the sylius-standard has a soft constraint
+	(cd ${APP_DIR} && ${COMPOSER} config extra.symfony.docker false)
+	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins allow-plugins.rector/extension-installer false)
+	(cd ${APP_DIR} && ${COMPOSER} config extra.symfony.require "${SYMFONY_VERSION}")
+	(cd ${APP_DIR} && ${COMPOSER} require --no-update --no-plugins --no-scripts sylius/sylius="${SYLIUS_VERSION}")
+	(cd ${APP_DIR} && ${COMPOSER} config --no-plugins --json extra.symfony.endpoint '["https://api.github.com/repos/Sylius/SyliusRecipes/contents/index.json?ref=flex/main","https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]')
 	$(MAKE) ${APP_DIR}/.php-version
 	$(MAKE) ${APP_DIR}/php.ini
-	(cd ${APP_DIR} && ${COMPOSER} install --no-interaction)
+	@if ! php -r '$$config = json_decode(file_get_contents("${APP_DIR}/composer.json"), true, 512, JSON_THROW_ON_ERROR); exit(isset($$config["require"]["monsieurbiz/${PLUGIN_NAME}"]) ? 0 : 1);'; then \
+		(cd ${APP_DIR} && ${COMPOSER} install --no-scripts --no-interaction); \
+	fi
+	# Bootstrap the path plugin from dist, never from the published Sylius 1 recipe.
+	(cd ${APP_DIR} && ${COMPOSER} require --no-plugins --no-scripts --no-interaction --with-all-dependencies --minimal-changes sylius/sylius="${SYLIUS_VERSION}" monsieurbiz/${PLUGIN_NAME}="dev-upgrade-2.x")
 	$(MAKE) apply_dist
-	(cd ${APP_DIR} && ${COMPOSER} require --no-install --no-scripts --no-progress nikic/php-parser="^4.0") # Required by jane-php/automapper
-	(cd ${APP_DIR} && ${COMPOSER} require --no-progress --no-interaction monsieurbiz/${PLUGIN_NAME}="*@dev")
-	git restore dist/docker-compose.override.yaml # Restore dist file to prevent modification by flex recipes (symfony/mailer)
-	rm -rf ${APP_DIR}/var/cache
+	${CONSOLE} cache:clear
+.PHONY: setup_application
 
 
 ${APP_DIR}/docker-compose.yaml:
@@ -98,24 +110,26 @@ ${APP_DIR}/php.ini: php.ini
 	(cd ${APP_DIR} && ln -sf ../../php.ini)
 
 apply_dist:
-	ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST)))); \
-	for i in `cd dist && find . -type f`; do \
-		FILE_PATH=`echo $$i | sed 's|./||'`; \
-		FOLDER_PATH=`dirname $$FILE_PATH`; \
-		echo $$FILE_PATH; \
-		(cd ${APP_DIR} && rm -f $$FILE_PATH); \
-		(cd ${APP_DIR} && mkdir -p $$FOLDER_PATH); \
-		(cd ${APP_DIR} && ln -s $$ROOT_DIR/dist/$$FILE_PATH $$FILE_PATH); \
-    done
-## Specific because symlink is not used correctly in Github Actions
-	rm ${APP_DIR}/docker/elasticsearch/Dockerfile
-	cp dist/docker/elasticsearch/Dockerfile ${APP_DIR}/docker/elasticsearch/
+	php tests/setup-application.php
+.PHONY: apply_dist
 
 ###
 ### TESTS
 ### ¯¯¯¯¯
 
-test.all: test.composer test.phpstan test.phpmd test.phpunit test.phpspec test.phpcs test.yaml test.schema test.twig test.container ## Run all tests in once
+test.all: test.composer test.phpstan test.phpmd test.phpunit test.javascript test.phpspec test.phpcs test.yaml test.schema test.twig test.container ## Run all tests in once
+
+test.javascript: ## Test instant search without external services
+	node --test tests/javascript/*.test.cjs
+.PHONY: test.javascript
+
+test.integration: ## Exercise the installed application, its routes, forms and index
+	${SYMFONY} php vendor/bin/phpunit -c ../../phpunit.integration.xml.dist
+.PHONY: test.integration
+
+recipe.endpoint: ## Prepare an unpublished endpoint from the sibling recipes checkout
+	php tests/recipe-endpoint.php
+.PHONY: recipe.endpoint
 
 test.composer: ## Validate composer.json
 	${COMPOSER} validate --strict
@@ -141,23 +155,37 @@ test.phpcs.fix: ## Run PHP CS Fixer and fix issues if possible
 test.container: ## Lint the symfony container
 	${CONSOLE} lint:container
 
+sylius.cache.clear: ## Rebuild the test application's cache and generated mappers
+	${CONSOLE} cache:clear
+.PHONY: sylius.cache.clear
+
 test.yaml: ## Lint the symfony Yaml files
-	${CONSOLE} lint:yaml ../../src/Resources/config --parse-tags
+	${CONSOLE} lint:yaml ../../config --parse-tags
 
 test.schema: ## Validate MySQL Schema
+	${CONSOLE} app:search:validate-mappings
+	${CONSOLE} doctrine:schema:validate --skip-mapping
+
+test.schema.upstream: ## Run Doctrine's unfiltered validator (includes known Sylius superclass diagnostic)
 	${CONSOLE} doctrine:schema:validate
 
 test.twig: ## Validate Twig templates
-	${CONSOLE} lint:twig --no-debug templates/ ../../src/Resources/views/
+	${CONSOLE} lint:twig --no-debug templates/ ../../templates/
 
 ###
 ### SYLIUS
 ### ¯¯¯¯¯¯
 
-sylius: dependencies sylius.database sylius.fixtures sylius.assets messenger.setup ## Install Sylius
+sylius: ## Install Sylius
+	${MAKE} dependencies
+	${MAKE} sylius.database
+	${MAKE} messenger.setup
+	${MAKE} sylius.fixtures
+	${MAKE} sylius.assets
 .PHONY: sylius
 
 sylius.database: ## Setup the database
+	@test "$(REBUILD_DATABASE)" = "1" || (printf 'Set REBUILD_DATABASE=1 only for the disposable search test database.\n'; exit 1)
 	${CONSOLE} doctrine:database:drop --if-exists --force
 	${CONSOLE} doctrine:database:create --if-not-exists
 	${CONSOLE} doctrine:migration:migrate -n
@@ -167,8 +195,6 @@ sylius.fixtures: ## Run the fixtures
 
 sylius.assets: ## Install all assets with symlinks
 	${CONSOLE} assets:install --symlink
-	${CONSOLE} sylius:install:assets
-	${CONSOLE} sylius:theme:assets:install --symlink
 
 messenger.setup: ## Setup Messenger transports
 	${CONSOLE} messenger:setup-transports
@@ -184,7 +210,7 @@ docker.pull: ## Pull the docker images
 	cd ${APP_DIR} && ${COMPOSE} pull
 
 docker.up: ## Start the docker containers
-	cd ${APP_DIR} && ${COMPOSE} up -d
+	cd ${APP_DIR} && ${COMPOSE} up -d --wait --wait-timeout 180
 .PHONY: docker.up
 
 docker.stop: ## Stop the docker containers

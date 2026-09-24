@@ -1,0 +1,9 @@
+{% extends '@MonsieurBizSyliusSearchPlugin/Search/result.html.twig' %}
+
+{% block search_header %}
+    {% include '@SyliusShop/product/index/content/breadcrumbs.html.twig' with { taxon } %}
+    <h1 class="mb-4">{{ taxon.name }}</h1>
+    {% if taxon.description %}<p>{{ taxon.description }}</p>{% endif %}
+{% endblock %}
+
+{% block search_tabs %}{% endblock %}

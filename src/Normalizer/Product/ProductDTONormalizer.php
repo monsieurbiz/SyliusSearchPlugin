@@ -15,60 +15,32 @@ namespace MonsieurBiz\SyliusSearchPlugin\Normalizer\Product;
 
 use MonsieurBiz\SyliusSearchPlugin\AutoMapper\Configuration;
 use MonsieurBiz\SyliusSearchPlugin\Model\Product\ProductDTO;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-/** @TODO remove ObjectNormalizer extends before Symfony 7.0 */
-/** @phpstan-ignore-next-line */
-final class ProductDTONormalizer extends ObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+final class ProductDTONormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
-    use NormalizerAwareTrait;
 
     private Configuration $automapperConfiguration;
 
     public function __construct(
         Configuration $automapperConfiguration,
-        ClassMetadataFactoryInterface $classMetadataFactory = null,
-        NameConverterInterface $nameConverter = null,
-        PropertyAccessorInterface $propertyAccessor = null,
-        PropertyTypeExtractorInterface $propertyTypeExtractor = null,
-        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
-        callable $objectClassResolver = null,
-        array $defaultContext = []
+        private ObjectNormalizer $objectNormalizer
     ) {
-        parent::__construct(
-            $classMetadataFactory,
-            $nameConverter,
-            $propertyAccessor,
-            $propertyTypeExtractor,
-            $classDiscriminatorResolver,
-            $objectClassResolver,
-            $defaultContext
-        );
         $this->automapperConfiguration = $automapperConfiguration;
     }
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
-     *
-     * @param mixed $data
      */
-    public function denormalize($data, string $type, string $format = null, array $context = []): ProductDTO
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): ProductDTO
     {
         /** @var ProductDTO $object */
-        $object = parent::denormalize($data, $type, $format, $context);
+        $object = $this->objectNormalizer->denormalize($data, $type, $format, $context);
 
         if (\is_array($data) && \array_key_exists('main_taxon', $data) && null !== $data['main_taxon']) {
             $taxonDTOClass = $this->automapperConfiguration->getTargetClass('taxon');
@@ -131,21 +103,17 @@ final class ProductDTONormalizer extends ObjectNormalizer implements Denormalize
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param mixed $data
      */
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $this->automapperConfiguration->getTargetClass('product') === $type;
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param mixed $data
      */
-    public function supportsNormalization($data, string $format = null): bool
+    public function getSupportedTypes(?string $format): array
     {
-        return false;
+        return [$this->automapperConfiguration->getTargetClass('product') => true];
     }
 }

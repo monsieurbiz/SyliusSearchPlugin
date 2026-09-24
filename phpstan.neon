@@ -1,7 +1,7 @@
 parameters:
     level: max
     paths:
-        - %rootDir%/src/
+        - src/
 
     excludePaths:
         # Makes PHPStan crash

@@ -2,7 +2,7 @@ const Encore = require('@symfony/webpack-encore');
 
 Encore
     // directory where compiled assets will be stored
-    .setOutputPath('src/Resources/public')
+    .setOutputPath('public')
     // public path used by the web server to access the output path
     .setPublicPath('/bundles/monsieurbizsyliussearchplugin/')
     // change the key in the manifest.json
@@ -10,6 +10,7 @@ Encore
 
     // entries
     .addEntry('monsieurbiz-search', './assets/js/app.js')
+    .copyFiles({ from: './assets/images', to: 'images/[path][name].[ext]' })
 
     // configuration
     .disableSingleRuntimeChunk()

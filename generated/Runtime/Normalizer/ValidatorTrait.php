@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Validation;
 trait ValidatorTrait
 {
-    protected function validate(array $data, Constraint $constraint) : void
+    protected function validate(array $data, Constraint $constraint): void
     {
         $validator = Validation::createValidator();
         $violations = $validator->validate($data, $constraint);

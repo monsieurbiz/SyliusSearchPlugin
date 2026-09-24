@@ -1,0 +1,23 @@
+sylius_twig_hooks:
+  hooks:
+    'sylius_shop.base#javascripts':
+      monsieurbiz_search:
+        template: '@MonsieurBizSyliusSearchPlugin/_scripts.html.twig'
+        priority: -100
+    'sylius_shop.base.header.content':
+      monsieurbiz_search:
+        template: '@MonsieurBizSyliusSearchPlugin/Header/form.html.twig'
+        priority: 250
+    'sylius_admin.product_attribute.create.content.form.general': &search_fields
+      searchable:
+        template: '@MonsieurBizSyliusSearchPlugin/Admin/Form/searchable.html.twig'
+        priority: -100
+      filterable:
+        template: '@MonsieurBizSyliusSearchPlugin/Admin/Form/filterable.html.twig'
+        priority: -200
+      search_weight:
+        template: '@MonsieurBizSyliusSearchPlugin/Admin/Form/search_weight.html.twig'
+        priority: -300
+    'sylius_admin.product_attribute.update.content.form.general': *search_fields
+    'sylius_admin.product_option.create.content.form.sections.general': *search_fields
+    'sylius_admin.product_option.update.content.form.sections.general': *search_fields

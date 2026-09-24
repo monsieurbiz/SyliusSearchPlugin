@@ -13,13 +13,15 @@ declare(strict_types=1);
 
 namespace MonsieurBiz\SyliusSearchPlugin\AutoMapper\ProductAttributeValueReader;
 
-use DateTime;
+use DateTimeInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
+use UnexpectedValueException;
 
 class DateTimeReader implements ReaderInterface
 {
     protected string $defaultFormat = 'Y-m-d H:i:s';
 
+    /** @SuppressWarnings(PHPMD.CyclomaticComplexity) Validate the widened Sylius 2 mixed value contract. */
     public function getValue(ProductAttributeValueInterface $productAttribute)
     {
         if (null === $productAttribute->getAttribute()) {
@@ -27,8 +29,12 @@ class DateTimeReader implements ReaderInterface
         }
 
         $productAttributeValue = $productAttribute->getValue();
-        if ($productAttributeValue instanceof DateTime) {
+        if ($productAttributeValue instanceof DateTimeInterface) {
             $productAttributeValue = $productAttributeValue->format($this->defaultFormat);
+        }
+
+        if (!\is_string($productAttributeValue) && !\is_array($productAttributeValue)) {
+            throw new UnexpectedValueException('Expected a date attribute value.');
         }
 
         return $productAttributeValue;

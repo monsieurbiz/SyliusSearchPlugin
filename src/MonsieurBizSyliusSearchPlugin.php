@@ -25,6 +25,11 @@ final class MonsieurBizSyliusSearchPlugin extends Bundle
 {
     use SyliusPluginTrait;
 
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
+    }
+
     public function getContainerExtension(): ?ExtensionInterface
     {
         if (null === $this->containerExtension) {

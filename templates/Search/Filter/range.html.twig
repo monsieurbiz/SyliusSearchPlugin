@@ -1,0 +1,20 @@
+<div class="mb-3">
+    <div class="filter-item" id="{{ 'filter-' ~ filter.code }}">
+        <h3 class="h6">{{ filter.label | trans }}</h3>
+        <div class="filter-values" style="width: 100%">
+
+            {% for value in filter.values %}
+                {% set valueType = filter.valueType(value.label) %}
+                {% set inputValue = value.isApplied ? value.value : '' %}
+                {% set placeholderValue = value.isApplied ? filter.defaultValue(valueType) : value.value %}
+                <div class="filter-value" style="margin-top: 10px;">
+                    <label for="{{ 'filter-' ~ filter.code ~ '-' ~ valueType}}" style="margin-bottom: 5px;display: block;">{{ value.label | trans }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text">{{ currencySymbol }}</span>
+                        <input type="number" class="form-control" step="0.01" id="{{ 'filter-' ~ filter.code ~ '-' ~ valueType}}" name="{{ filter.code ~ '[' ~ valueType ~ ']'}}" value="{{ inputValue }}" placeholder="{{ placeholderValue }}">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
